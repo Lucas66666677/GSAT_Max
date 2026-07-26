@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -239,6 +240,28 @@ void main() {
     controller.dispose();
   });
 
+  test('offline review sync queue survives controller reconstruction',
+      () async {
+    final auth = _StaticAuthController(signedIn: true);
+    await Future<void>.delayed(const Duration(milliseconds: 20));
+    final first = ReviewSyncController(
+      sender: (_, __) async => throw const SocketException('offline'),
+    );
+    await first.initialize();
+    await first.enqueueReview(vocabId: 88, quality: 4);
+    await Future<void>.delayed(const Duration(milliseconds: 30));
+    expect(first.pendingCount, 1);
+    first.dispose();
+
+    final restored = ReviewSyncController(
+      sender: (_, __) async => throw const SocketException('offline'),
+    );
+    await restored.initialize();
+    expect(restored.pendingCount, 1);
+    restored.dispose();
+    auth.dispose();
+  });
+
   testWidgets('app startup router settles on login when no session exists',
       (tester) async {
     final auth = _StaticAuthController(signedIn: false);
@@ -320,6 +343,31 @@ void main() {
       await _openTab(tester, label);
       expect(tester.takeException(), isNull, reason: '$label overflowed');
     }
+  });
+
+  testWidgets('delete account requires destructive confirmation',
+      (tester) async {
+    final auth = _StaticAuthController(signedIn: true);
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [authControllerProvider.overrideWith((ref) => auth)],
+        child: const MaterialApp(home: SettingsScreen()),
+      ),
+    );
+    await tester.pump(const Duration(milliseconds: 300));
+    await tester.scrollUntilVisible(
+      find.widgetWithText(FilledButton, '刪除帳號'),
+      500,
+    );
+    await tester.ensureVisible(find.widgetWithText(FilledButton, '刪除帳號'));
+    await tester.pump();
+    await tester.tap(find.widgetWithText(FilledButton, '刪除帳號'));
+    await tester.pumpAndSettle();
+    expect(find.text('確定刪除帳號？'), findsOneWidget);
+    expect(find.text('永久刪除'), findsOneWidget);
+    await tester.tap(find.text('取消'));
+    await tester.pumpAndSettle();
+    expect(find.byType(SettingsScreen), findsOneWidget);
   });
 
   group('paywall outcomes', () {

@@ -1720,10 +1720,15 @@ class ReviewSyncController extends ChangeNotifier {
   List<ReviewSyncAction> _pendingActions = <ReviewSyncAction>[];
   Timer? _retryTimer;
   bool _isSyncing = false;
+  bool _isDisposed = false;
 
-  ReviewSyncController() {
+  ReviewSyncController({ReviewSyncSender? sender})
+      : _sender =
+            sender ?? ((uri, body) => _authenticatedPost(uri, body: body)) {
     _activeReviewSyncController = this;
   }
+
+  final ReviewSyncSender _sender;
 
   bool get isSyncing => _isSyncing;
   bool get hasPendingActions => _pendingActions.isNotEmpty;
@@ -1731,12 +1736,13 @@ class ReviewSyncController extends ChangeNotifier {
 
   Future<void> initialize() async {
     _prefs = await SharedPreferences.getInstance();
+    if (_isDisposed) return;
     _pendingActions = _readQueue();
     _retryTimer ??= Timer.periodic(
       const Duration(minutes: 2),
       (_) => unawaited(syncNow()),
     );
-    notifyListeners();
+    _notifyIfMounted();
     unawaited(syncNow());
   }
 
@@ -1765,15 +1771,21 @@ class ReviewSyncController extends ChangeNotifier {
       ),
     ];
     await _persistQueue();
-    notifyListeners();
+    if (_isDisposed) return;
+    _notifyIfMounted();
     unawaited(syncNow());
   }
 
   Future<void> syncNow() async {
     final currentUserId = _activeAuthController?.userId;
-    if (_isSyncing || _pendingActions.isEmpty || currentUserId == null) return;
+    if (_isDisposed ||
+        _isSyncing ||
+        _pendingActions.isEmpty ||
+        currentUserId == null) {
+      return;
+    }
     _isSyncing = true;
-    notifyListeners();
+    _notifyIfMounted();
 
     final snapshot = List<ReviewSyncAction>.from(_pendingActions);
     final snapshotIds = snapshot.map((action) => action.actionId).toSet();
@@ -1784,9 +1796,9 @@ class ReviewSyncController extends ChangeNotifier {
         continue;
       }
       try {
-        final response = await _authenticatedPost(
+        final response = await _sender(
           _updateProgressEndpoint,
-          body: jsonEncode({
+          jsonEncode({
             'vocab_id': action.vocabId,
             'quality': action.quality,
             'action_id': action.actionId,
@@ -1811,7 +1823,7 @@ class ReviewSyncController extends ChangeNotifier {
       await _persistQueue();
     } finally {
       _isSyncing = false;
-      notifyListeners();
+      _notifyIfMounted();
     }
   }
 
@@ -1823,7 +1835,11 @@ class ReviewSyncController extends ChangeNotifier {
     _pendingActions =
         _pendingActions.where((action) => action.userId != userId).toList();
     await _persistQueue();
-    notifyListeners();
+    _notifyIfMounted();
+  }
+
+  void _notifyIfMounted() {
+    if (!_isDisposed) notifyListeners();
   }
 
   List<ReviewSyncAction> _readQueue() {
@@ -1860,10 +1876,19 @@ class ReviewSyncController extends ChangeNotifier {
 
   @override
   void dispose() {
+    _isDisposed = true;
     _retryTimer?.cancel();
+    if (identical(_activeReviewSyncController, this)) {
+      _activeReviewSyncController = null;
+    }
     super.dispose();
   }
 }
+
+typedef ReviewSyncSender = Future<http.Response> Function(
+  Uri uri,
+  String body,
+);
 
 class AuthController extends ChangeNotifier {
   static final Uri _loginEndpoint = AppConfig.apiUri('/auth/login');
@@ -5306,16 +5331,16 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         return AlertDialog(
           backgroundColor: const Color(0xFF1B1115),
           title: const Text(
-            'Delete account?',
+            '確定刪除帳號？',
             style: TextStyle(color: kDangerRed, fontWeight: FontWeight.w900),
           ),
           content: const Text(
-            'This permanently deletes your account and learning data. This action cannot be undone.',
+            '帳號與所有學習資料將永久刪除，而且無法復原。',
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Cancel'),
+              child: const Text('取消'),
             ),
             FilledButton(
               style: FilledButton.styleFrom(
@@ -5323,7 +5348,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 foregroundColor: Colors.white,
               ),
               onPressed: () => Navigator.of(context).pop(true),
-              child: const Text('Delete'),
+              child: const Text('永久刪除'),
             ),
           ],
         );
@@ -15333,9 +15358,7 @@ class _DiagnosticScreenState extends State<DiagnosticScreen> {
     final code = error.code.toLowerCase();
 
     if (code.contains('denied') || code.contains('restricted')) {
-      return isCamera
-          ? '相機權限遭拒，請到系統設定開啟權限，或改從相簿選取。'
-          : '相簿權限遭拒，請到系統設定開啟照片存取權限。';
+      return isCamera ? '相機權限遭拒，請到系統設定開啟權限，或改從相簿選取。' : '相簿權限遭拒，請到系統設定開啟照片存取權限。';
     }
 
     return error.message ??
@@ -17478,7 +17501,13 @@ class CleanCard extends StatelessWidget {
                 ],
         );
 
-        final card = Container(decoration: decoration, child: child);
+        final card = Container(
+          decoration: decoration,
+          child: Material(
+            type: MaterialType.transparency,
+            child: child,
+          ),
+        );
         return ClipRRect(
           borderRadius: BorderRadius.circular(8),
           child: isFocusMode
