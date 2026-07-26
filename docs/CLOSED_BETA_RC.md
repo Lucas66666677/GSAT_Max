@@ -8,11 +8,11 @@
 
 ## 已驗證
 
-- Git 安全基準與初始 RC commit：`0545dfa`。
+- Git 安全基準與初始 RC commit：`0545dfa`；最新已驗證 commit：`13d281c`。
 - `flutter analyze`：PASS。
-- `flutter test`：PASS，涵蓋 Router、登入恢復、Refresh 成敗、離線 session、API host、任務持久化、背景 job polling、Writing DTO、Paywall 三種結果、五分頁與小螢幕 overflow。
+- `flutter test`：20 tests PASS，涵蓋 Router、登入恢復、Refresh 成敗、離線 session、API host、任務持久化、離線 SyncQueue 重建、背景 job polling、Writing DTO、Paywall 三種結果、登出／刪帳確認、五分頁與小螢幕 overflow。
 - `flutter build web`：PASS。
-- `pytest backend/tests -q`：PASS，涵蓋 Auth rotation/revoke、Email token、Password reset、SM-2、OCR 驗證、背景 job、Writing schema、Mock Exam 防答案外洩與後端評分、AI quota、RevenueCat webhook、Migration 與 Seed 冪等。
+- `pytest backend/tests -q`：23 tests PASS，涵蓋 Auth rotation/revoke、Email token、Password reset、SM-2、OCR 驗證、背景 job、Writing schema、Mock Exam 防答案外洩與後端評分、AI quota、RevenueCat webhook、Migration 與 Seed 冪等。
 - Alembic：空資料庫 upgrade/downgrade/re-upgrade PASS；完整既有 schema 保留資料 upgrade PASS；部分 schema 會安全拒絕。
 - Seed：實際 SQLite 達到 500 vocab／50 grammar；第二次執行新增 0／0。
 - Tesseract 5.5.3：使用 `backend/tests/fixtures/exam_sample.png` 真實辨識 PASS，必要英文行皆可取回。
@@ -56,5 +56,5 @@ $env:JAVA_HOME=(Resolve-Path '.\.tools\jdk17').Path
 $env:ANDROID_SDK_ROOT=(Resolve-Path '.\.tools\android-sdk').Path
 .\.tools\flutter\bin\flutter.bat doctor -v
 .\.tools\flutter\bin\flutter.bat build apk --debug
-.\.tools\flutter\bin\flutter.bat test integration_test\android_core_flow_test.dart -d emulator-5554
+.\.tools\flutter\bin\flutter.bat test integration_test\android_core_flow_test.dart -d emulator-5554 --dart-define=GSAT_MAX_DISABLE_PERMISSION_PROMPTS=true
 ```
