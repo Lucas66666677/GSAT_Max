@@ -1583,7 +1583,7 @@ Future<void> _showAiQuotaBottomSheet(BuildContext context) async {
                             router.push('/error-ledger');
                           },
                           icon: const Icon(Icons.fact_check_outlined),
-                          label: const Text('Error Ledger'),
+                          label: const Text('錯題本'),
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -1594,7 +1594,7 @@ Future<void> _showAiQuotaBottomSheet(BuildContext context) async {
                             router.push('/paywall');
                           },
                           icon: const Icon(Icons.workspace_premium_rounded),
-                          label: const Text('Go Pro'),
+                          label: const Text('升級 Pro'),
                         ),
                       ),
                     ],
@@ -1649,7 +1649,7 @@ class ShareCaptureService {
         ..hideCurrentSnackBar()
         ..showSnackBar(
           const SnackBar(
-            content: Text('Could not prepare the share image yet. Try again.'),
+            content: Text('目前無法產生分享圖片，請稍後再試。'),
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -2416,7 +2416,7 @@ class SystemAnomalyFallback extends StatelessWidget {
                   FilledButton.icon(
                     onPressed: () => AppRestartScope.restartApp(context),
                     icon: const Icon(Icons.restart_alt_rounded),
-                    label: const Text('Restart App'),
+                    label: const Text('重新啟動 App'),
                   ),
                 ],
               ),
@@ -2976,7 +2976,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     if (email.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Enter your email address first.'),
+          content: Text('請先輸入電子郵件。'),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -3006,8 +3006,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content:
-              Text('Could not request a password reset. Try again shortly.'),
+          content: Text('目前無法寄送密碼重設信，請稍後再試。'),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -3041,12 +3040,12 @@ class _PasswordResetScreenState extends State<PasswordResetScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Reset Password')),
+      appBar: AppBar(title: const Text('重設密碼')),
       body: AppPage(
         children: [
           const PageIntro(
             icon: Icons.password_rounded,
-            title: 'Choose a new password',
+            title: '設定新密碼',
             subtitle:
                 'Use at least eight characters and keep it unique to GSAT_Max.',
           ),
@@ -3060,7 +3059,7 @@ class _PasswordResetScreenState extends State<PasswordResetScreen> {
                     const Icon(Icons.check_circle_rounded,
                         color: kNeonGreen, size: 52),
                     const SizedBox(height: 12),
-                    Text('Password updated',
+                    Text('密碼已更新',
                         style: Theme.of(context).textTheme.titleLarge),
                     const SizedBox(height: 8),
                     const Text(
@@ -3072,7 +3071,7 @@ class _PasswordResetScreenState extends State<PasswordResetScreen> {
                     FilledButton.icon(
                       onPressed: () => context.go('/login'),
                       icon: const Icon(Icons.login_rounded),
-                      label: const Text('Return to Login'),
+                      label: const Text('返回登入'),
                     ),
                   ],
                 ),
@@ -3197,14 +3196,14 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Email Verification')),
+      appBar: AppBar(title: const Text('電子郵件驗證')),
       body: AppPage(
         children: [
           if (_isLoading)
             const GrammarSkeleton()
           else if (_error != null)
             UnifiedErrorState(
-              title: 'Verification failed',
+              title: '驗證失敗',
               message: _error!,
               onRetry: _verify,
             )
@@ -3229,7 +3228,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                     const SizedBox(height: 16),
                     FilledButton(
                       onPressed: () => context.go('/login'),
-                      child: const Text('Continue to Login'),
+                      child: const Text('前往登入'),
                     ),
                   ],
                 ),
@@ -3891,14 +3890,14 @@ class _ZenModeScreenState extends State<ZenModeScreen>
       child: Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: !_isRunning || !_isFocusBlock,
-          title: const Text('Zen Mode'),
+          title: const Text('禪定模式'),
         ),
         body: AppPage(
           children: [
             const PageIntro(
               icon: Icons.self_improvement_rounded,
-              title: 'Zen Mode',
-              subtitle: '25 minutes of clean focus, then a 5-minute reset.',
+              title: '禪定模式',
+              subtitle: '專注 25 分鐘，再休息 5 分鐘。',
             ),
             const SizedBox(height: 28),
             Center(
@@ -3954,7 +3953,7 @@ class _ZenModeScreenState extends State<ZenModeScreen>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Ambient Sound',
+                    Text('環境音效',
                         style: Theme.of(context).textTheme.titleMedium),
                     const SizedBox(height: 12),
                     SegmentedButton<AmbientSound>(
@@ -3966,7 +3965,7 @@ class _ZenModeScreenState extends State<ZenModeScreen>
                         ),
                         ButtonSegment(
                           value: AmbientSound.rainstorm,
-                          label: Text('Rain'),
+                          label: Text('雨聲'),
                           icon: Icon(Icons.water_drop_outlined),
                         ),
                       ],
@@ -4005,7 +4004,7 @@ class _ZenModeScreenState extends State<ZenModeScreen>
                 IconButton.filledTonal(
                   onPressed: _isRunning ? null : _resetTimer,
                   icon: const Icon(Icons.refresh_rounded),
-                  tooltip: 'Reset',
+                  tooltip: '重設',
                 ),
               ],
             ),
@@ -4357,7 +4356,7 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
     final auth = ref.watch(authControllerProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Upgrade to Pro')),
+      appBar: AppBar(title: const Text('升級 Pro')),
       body: AppPage(
         children: [
           Container(
@@ -4433,18 +4432,18 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                 const SizedBox(height: 24),
                 const _PaywallFeature(
                   icon: Icons.psychology_alt_rounded,
-                  title: 'Unlimited AI Diagnostics',
+                  title: '無限 AI 診斷',
                   subtitle:
                       'Analyze exam papers and weak points whenever you need.',
                 ),
                 const _PaywallFeature(
                   icon: Icons.account_tree_outlined,
-                  title: 'Unlimited Discourse Generation',
-                  subtitle: 'Train 篇章結構 with fresh GSAT-style logic drills.',
+                  title: '無限篇章結構生成',
+                  subtitle: '持續練習全新的學測篇章邏輯題。',
                 ),
                 const _PaywallFeature(
                   icon: Icons.school_outlined,
-                  title: 'Infinite Grammar Explanations',
+                  title: '無限文法解析',
                   subtitle:
                       'Generate targeted explanations without daily limits.',
                 ),
@@ -4482,7 +4481,7 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                 TextButton.icon(
                   onPressed: _isPurchasing || auth.isPro ? null : _restore,
                   icon: const Icon(Icons.restore_rounded),
-                  label: const Text('Restore Purchase'),
+                  label: const Text('恢復購買'),
                 ),
               ],
             ),
@@ -4522,7 +4521,7 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
           ..hideCurrentSnackBar()
           ..showSnackBar(
             const SnackBar(
-              content: Text('Pro activated. Unlimited AI is unlocked.'),
+              content: Text('Pro 已啟用，AI 使用額度已解鎖。'),
               behavior: SnackBarBehavior.floating,
             ),
           );
@@ -4566,7 +4565,7 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
       if (!mounted) return;
       if (active) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Pro entitlement restored.')),
+          const SnackBar(content: Text('Pro 資格已恢復。')),
         );
         context.go('/profile');
       } else {
@@ -4690,18 +4689,18 @@ class LegalScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Terms & Privacy')),
+      appBar: AppBar(title: const Text('條款與隱私權')),
       body: AppPage(
         children: [
           const PageIntro(
             icon: Icons.verified_user_outlined,
-            title: 'Legal Center',
+            title: '法律與隱私中心',
             subtitle:
                 'Required publishing policies for AI-assisted GSAT English practice.',
           ),
           const SizedBox(height: 18),
           _LegalPolicyCard(
-            title: 'Terms of Service',
+            title: '服務條款',
             icon: Icons.gavel_outlined,
             paragraphs: [
               'This app provides study tools for English GSAT preparation, including AI-generated diagnostics, feedback, practice questions, and study recommendations.',
@@ -4712,7 +4711,7 @@ class LegalScreen extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           _LegalPolicyCard(
-            title: 'Privacy Policy',
+            title: '隱私權政策',
             icon: Icons.privacy_tip_outlined,
             paragraphs: [
               'We collect account information, learning progress, uploaded study content, AI requests, and app diagnostics only to operate and improve the learning experience.',
@@ -5175,7 +5174,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         ..hideCurrentSnackBar()
         ..showSnackBar(
           const SnackBar(
-            content: Text('GSAT target date updated.'),
+            content: Text('學測目標日期已更新。'),
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -5185,8 +5184,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         ..hideCurrentSnackBar()
         ..showSnackBar(
           const SnackBar(
-            content:
-                Text('Could not update the target date. Try again online.'),
+            content: Text('目前無法更新目標日期，請連線後再試。'),
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -5205,7 +5203,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ..hideCurrentSnackBar()
           ..showSnackBar(
             const SnackBar(
-              content: Text('TTS is unavailable on this device.'),
+              content: Text('此裝置目前無法使用語音朗讀。'),
               behavior: SnackBarBehavior.floating,
             ),
           );
@@ -5239,7 +5237,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         ..hideCurrentSnackBar()
         ..showSnackBar(
           SnackBar(
-            content: Text('Daily reminder set for ${picked.format(context)}.'),
+            content: Text('每日提醒已設為 ${picked.format(context)}。'),
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -5249,7 +5247,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         ..hideCurrentSnackBar()
         ..showSnackBar(
           const SnackBar(
-            content: Text('Could not reschedule notifications on this device.'),
+            content: Text('此裝置目前無法重新設定通知。'),
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -5273,7 +5271,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       ..hideCurrentSnackBar()
       ..showSnackBar(
         const SnackBar(
-          content: Text('Offline flashcard cache cleared.'),
+          content: Text('離線單字卡快取已清除。'),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -5370,7 +5368,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         ..hideCurrentSnackBar()
         ..showSnackBar(
           const SnackBar(
-            content: Text('Account deleted.'),
+            content: Text('帳號已刪除。'),
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -5431,7 +5429,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           ),
                         ),
                         IconButton(
-                          tooltip: 'Clear logs',
+                          tooltip: '清除紀錄',
                           onPressed: () async {
                             await TelemetryService.instance.clearCrashLogs();
                             if (!context.mounted) return;
@@ -5440,7 +5438,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                               ..hideCurrentSnackBar()
                               ..showSnackBar(
                                 const SnackBar(
-                                  content: Text('Crash logs cleared.'),
+                                  content: Text('當機紀錄已清除。'),
                                   behavior: SnackBarBehavior.floating,
                                 ),
                               );
@@ -6136,7 +6134,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           else if (_missionError != null)
             UnifiedErrorState(
               message: _missionError!,
-              title: 'Mission planner needs a refresh',
+              title: '今日任務需要重新載入',
               onRetry: _loadDailySchedule,
             )
           else if (_missionSchedule != null)
@@ -6175,7 +6173,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         else if (_expansionError != null) ...[
           UnifiedErrorState(
             message: _expansionError!,
-            title: 'Expansion quiz needs a refresh',
+            title: '舉一反三測驗需要重新載入',
             onRetry: _loadDailyExpansionGate,
           ),
           const SizedBox(height: 16),
@@ -6194,7 +6192,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ] else if (_loadError != null) ...[
           UnifiedErrorState(
             message: _loadError!,
-            title: 'Review deck needs a refresh',
+            title: '單字複習需要重新載入',
             onRetry: _loadDueWords,
           ),
           const SizedBox(height: 16),
@@ -6542,7 +6540,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ..hideCurrentSnackBar()
         ..showSnackBar(
           const SnackBar(
-            content: Text('Answer every expansion question to unlock today.'),
+            content: Text('請完成所有舉一反三題目，才能解鎖今日學習。'),
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -6580,7 +6578,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ..hideCurrentSnackBar()
           ..showSnackBar(
             SnackBar(
-              content: Text('Expansion complete: $correct / $total correct.'),
+              content: Text('舉一反三完成：答對 $correct / $total 題。'),
               behavior: SnackBarBehavior.floating,
             ),
           );
@@ -7099,7 +7097,7 @@ class _WeeklyReportDialog extends StatelessWidget {
                 child: FilledButton.icon(
                   onPressed: () => Navigator.of(context).pop(),
                   icon: const Icon(Icons.check_rounded),
-                  label: const Text('Lock in next week'),
+                  label: const Text('確認下週計畫'),
                 ),
               ),
             ],
@@ -8014,13 +8012,13 @@ class _MnemonicBottomSheet extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 _MnemonicBlock(
-                  title: 'Etymology',
+                  title: '字源拆解',
                   body: mnemonic.etymology,
                   icon: Icons.account_tree_rounded,
                 ),
                 const SizedBox(height: 12),
                 _MnemonicBlock(
-                  title: 'Taiwanese Hook',
+                  title: '台式記憶鉤子',
                   body: mnemonic.taiwaneseMnemonic,
                   icon: Icons.bolt_rounded,
                 ),
@@ -8321,11 +8319,11 @@ class _GrammarQuizScreenState extends State<GrammarQuizScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Grammar Quiz'),
+        title: const Text('文法測驗'),
         actions: [
           if (quiz != null)
             IconButton(
-              tooltip: 'Save to Error Ledger',
+              tooltip: '儲存至錯題本',
               onPressed: _isSaving ? null : _saveToLedger,
               icon: _isSaving
                   ? const Icon(Icons.hourglass_top_rounded)
@@ -8497,7 +8495,7 @@ class _GrammarQuizScreenState extends State<GrammarQuizScreen> {
         ..hideCurrentSnackBar()
         ..showSnackBar(
           const SnackBar(
-            content: Text('Saved to your Grammar Error Ledger'),
+            content: Text('已儲存至文法錯題本。'),
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -8962,7 +8960,7 @@ class _TimeAttackSimulatorScreenState
           ..hideCurrentSnackBar()
           ..showSnackBar(
             const SnackBar(
-              content: Text('Exam is in progress. Submit before exiting.'),
+              content: Text('模擬考仍在進行中，請先交卷再離開。'),
               behavior: SnackBarBehavior.floating,
             ),
           );
@@ -8973,7 +8971,7 @@ class _TimeAttackSimulatorScreenState
             ? null
             : AppBar(
                 automaticallyImplyLeading: !_isExamActive,
-                title: const Text('Time-Attack GSAT Simulator'),
+                title: const Text('100 分鐘學測模擬考'),
               ),
         body: _buildBody(),
       ),
@@ -9032,7 +9030,7 @@ class _TimeAttackSimulatorScreenState
       return AppPage(
         children: [
           UnifiedErrorState(
-            title: 'Scoring was interrupted',
+            title: '評分程序中斷',
             message: _gradingError!,
             onRetry: () => _finishExam(
               autoSubmitted: _submissionWasAutomatic,
@@ -9407,8 +9405,7 @@ class _TimeAttackSimulatorScreenState
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Question Navigator',
-                        style: Theme.of(context).textTheme.titleLarge),
+                    Text('題目導覽', style: Theme.of(context).textTheme.titleLarge),
                     const SizedBox(height: 12),
                     Wrap(
                       spacing: 8,
@@ -9846,7 +9843,7 @@ class _TimeAttackWarningScreen extends StatelessWidget {
                         FilledButton.icon(
                           onPressed: onStart,
                           icon: const Icon(Icons.play_arrow_rounded),
-                          label: const Text('Begin 100:00 Simulator'),
+                          label: const Text('開始 100 分鐘模擬考'),
                         ),
                       ],
                     ),
@@ -9946,8 +9943,7 @@ class _TimeAttackReadingSection extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Reading Passage',
-                    style: Theme.of(context).textTheme.titleLarge),
+                Text('閱讀文章', style: Theme.of(context).textTheme.titleLarge),
                 const SizedBox(height: 8),
                 Text(
                   'Read for main idea, transitions, and inference. You can move to grammar whenever ready.',
@@ -9961,7 +9957,7 @@ class _TimeAttackReadingSection extends StatelessWidget {
                   alignment: Alignment.centerRight,
                   child: PassageAudioButton(
                     text: article,
-                    label: 'Play Passage',
+                    label: '朗讀文章',
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -10038,7 +10034,7 @@ class _TimeAttackSectionPage extends StatelessWidget {
                     alignment: Alignment.centerRight,
                     child: PassageAudioButton(
                       text: section.passage!,
-                      label: 'Play Text',
+                      label: '朗讀文字',
                     ),
                   ),
                   const SizedBox(height: 10),
@@ -10288,8 +10284,7 @@ class _TimeAttackEssaySection extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Translation & Essay',
-                    style: Theme.of(context).textTheme.titleLarge),
+                Text('翻譯與作文', style: Theme.of(context).textTheme.titleLarge),
                 const SizedBox(height: 10),
                 Container(
                   width: double.infinity,
@@ -10317,7 +10312,7 @@ class _TimeAttackEssaySection extends StatelessWidget {
                   textAlignVertical: TextAlignVertical.top,
                   decoration: const InputDecoration(
                     labelText: 'Translation answer',
-                    hintText: 'Write your translation response here...',
+                    hintText: '在此輸入翻譯答案...',
                     alignLabelWithHint: true,
                   ),
                 ),
@@ -10347,7 +10342,7 @@ class _TimeAttackEssaySection extends StatelessWidget {
                   maxLines: 18,
                   textAlignVertical: TextAlignVertical.top,
                   decoration: const InputDecoration(
-                    hintText: 'Write your timed GSAT essay here...',
+                    hintText: '在此輸入限時學測作文...',
                     alignLabelWithHint: true,
                   ),
                 ),
@@ -10569,7 +10564,7 @@ class _TimeAttackBottomBar extends StatelessWidget {
             IconButton.filledTonal(
               onPressed: onPrevious,
               icon: const Icon(Icons.chevron_left_rounded),
-              tooltip: 'Previous section',
+              tooltip: '上一部分',
             ),
             const SizedBox(width: 10),
             Expanded(
@@ -10610,7 +10605,7 @@ class _TimeAttackBottomBar extends StatelessWidget {
               IconButton.filledTonal(
                 onPressed: onNavigate,
                 icon: const Icon(Icons.grid_view_rounded),
-                tooltip: 'Question navigator',
+                tooltip: '題目導覽',
               ),
             ],
             const SizedBox(width: 10),
@@ -10618,13 +10613,13 @@ class _TimeAttackBottomBar extends StatelessWidget {
               IconButton.filled(
                 onPressed: onNext,
                 icon: const Icon(Icons.chevron_right_rounded),
-                tooltip: 'Next section',
+                tooltip: '下一部分',
               )
             else
               FilledButton.icon(
                 onPressed: isSubmitted ? null : onSubmit,
                 icon: const Icon(Icons.send_rounded),
-                label: const Text('Submit'),
+                label: const Text('交卷'),
               ),
           ],
         ),
@@ -10644,7 +10639,7 @@ class TimeAttackResultsScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: const Text('Exam Evaluation'),
+        title: const Text('模擬考評分'),
       ),
       body: AppPage(
         children: [
@@ -10656,11 +10651,11 @@ class TimeAttackResultsScreen extends StatelessWidget {
                   children: [
                     const Icon(Icons.info_outline_rounded, size: 42),
                     const SizedBox(height: 12),
-                    const Text('No simulator result is available.'),
+                    const Text('目前沒有可顯示的模擬考結果。'),
                     const SizedBox(height: 16),
                     FilledButton(
                       onPressed: () => context.go('/diagnostic'),
-                      child: const Text('Back to Diagnostic'),
+                      child: const Text('返回診斷'),
                     ),
                   ],
                 ),
@@ -10675,7 +10670,7 @@ class TimeAttackResultsScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('AI Feedback',
+                    Text('AI 回饋',
                         style: Theme.of(context).textTheme.titleLarge),
                     const SizedBox(height: 10),
                     Text(
@@ -10706,7 +10701,7 @@ class TimeAttackResultsScreen extends StatelessWidget {
                   child: FilledButton.icon(
                     onPressed: () => context.go('/diagnostic'),
                     icon: const Icon(Icons.psychology_alt_rounded),
-                    label: const Text('Train Again'),
+                    label: const Text('再次練習'),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -10714,7 +10709,7 @@ class TimeAttackResultsScreen extends StatelessWidget {
                   child: OutlinedButton.icon(
                     onPressed: () => context.go('/home'),
                     icon: const Icon(Icons.home_outlined),
-                    label: const Text('Home'),
+                    label: const Text('返回首頁'),
                   ),
                 ),
               ],
@@ -10769,24 +10764,24 @@ class _TimeAttackScoreHero extends StatelessWidget {
             ),
             const SizedBox(height: 18),
             _ScoreBreakdownRow(
-              label: 'Choice Sections',
+              label: '選擇題',
               value:
                   '${result.objectiveScore.toStringAsFixed(1)}/70 (${result.objectiveCorrect}/${result.objectiveTotal})',
               icon: Icons.fact_check_outlined,
             ),
             _ScoreBreakdownRow(
-              label: 'Translation',
+              label: '翻譯',
               value: '${result.translationScore.toStringAsFixed(1)}/10',
               icon: Icons.translate_rounded,
             ),
             _ScoreBreakdownRow(
-              label: 'Essay',
+              label: '作文',
               value:
                   '${result.essayScore.toStringAsFixed(1)}/20 (${result.essayWordCount} words)',
               icon: Icons.edit_note_rounded,
             ),
             _ScoreBreakdownRow(
-              label: 'Time Used',
+              label: '作答時間',
               value: _formatDuration(result.timeUsed),
               icon: Icons.speed_rounded,
             ),
@@ -11322,7 +11317,7 @@ class UnifiedErrorState extends StatelessWidget {
             FilledButton.icon(
               onPressed: onRetry,
               icon: const Icon(Icons.refresh_rounded),
-              label: const Text('Retry'),
+              label: const Text('重試'),
             ),
           ],
         ),
@@ -11368,7 +11363,7 @@ class _DiscourseScreenState extends State<DiscourseScreen> {
     final isTablet = isTabletLayout(context);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Discourse Training')),
+      appBar: AppBar(title: const Text('篇章結構訓練')),
       body: SafeArea(
         child: _buildBody(context, question, isTablet),
       ),
@@ -12004,7 +11999,7 @@ class _DiscourseControlsPanel extends StatelessWidget {
               child: OutlinedButton.icon(
                 onPressed: onClear,
                 icon: const Icon(Icons.restart_alt_rounded),
-                label: const Text('Clear'),
+                label: const Text('清除'),
               ),
             ),
             const SizedBox(width: 12),
@@ -12013,7 +12008,7 @@ class _DiscourseControlsPanel extends StatelessWidget {
               child: FilledButton.icon(
                 onPressed: onSubmit,
                 icon: const Icon(Icons.task_alt_rounded),
-                label: const Text('Submit'),
+                label: const Text('送出答案'),
               ),
             ),
           ],
@@ -12068,8 +12063,7 @@ class _DiscourseTabletInteractionPanel extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Drop Targets',
-                    style: Theme.of(context).textTheme.titleLarge),
+                Text('句子放置區', style: Theme.of(context).textTheme.titleLarge),
                 const SizedBox(height: 10),
                 Text(
                   'Use the left passage as reference, then place each extracted sentence below.',
@@ -12228,7 +12222,7 @@ class _ErrorLedgerScreenState extends ConsumerState<ErrorLedgerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Error Ledger')),
+      appBar: AppBar(title: const Text('錯題本')),
       body: AppPage(
         children: [
           const Hero(
@@ -12481,7 +12475,7 @@ class _ErrorLedgerScreenState extends ConsumerState<ErrorLedgerScreen> {
         ..hideCurrentSnackBar()
         ..showSnackBar(
           const SnackBar(
-            content: Text('Concept Mastered!'),
+            content: Text('觀念已掌握！'),
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -12805,24 +12799,24 @@ class _LedgerEntryTile extends StatelessWidget {
             ),
             children: [
               _LedgerAnswerLine(
-                label: 'Question',
+                label: '原題目',
                 value: entry.originalQuestion,
                 icon: Icons.help_outline_rounded,
               ),
               _LedgerAnswerLine(
-                label: 'Your answer',
+                label: '你的答案',
                 value: entry.userAnswer ?? 'Not recorded',
                 icon: Icons.person_outline_rounded,
                 color: kDangerRed,
               ),
               _LedgerAnswerLine(
-                label: 'Correct answer',
+                label: '正確答案',
                 value: entry.correctAnswer ?? 'Not recorded',
                 icon: Icons.check_circle_outline_rounded,
                 color: kNeonGreen,
               ),
               _LedgerAnswerLine(
-                label: 'Explanation',
+                label: '解析',
                 value: entry.explanation ?? 'No explanation was saved.',
                 icon: Icons.school_outlined,
                 color: kElectricBlue,
@@ -12939,7 +12933,7 @@ class _RedemptionQuizPanel extends StatelessWidget {
               OutlinedButton.icon(
                 onPressed: onRestart,
                 icon: const Icon(Icons.replay_rounded),
-                label: const Text('Run another challenge'),
+                label: const Text('再做一次挑戰'),
               ),
             ],
           ),
@@ -13043,7 +13037,7 @@ class _RedemptionQuizPanel extends StatelessWidget {
                   child: FilledButton.icon(
                     onPressed: onNext,
                     icon: const Icon(Icons.arrow_forward_rounded),
-                    label: const Text('Next question'),
+                    label: const Text('下一題'),
                   ),
                 ),
               ],
@@ -13129,7 +13123,7 @@ class _ConceptMasteredPulseState extends State<_ConceptMasteredPulse> {
                 shareText: 'I mastered a GSAT English concept with GSAT_Max.',
               ),
               icon: const Icon(Icons.ios_share_rounded, color: kElectricBlue),
-              label: const Text('Share Progress'),
+              label: const Text('分享學習進度'),
             ),
           ),
         ],
@@ -13213,7 +13207,7 @@ class _SentenceLevelUpScreenState extends State<SentenceLevelUpScreen> {
   Widget build(BuildContext context) {
     final prompt = _prompt;
     return Scaffold(
-      appBar: AppBar(title: const Text('Sentence Level-Up')),
+      appBar: AppBar(title: const Text('句子升級')),
       body: SafeArea(
         child: AppPage(
           children: [
@@ -13229,7 +13223,7 @@ class _SentenceLevelUpScreenState extends State<SentenceLevelUpScreen> {
             else if (_errorMessage != null)
               UnifiedErrorState(
                 message: _errorMessage!,
-                title: 'Level-up prompt needs a refresh',
+                title: '句子升級題目需要重新載入',
                 onRetry: _loadPrompt,
               )
             else if (prompt != null) ...[
@@ -13247,7 +13241,7 @@ class _SentenceLevelUpScreenState extends State<SentenceLevelUpScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Your upgraded sentence',
+                      Text('你的升級句子',
                           style: Theme.of(context).textTheme.titleMedium),
                       const SizedBox(height: 10),
                       TextField(
@@ -13255,7 +13249,7 @@ class _SentenceLevelUpScreenState extends State<SentenceLevelUpScreen> {
                         minLines: 3,
                         maxLines: 6,
                         decoration: const InputDecoration(
-                          hintText: 'Rewrite the sentence here...',
+                          hintText: '在此改寫句子...',
                         ),
                       ),
                       const SizedBox(height: 14),
@@ -13276,7 +13270,7 @@ class _SentenceLevelUpScreenState extends State<SentenceLevelUpScreen> {
                           ),
                           const SizedBox(width: 12),
                           IconButton.filledTonal(
-                            tooltip: 'New prompt',
+                            tooltip: '產生新題目',
                             onPressed: _isEvaluating
                                 ? null
                                 : () => _loadPrompt(forceRefresh: true),
@@ -13377,7 +13371,7 @@ class _SentenceLevelUpScreenState extends State<SentenceLevelUpScreen> {
         _throwIfAiQuotaExceeded(response);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Evaluation failed with ${response.statusCode}.'),
+            content: Text('評分失敗（${response.statusCode}）。'),
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -13511,8 +13505,7 @@ class _SentenceUpgradeFeedbackCard extends StatelessWidget {
                   ),
             ),
             const SizedBox(height: 14),
-            Text('Suggested upgrade',
-                style: Theme.of(context).textTheme.titleMedium),
+            Text('建議改寫', style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 8),
             Text(
               feedback.suggestedUpgrade,
@@ -13561,7 +13554,7 @@ class _ClozePracticeScreenState extends State<ClozePracticeScreen> {
   Widget build(BuildContext context) {
     final set = _set;
     return Scaffold(
-      appBar: AppBar(title: const Text('Dynamic Cloze Test')),
+      appBar: AppBar(title: const Text('動態文意選填')),
       body: SafeArea(
         child: AppPage(
           children: [
@@ -13577,7 +13570,7 @@ class _ClozePracticeScreenState extends State<ClozePracticeScreen> {
             else if (_errorMessage != null)
               UnifiedErrorState(
                 message: _errorMessage!,
-                title: 'Cloze generator needs a refresh',
+                title: '文意選填題目需要重新載入',
                 onRetry: _loadSet,
               )
             else if (set != null) ...[
@@ -13589,7 +13582,7 @@ class _ClozePracticeScreenState extends State<ClozePracticeScreen> {
                     children: [
                       Row(
                         children: [
-                          Text('Story',
+                          Text('文章',
                               style: Theme.of(context).textTheme.titleLarge),
                           const Spacer(),
                           if (set.metrics != null)
@@ -13623,7 +13616,7 @@ class _ClozePracticeScreenState extends State<ClozePracticeScreen> {
                     child: OutlinedButton.icon(
                       onPressed: _clearAnswers,
                       icon: const Icon(Icons.restart_alt_rounded),
-                      label: const Text('Clear'),
+                      label: const Text('清除'),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -13633,7 +13626,7 @@ class _ClozePracticeScreenState extends State<ClozePracticeScreen> {
                       onPressed:
                           _assignments.length == 10 ? _submitAnswers : null,
                       icon: const Icon(Icons.task_alt_rounded),
-                      label: const Text('Submit'),
+                      label: const Text('送出答案'),
                     ),
                   ),
                 ],
@@ -13854,7 +13847,7 @@ class _ClozePhraseBank extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Phrase Bank', style: Theme.of(context).textTheme.titleMedium),
+            Text('片語選項', style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 12),
             Wrap(
               spacing: 10,
@@ -13938,7 +13931,7 @@ class _TranslationScreenState extends State<TranslationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Translation Practice')),
+      appBar: AppBar(title: const Text('中翻英練習')),
       body: SafeArea(
         child: AppPage(
           children: [
@@ -13955,7 +13948,7 @@ class _TranslationScreenState extends State<TranslationScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Chinese Sentence',
+                    Text('中文句子',
                         style: Theme.of(context).textTheme.titleMedium),
                     const SizedBox(height: 10),
                     TextField(
@@ -13967,7 +13960,7 @@ class _TranslationScreenState extends State<TranslationScreen> {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    Text('Your English Translation',
+                    Text('你的英文翻譯',
                         style: Theme.of(context).textTheme.titleMedium),
                     const SizedBox(height: 10),
                     TextField(
@@ -13975,7 +13968,7 @@ class _TranslationScreenState extends State<TranslationScreen> {
                       minLines: 3,
                       maxLines: 6,
                       decoration: const InputDecoration(
-                        hintText: 'Type your English translation...',
+                        hintText: '輸入英文翻譯...',
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -13997,7 +13990,7 @@ class _TranslationScreenState extends State<TranslationScreen> {
                         ),
                         const SizedBox(width: 12),
                         IconButton.filledTonal(
-                          tooltip: 'Try Similar Sentence',
+                          tooltip: '試做相似句',
                           onPressed:
                               _isGeneratingSimilar ? null : _trySimilarSentence,
                           icon: Icon(
@@ -14016,7 +14009,7 @@ class _TranslationScreenState extends State<TranslationScreen> {
               const SizedBox(height: 16),
               UnifiedErrorState(
                 message: _errorMessage!,
-                title: 'Translation grader needs a refresh',
+                title: '翻譯評分需要重新載入',
                 onRetry: _submitTranslation,
               ),
             ],
@@ -14183,8 +14176,7 @@ class _TranslationResultCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 12),
-            Text('Marked Translation',
-                style: Theme.of(context).textTheme.titleMedium),
+            Text('訂正標記', style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 8),
             Container(
               width: double.infinity,
@@ -14209,8 +14201,7 @@ class _TranslationResultCard extends StatelessWidget {
             ),
             if (result.deductions.isNotEmpty) ...[
               const SizedBox(height: 14),
-              Text('Deductions',
-                  style: Theme.of(context).textTheme.titleMedium),
+              Text('扣分明細', style: Theme.of(context).textTheme.titleMedium),
               const SizedBox(height: 8),
               for (final deduction in result.deductions) ...[
                 _TranslationDeductionTile(deduction: deduction),
@@ -14218,8 +14209,7 @@ class _TranslationResultCard extends StatelessWidget {
               ],
             ],
             const SizedBox(height: 14),
-            Text('Suggested Translation',
-                style: Theme.of(context).textTheme.titleMedium),
+            Text('建議翻譯', style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 8),
             Text(
               result.suggestedTranslation,
@@ -14372,7 +14362,7 @@ class _MixedQuestionScreenState extends State<MixedQuestionScreen> {
     final set = _set;
     final isTablet = isTabletLayout(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('Mixed Questions Sandbox')),
+      appBar: AppBar(title: const Text('混合題訓練')),
       body: SafeArea(
         child: _buildBody(set, isTablet),
       ),
@@ -14407,7 +14397,7 @@ class _MixedQuestionScreenState extends State<MixedQuestionScreen> {
           const SizedBox(height: 16),
           UnifiedErrorState(
             message: _errorMessage!,
-            title: 'Mixed set needs a refresh',
+            title: '混合題組需要重新載入',
             onRetry: _loadSet,
           ),
         ],
@@ -14559,7 +14549,7 @@ class _MixedQuestionScreenState extends State<MixedQuestionScreen> {
         _throwIfAiQuotaExceeded(response);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Evaluation failed with ${response.statusCode}.'),
+            content: Text('評分失敗（${response.statusCode}）。'),
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -14592,8 +14582,7 @@ class _MixedTextsPanel extends StatelessWidget {
           children: [
             Row(
               children: [
-                Text('Dual Texts',
-                    style: Theme.of(context).textTheme.titleLarge),
+                Text('雙文本', style: Theme.of(context).textTheme.titleLarge),
                 const Spacer(),
                 if (set.metrics != null)
                   InferenceBadge(
@@ -14679,8 +14668,7 @@ class _MixedQuestionsPanel extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Questions 47-56',
-                style: Theme.of(context).textTheme.titleLarge),
+            Text('第 47–56 題', style: Theme.of(context).textTheme.titleLarge),
             const SizedBox(height: 14),
             for (final question in set.multipleChoice) ...[
               _MixedMcqCard(
@@ -15588,12 +15576,12 @@ class _CorrectedMistakeTile extends StatelessWidget {
       ),
       children: [
         _MistakeLine(
-          label: 'Your answer',
+          label: '你的答案',
           value: mistake.studentWrongAnswer ?? 'Unknown',
           color: kDangerRed,
         ),
         _MistakeLine(
-          label: 'Correct answer',
+          label: '正確答案',
           value: mistake.correctAnswer,
           color: kNeonGreen,
         ),
@@ -15794,9 +15782,9 @@ class _ReadingVocabScreenState extends State<ReadingVocabScreen> {
                   spacing: 8,
                   runSpacing: 8,
                   children: const [
-                    Chip(label: Text('Education')),
-                    Chip(label: Text('GSAT Level 4')),
-                    Chip(label: Text('5 min')),
+                    Chip(label: Text('教育主題')),
+                    Chip(label: Text('學測第 4 級')),
+                    Chip(label: Text('約 5 分鐘')),
                   ],
                 ),
                 const SizedBox(height: 12),
@@ -15837,7 +15825,7 @@ class _ReadingVocabScreenState extends State<ReadingVocabScreen> {
           const SizedBox(height: 16),
           UnifiedErrorState(
             message: _errorMessage!,
-            title: 'Reading generator paused',
+            title: '閱讀文章暫時無法產生',
             onRetry: _generateReadingPassage,
           ),
         ],
@@ -15997,7 +15985,7 @@ class _TappableReadingPassageState extends State<TappableReadingPassage> {
       ..hideCurrentSnackBar()
       ..showSnackBar(
         SnackBar(
-          content: Text('Added $word to your 7000 vocabulary list'),
+          content: Text('已將 $word 加入 7000 單字庫'),
           behavior: SnackBarBehavior.floating,
           duration: const Duration(seconds: 2),
         ),
@@ -16754,7 +16742,7 @@ class _WritingFeedbackResults extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('AI Feedback', style: Theme.of(context).textTheme.titleLarge),
+        Text('AI 回饋', style: Theme.of(context).textTheme.titleLarge),
         const SizedBox(height: 12),
         if (feedback != null && feedback!.isNotEmpty) ...[
           _FeedbackSummaryCard(feedback: feedback!),
@@ -16848,8 +16836,7 @@ class _ScoreCard extends StatelessWidget {
                   color: Theme.of(context).colorScheme.primary,
                 ),
                 const SizedBox(width: 10),
-                Text('Score Card',
-                    style: Theme.of(context).textTheme.titleMedium),
+                Text('評分卡', style: Theme.of(context).textTheme.titleMedium),
                 const Spacer(),
                 Text(
                   '${evaluation.totalScore.toStringAsFixed(1)}/${evaluation.maxScore.toStringAsFixed(0)}',
@@ -16862,12 +16849,10 @@ class _ScoreCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 16),
-            _ScoreMetric(label: 'Content', score: evaluation.scores.content),
-            _ScoreMetric(
-                label: 'Organization', score: evaluation.scores.organization),
-            _ScoreMetric(label: 'Grammar', score: evaluation.scores.grammar),
-            _ScoreMetric(
-                label: 'Vocabulary', score: evaluation.scores.vocabulary),
+            _ScoreMetric(label: '內容', score: evaluation.scores.content),
+            _ScoreMetric(label: '組織', score: evaluation.scores.organization),
+            _ScoreMetric(label: '文法', score: evaluation.scores.grammar),
+            _ScoreMetric(label: '字彙', score: evaluation.scores.vocabulary),
             if (metrics != null) ...[
               const SizedBox(height: 12),
               Align(
@@ -17079,13 +17064,12 @@ class _SuggestedTemplateCard extends StatelessWidget {
             else
               for (var index = 0; index < steps.length; index++)
                 _TemplateStep(
-                  label: 'Step ${index + 1}',
+                  label: '步驟 ${index + 1}',
                   text: steps[index],
                 ),
             if (demonstration.trim().isNotEmpty) ...[
               const SizedBox(height: 12),
-              Text('Model revision',
-                  style: Theme.of(context).textTheme.labelLarge),
+              Text('範文改寫', style: Theme.of(context).textTheme.labelLarge),
               const SizedBox(height: 6),
               Text(
                 demonstration,
