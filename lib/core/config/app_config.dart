@@ -27,6 +27,11 @@ class AppConfig {
     defaultValue: '',
   );
 
+  static const bool disablePermissionPrompts = bool.fromEnvironment(
+    'GSAT_MAX_DISABLE_PERMISSION_PROMPTS',
+    defaultValue: false,
+  );
+
   static bool get isProduction => environment == 'production';
   static bool get hasRevenueCatKey => revenueCatApiKey.trim().isNotEmpty;
 

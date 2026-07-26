@@ -214,7 +214,7 @@ class NotificationService {
   }
 
   Future<void> requestPermissionsGracefully() async {
-    if (_permissionsRequested) return;
+    if (_permissionsRequested || AppConfig.disablePermissionPrompts) return;
     _permissionsRequested = true;
 
     try {

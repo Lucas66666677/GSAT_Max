@@ -6,6 +6,9 @@ import 'package:gsat_max/main.dart' as app;
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
+  // Run with --dart-define=GSAT_MAX_DISABLE_PERMISSION_PROMPTS=true. Native
+  // notification denial is exercised separately through adb during RC smoke.
+
   testWidgets('Android Closed Beta local core flow', (tester) async {
     final timestamp = DateTime.now().millisecondsSinceEpoch;
     final email = 'android.rc.$timestamp@example.com';
