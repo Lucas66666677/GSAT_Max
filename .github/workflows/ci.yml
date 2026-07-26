@@ -13,6 +13,7 @@ jobs:
         with:
           python-version: "3.11"
           cache: pip
+      - run: sudo apt-get update && sudo apt-get install -y tesseract-ocr
       - run: python -m pip install -r requirements.txt
       - run: python -m compileall -q backend
       - run: python -m pytest backend/tests -q
@@ -27,8 +28,12 @@ jobs:
           channel: stable
           cache: true
       - run: flutter pub get
-      - run: dart format --output=none --set-exit-if-changed lib test
+      - run: dart format --output=none --set-exit-if-changed lib test integration_test
       - run: flutter analyze
       - run: flutter test
       - run: flutter build web --release --dart-define=API_BASE_URL=http://localhost:8000
       - run: flutter build apk --debug --dart-define=API_BASE_URL=http://10.0.2.2:8000
+      - uses: actions/upload-artifact@v4
+        with:
+          name: gsat-max-debug-apk
+          path: build/app/outputs/flutter-apk/app-debug.apk

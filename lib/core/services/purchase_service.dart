@@ -12,7 +12,13 @@ class PurchaseFlowResult {
   final String message;
 }
 
-class PurchaseService {
+abstract interface class PurchaseServiceApi {
+  Future<PurchaseFlowResult> purchaseMonthly(int userId);
+
+  Future<PurchaseFlowResult> restore(int userId);
+}
+
+class PurchaseService implements PurchaseServiceApi {
   PurchaseService._();
 
   static final PurchaseService instance = PurchaseService._();
@@ -41,6 +47,7 @@ class PurchaseService {
     _configuredUserId = appUserId;
   }
 
+  @override
   Future<PurchaseFlowResult> purchaseMonthly(int userId) async {
     try {
       await initialize(userId);
@@ -75,6 +82,7 @@ class PurchaseService {
     }
   }
 
+  @override
   Future<PurchaseFlowResult> restore(int userId) async {
     try {
       await initialize(userId);

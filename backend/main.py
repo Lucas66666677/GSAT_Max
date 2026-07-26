@@ -1,5 +1,7 @@
 import base64
+import asyncio
 from collections import defaultdict, deque
+from contextlib import asynccontextmanager
 from datetime import datetime, timedelta
 import hashlib
 import hmac
@@ -7,6 +9,7 @@ import html
 from io import BytesIO
 import json
 import os
+from pathlib import Path
 import re
 import secrets
 import time
@@ -15,6 +18,8 @@ from typing import Any, Generator
 from urllib.parse import quote
 
 import httpx
+from alembic import command as alembic_command
+from alembic.config import Config as AlembicConfig
 from fastapi import BackgroundTasks, Depends, FastAPI, File, Form, Header, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
@@ -114,6 +119,7 @@ OPENAI_BASE_URL = settings.openai_base_url
 OPENAI_API_KEY = settings.openai_api_key
 CODEX_MODEL = settings.codex_model
 OPENAI_TIMEOUT_SECONDS = settings.openai_timeout_seconds
+OPENAI_MAX_RETRIES = settings.openai_max_retries
 DEFAULT_USER_EMAIL = settings.default_user_email
 JWT_SECRET_KEY = settings.jwt_secret_key
 JWT_ALGORITHM = "HS256"
@@ -128,7 +134,22 @@ engine = create_engine(
 )
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-app = FastAPI(title="GSAT_Max Backend")
+
+def run_database_migrations() -> None:
+    config_path = Path(__file__).resolve().parent.parent / "alembic.ini"
+    migration_config = AlembicConfig(str(config_path))
+    alembic_command.upgrade(migration_config, "head")
+
+
+@asynccontextmanager
+async def app_lifespan(_: FastAPI):
+    run_database_migrations()
+    with SessionLocal() as db:
+        ensure_user(db, user_id=1)
+    yield
+
+
+app = FastAPI(title="GSAT_Max Backend", lifespan=app_lifespan)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=list(settings.cors_origins),
@@ -762,18 +783,6 @@ def health_check(db: Session = Depends(get_db)) -> dict[str, Any]:
         "openai_configured": bool(OPENAI_API_KEY),
         "ollama_base_url": OLLAMA_BASE_URL,
     }
-
-
-@app.on_event("startup")
-def on_startup() -> None:
-    Base.metadata.create_all(bind=engine)
-    ensure_user_schema()
-    ensure_vocabulary_schema()
-    ensure_grammar_concept_bank_schema()
-    ensure_grammar_ledger_schema()
-    ensure_daily_expansion_quiz_schema()
-    with SessionLocal() as db:
-        ensure_user(db, user_id=1)
 
 
 def ensure_user_schema() -> None:
@@ -2085,6 +2094,12 @@ def apply_app_mode_to_prompt(prompt: str, app_mode: str | None) -> str:
     return f"{app_mode_system_instruction(app_mode)}\n\n{prompt}"
 
 
+def ai_runtime_signature() -> str:
+    if OPENAI_API_KEY:
+        return f"openai:{OPENAI_BASE_URL}:{CODEX_MODEL}"
+    return f"ollama:{OLLAMA_BASE_URL}:{OLLAMA_MODEL}"
+
+
 async def call_ollama(prompt: str) -> tuple[str, PerformanceMetrics]:
     payload = {
         "model": OLLAMA_MODEL,
@@ -2116,6 +2131,65 @@ async def call_ollama(prompt: str) -> tuple[str, PerformanceMetrics]:
     return generated_text, metrics
 
 
+async def _post_openai_payload(
+    payload: dict[str, Any],
+    *,
+    operation_name: str,
+) -> tuple[dict[str, Any], float]:
+    headers = {
+        "Authorization": f"Bearer {OPENAI_API_KEY}",
+        "Content-Type": "application/json",
+    }
+    started_at = time.perf_counter()
+    for attempt in range(OPENAI_MAX_RETRIES):
+        try:
+            async with httpx.AsyncClient(timeout=OPENAI_TIMEOUT_SECONDS) as client:
+                response = await client.post(
+                    f"{OPENAI_BASE_URL}/chat/completions",
+                    headers=headers,
+                    json=payload,
+                )
+                response.raise_for_status()
+        except httpx.TimeoutException as exc:
+            if attempt + 1 >= OPENAI_MAX_RETRIES:
+                raise HTTPException(
+                    status_code=504,
+                    detail=f"{operation_name} timed out after {OPENAI_MAX_RETRIES} attempts.",
+                ) from exc
+        except httpx.HTTPStatusError as exc:
+            status = exc.response.status_code
+            retryable = status == 429 or status >= 500
+            if not retryable or attempt + 1 >= OPENAI_MAX_RETRIES:
+                raise HTTPException(
+                    status_code=502,
+                    detail=f"{operation_name} failed with upstream status {status}.",
+                ) from exc
+        except httpx.HTTPError as exc:
+            if attempt + 1 >= OPENAI_MAX_RETRIES:
+                raise HTTPException(
+                    status_code=502,
+                    detail=f"{operation_name} failed after {OPENAI_MAX_RETRIES} attempts.",
+                ) from exc
+        else:
+            try:
+                data = response.json()
+            except (ValueError, json.JSONDecodeError) as exc:
+                raise HTTPException(
+                    status_code=502,
+                    detail=f"{operation_name} returned malformed JSON.",
+                ) from exc
+            if not isinstance(data, dict):
+                raise HTTPException(
+                    status_code=502,
+                    detail=f"{operation_name} returned an invalid response object.",
+                )
+            return data, time.perf_counter() - started_at
+
+        await asyncio.sleep(min(0.5 * (2**attempt), 2.0))
+
+    raise HTTPException(status_code=502, detail=f"{operation_name} failed.")
+
+
 async def call_codex_api(
     prompt: str,
     app_mode: str | None = "engagement",
@@ -2141,36 +2215,15 @@ async def call_codex_api(
         ],
         "temperature": 0.2,
     }
-    headers = {
-        "Authorization": f"Bearer {OPENAI_API_KEY}",
-        "Content-Type": "application/json",
-    }
-
-    started_at = time.perf_counter()
-    try:
-        async with httpx.AsyncClient(timeout=OPENAI_TIMEOUT_SECONDS) as client:
-            response = await client.post(
-                f"{OPENAI_BASE_URL}/chat/completions",
-                headers=headers,
-                json=payload,
-            )
-            response.raise_for_status()
-    except httpx.TimeoutException as exc:
-        raise HTTPException(
-            status_code=504,
-            detail="Codex API request timed out.",
-        ) from exc
-    except httpx.HTTPError as exc:
-        raise HTTPException(
-            status_code=502,
-            detail=f"Codex API request failed: {exc}",
-        ) from exc
-
-    elapsed_seconds = time.perf_counter() - started_at
-    data = response.json()
+    data, elapsed_seconds = await _post_openai_payload(
+        payload,
+        operation_name="Codex API request",
+    )
     choices = data.get("choices") or []
     message = choices[0].get("message", {}) if choices else {}
     generated_text = str(message.get("content", "")).strip()
+    if not generated_text:
+        raise HTTPException(status_code=502, detail="Codex API returned empty content.")
     usage = data.get("usage") or {}
     total_tokens = _safe_int(
         usage.get("total_tokens"),
@@ -2218,36 +2271,15 @@ async def call_codex_vision_api(
         ],
         "temperature": 0.2,
     }
-    headers = {
-        "Authorization": f"Bearer {OPENAI_API_KEY}",
-        "Content-Type": "application/json",
-    }
-
-    started_at = time.perf_counter()
-    try:
-        async with httpx.AsyncClient(timeout=OPENAI_TIMEOUT_SECONDS) as client:
-            response = await client.post(
-                f"{OPENAI_BASE_URL}/chat/completions",
-                headers=headers,
-                json=payload,
-            )
-            response.raise_for_status()
-    except httpx.TimeoutException as exc:
-        raise HTTPException(
-            status_code=504,
-            detail="Codex Vision API request timed out.",
-        ) from exc
-    except httpx.HTTPError as exc:
-        raise HTTPException(
-            status_code=502,
-            detail=f"Codex Vision API request failed: {exc}",
-        ) from exc
-
-    elapsed_seconds = time.perf_counter() - started_at
-    data = response.json()
+    data, elapsed_seconds = await _post_openai_payload(
+        payload,
+        operation_name="Codex Vision API request",
+    )
     choices = data.get("choices") or []
     message = choices[0].get("message", {}) if choices else {}
     generated_text = str(message.get("content", "")).strip()
+    if not generated_text:
+        raise HTTPException(status_code=502, detail="Codex Vision API returned empty content.")
     usage = data.get("usage") or {}
     total_tokens = _safe_int(
         usage.get("total_tokens"),
@@ -2255,6 +2287,16 @@ async def call_codex_vision_api(
     )
     metrics = calculate_api_performance_metrics(elapsed_seconds, total_tokens)
     return generated_text, metrics
+
+
+async def call_preferred_text_ai(
+    prompt: str,
+    *,
+    app_mode: str | None = "engagement",
+) -> tuple[str, PerformanceMetrics]:
+    if OPENAI_API_KEY:
+        return await call_codex_api(prompt, app_mode=app_mode)
+    return await call_ollama(apply_app_mode_to_prompt(prompt, app_mode))
 
 
 async def generate_expansion_questions_for_mistake(
@@ -4302,6 +4344,7 @@ async def generate_grammar(
         "mode": mode,
         "sentence": request.sentence,
         "app_mode": normalize_app_mode(request.app_mode),
+        "ai_runtime": ai_runtime_signature(),
     }
     if reference_signature:
         cache_params["gsat_reference_signature"] = reference_signature
@@ -4335,8 +4378,9 @@ async def generate_grammar(
             f"Extra guidance: {request.sentence}"
         )
 
-        raw_response, metrics = await call_ollama(
-            apply_app_mode_to_prompt(prompt, request.app_mode)
+        raw_response, metrics = await call_preferred_text_ai(
+            prompt,
+            app_mode=request.app_mode,
         )
         quiz_data = parse_json_object_from_text(raw_response)
         options_value = quiz_data.get("options")
@@ -4389,8 +4433,9 @@ async def generate_grammar(
         f"Sentence: {request.sentence}"
     )
 
-    correction, metrics = await call_ollama(
-        apply_app_mode_to_prompt(prompt, request.app_mode)
+    correction, metrics = await call_preferred_text_ai(
+        prompt,
+        app_mode=request.app_mode,
     )
     ledger_entry = GrammarErrorLedger(
         user_id=current_user.id,
@@ -4605,6 +4650,7 @@ async def generate_full_mock_exam(
         "version": request.version,
         "level_bucket": level_bucket,
         "app_mode": normalize_app_mode(request.app_mode),
+        "ai_runtime": ai_runtime_signature(),
         "structure": "gsat_full_mock_1_56_plus_non_choice",
     }
     if not request.force_refresh:
@@ -5265,6 +5311,7 @@ async def generate_reading(
         "level": request.level,
         "word_count": request.word_count,
         "app_mode": normalize_app_mode(request.app_mode),
+        "ai_runtime": ai_runtime_signature(),
     }
     if reference_signature:
         cache_params["gsat_reference_signature"] = reference_signature
@@ -5283,8 +5330,9 @@ async def generate_reading(
         f"Approximate word count: {request.word_count}"
     )
 
-    article, metrics = await call_ollama(
-        apply_app_mode_to_prompt(prompt, request.app_mode)
+    article, metrics = await call_preferred_text_ai(
+        prompt,
+        app_mode=request.app_mode,
     )
     response_model = ReadingResponse(
         article=article,
@@ -5324,8 +5372,9 @@ async def generate_discourse(
         "Do not include markdown or explanations."
     )
 
-    raw_response, metrics = await call_ollama(
-        apply_app_mode_to_prompt(prompt, app_mode)
+    raw_response, metrics = await call_preferred_text_ai(
+        prompt,
+        app_mode=app_mode,
     )
     parsed = parse_json_object_from_text(raw_response)
     article = _safe_string(parsed.get("article_with_blanks"), "")

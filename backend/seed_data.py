@@ -21,8 +21,10 @@ import sys
 from typing import Any
 
 import httpx
+from alembic import command as alembic_command
+from alembic.config import Config as AlembicConfig
 from dotenv import load_dotenv
-from sqlalchemy import create_engine, select, text
+from sqlalchemy import create_engine, select
 from sqlalchemy.orm import Session, sessionmaker
 
 CURRENT_DIR = Path(__file__).resolve().parent
@@ -31,7 +33,7 @@ load_dotenv(PROJECT_ROOT / ".env", override=False)
 if str(CURRENT_DIR) not in sys.path:
     sys.path.insert(0, str(CURRENT_DIR))
 
-from models import Base, GrammarConceptBank, Vocabulary  # noqa: E402
+from models import GrammarConceptBank, Vocabulary  # noqa: E402
 
 
 DEFAULT_DATABASE_URL = f"sqlite:///{(CURRENT_DIR / 'gsat_english.db').as_posix()}"
@@ -138,6 +140,20 @@ FALLBACK_VOCAB: list[dict[str, Any]] = [
 ]
 
 
+def load_rc_fallback_vocab() -> list[dict[str, Any]]:
+    data_path = CURRENT_DIR / "data" / "rc_vocab_seed.json"
+    try:
+        payload = json.loads(data_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise RuntimeError(f"Unable to load RC vocabulary seed data: {exc}") from exc
+    if not isinstance(payload, list):
+        raise RuntimeError("RC vocabulary seed data must be a JSON array.")
+    return [item for item in payload if isinstance(item, dict)]
+
+
+RC_FALLBACK_VOCAB = load_rc_fallback_vocab()
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Seed GSAT vocabulary and grammar concepts.")
     parser.add_argument("--vocab", type=int, default=500, help="Number of vocabulary words to seed.")
@@ -161,44 +177,14 @@ def parse_args() -> argparse.Namespace:
 
 
 def create_session(database_url: str) -> sessionmaker[Session]:
+    migration_config = AlembicConfig(str(PROJECT_ROOT / "alembic.ini"))
+    migration_config.attributes["database_url"] = database_url
+    alembic_command.upgrade(migration_config, "head")
     engine = create_engine(
         database_url,
         connect_args={"check_same_thread": False} if database_url.startswith("sqlite") else {},
     )
-    Base.metadata.create_all(bind=engine)
-    ensure_seed_schema(engine, database_url)
     return sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-
-def ensure_seed_schema(engine: Any, database_url: str) -> None:
-    if not database_url.startswith("sqlite"):
-        return
-    with engine.begin() as connection:
-        rows = connection.execute(text("PRAGMA table_info(vocabulary)"))
-        vocab_columns = {row[1] for row in rows}
-        if vocab_columns:
-            if "part_of_speech" not in vocab_columns:
-                connection.execute(text("ALTER TABLE vocabulary ADD COLUMN part_of_speech VARCHAR(40)"))
-            if "gsat_level" not in vocab_columns:
-                connection.execute(text("ALTER TABLE vocabulary ADD COLUMN gsat_level INTEGER"))
-            if "gsat_frequency" not in vocab_columns:
-                connection.execute(text("ALTER TABLE vocabulary ADD COLUMN gsat_frequency INTEGER"))
-
-        connection.execute(
-            text(
-                """
-                CREATE TABLE IF NOT EXISTS grammar_concept_bank (
-                    id INTEGER NOT NULL PRIMARY KEY,
-                    name VARCHAR(120) NOT NULL UNIQUE,
-                    category VARCHAR(120),
-                    description TEXT,
-                    example_sentence TEXT,
-                    gsat_level INTEGER,
-                    created_at DATETIME NOT NULL
-                )
-                """
-            )
-        )
 
 
 def call_codex_json(prompt: str, *, model: str, base_url: str, timeout: float) -> Any:
@@ -415,7 +401,8 @@ def seed_vocab(args: argparse.Namespace, session_factory: sessionmaker[Session])
                 ) from exc
             print(f"[warn] vocab batch failed; using fallback entries: {exc}")
             items = [
-                item for item in FALLBACK_VOCAB
+                item
+                for item in [*FALLBACK_VOCAB, *RC_FALLBACK_VOCAB]
                 if item["word"] not in existing_words
             ][:batch_count]
             if not items:

@@ -26,10 +26,18 @@ def _tesseract_command() -> str | None:
         return configured
 
     if os.name == "nt":
-        for candidate in (
+        candidates: list[Path] = []
+        local_app_data = os.getenv("LOCALAPPDATA")
+        if local_app_data:
+            candidates.append(
+                Path(local_app_data) / "GSAT_Max" / "Tesseract" / "tesseract.exe"
+            )
+        candidates.extend((
             Path(r"C:\Program Files\Tesseract-OCR\tesseract.exe"),
             Path(r"C:\Program Files (x86)\Tesseract-OCR\tesseract.exe"),
-        ):
+            PROJECT_ROOT / ".tools" / "tesseract" / "tesseract.exe",
+        ))
+        for candidate in candidates:
             if candidate.is_file():
                 return str(candidate)
     return None
@@ -47,6 +55,7 @@ class Settings:
     openai_api_key: str | None
     codex_model: str
     openai_timeout_seconds: float
+    openai_max_retries: int
     default_user_email: str
     jwt_secret_key: str
     jwt_expire_minutes: int
@@ -102,6 +111,7 @@ def load_settings() -> Settings:
         openai_api_key=os.getenv("OPENAI_API_KEY") or None,
         codex_model=os.getenv("CODEX_MODEL", os.getenv("OPENAI_MODEL", "gpt-4o-mini")),
         openai_timeout_seconds=float(os.getenv("OPENAI_TIMEOUT_SECONDS", "90")),
+        openai_max_retries=max(1, int(os.getenv("OPENAI_MAX_RETRIES", "3"))),
         default_user_email=os.getenv("DEFAULT_USER_EMAIL", "demo@student.local"),
         jwt_secret_key=os.getenv("JWT_SECRET_KEY", "change-this-dev-secret"),
         jwt_expire_minutes=int(os.getenv("JWT_EXPIRE_MINUTES", "30")),

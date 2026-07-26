@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import replace
 from datetime import datetime, timedelta
 import json
 
@@ -162,6 +163,26 @@ def test_ocr_upload_rejects_spoofed_mime_before_processing(
         files={"exam_image": ("paper.txt", b"not-an-image", "text/plain")},
     )
     assert response.status_code == 415
+
+
+def test_ocr_upload_rejects_files_over_configured_limit(
+    client: TestClient,
+    auth_session: dict[str, object],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(
+        backend_main,
+        "settings",
+        replace(backend_main.settings, max_upload_bytes=1024),
+    )
+    oversized_png = b"\x89PNG\r\n\x1a\n" + (b"0" * 1025)
+    response = client.post(
+        "/upload/exam",
+        headers=auth_session["headers"],
+        files={"exam_image": ("large.png", oversized_png, "image/png")},
+    )
+    assert response.status_code == 413
+    assert "exceeds" in response.json()["detail"].lower()
 
 
 def test_sm2_updates_and_validation() -> None:

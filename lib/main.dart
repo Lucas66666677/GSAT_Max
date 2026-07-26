@@ -7,6 +7,7 @@ import 'dart:ui' as ui;
 import 'package:audioplayers/audioplayers.dart';
 import 'package:confetti/confetti.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
@@ -29,7 +30,10 @@ import 'package:timezone/timezone.dart' as tz;
 import 'package:url_launcher/url_launcher.dart';
 
 import 'core/config/app_config.dart';
+import 'core/services/background_job_poller.dart';
 import 'core/services/purchase_service.dart';
+import 'core/services/target_exam_date_service.dart';
+import 'core/storage/mission_progress_store.dart';
 
 const Color kAppBackground = Color(0xFF121212);
 const Color kSurfaceGlass = Color(0xB01B2430);
@@ -466,7 +470,15 @@ Future<void> main() async {
         return const SystemAnomalyFallback();
       };
 
-      await NotificationService.instance.initialize();
+      try {
+        await NotificationService.instance.initialize();
+      } catch (error, stack) {
+        await TelemetryService.instance.recordError(
+          error,
+          stack,
+          source: 'notification_initialization',
+        );
+      }
       unawaited(AudioService.instance.initialize().catchError((_) {}));
       runApp(
         const AppRestartScope(
@@ -506,6 +518,10 @@ final reviewSyncControllerProvider =
   unawaited(controller.initialize());
   return controller;
 });
+
+final purchaseServiceProvider = Provider<PurchaseServiceApi>(
+  (ref) => PurchaseService.instance,
+);
 
 final routerProvider = Provider<GoRouter>((ref) {
   final authController = ref.watch(authControllerProvider);
@@ -1226,15 +1242,28 @@ class SecureTokenSession {
   const SecureTokenSession({
     required this.accessToken,
     required this.refreshToken,
+    this.userId,
+    this.email,
+    this.displayName,
+    this.currentStreak = 0,
+    this.hasCompletedOnboarding = false,
+    this.isPro = false,
   });
 
   final String accessToken;
   final String refreshToken;
+  final int? userId;
+  final String? email;
+  final String? displayName;
+  final int currentStreak;
+  final bool hasCompletedOnboarding;
+  final bool isPro;
 }
 
 class SecureTokenStorage {
   static const String _accessTokenKey = 'auth_access_token_v1';
   static const String _refreshTokenKey = 'auth_refresh_token_v1';
+  static const String _profileKey = 'auth_profile_v1';
   static const FlutterSecureStorage _storage = FlutterSecureStorage(
     aOptions: AndroidOptions(encryptedSharedPreferences: true),
   );
@@ -1242,10 +1271,27 @@ class SecureTokenStorage {
   Future<void> writeSession({
     required String accessToken,
     required String refreshToken,
+    required int userId,
+    required String email,
+    String? displayName,
+    required int currentStreak,
+    required bool hasCompletedOnboarding,
+    required bool isPro,
   }) async {
     await Future.wait([
       _storage.write(key: _accessTokenKey, value: accessToken),
       _storage.write(key: _refreshTokenKey, value: refreshToken),
+      _storage.write(
+        key: _profileKey,
+        value: jsonEncode({
+          'user_id': userId,
+          'email': email,
+          'display_name': displayName,
+          'current_streak': currentStreak,
+          'has_completed_onboarding': hasCompletedOnboarding,
+          'is_pro': isPro,
+        }),
+      ),
     ]);
   }
 
@@ -1253,13 +1299,23 @@ class SecureTokenStorage {
     final values = await Future.wait([
       _storage.read(key: _accessTokenKey),
       _storage.read(key: _refreshTokenKey),
+      _storage.read(key: _profileKey),
     ]);
     final accessToken = values[0];
     final refreshToken = values[1];
     if (accessToken == null || refreshToken == null) return null;
+    final profile = _decodeJsonObject(values[2] ?? '');
+    final userId = PerformanceMetrics._asInt(profile['user_id']);
     return SecureTokenSession(
       accessToken: accessToken,
       refreshToken: refreshToken,
+      userId: userId > 0 ? userId : null,
+      email: _nullableString(profile['email']),
+      displayName: _nullableString(profile['display_name']),
+      currentStreak: PerformanceMetrics._asInt(profile['current_streak']),
+      hasCompletedOnboarding:
+          _boolFromJson(profile['has_completed_onboarding']),
+      isPro: _boolFromJson(profile['is_pro']),
     );
   }
 
@@ -1267,6 +1323,7 @@ class SecureTokenStorage {
     await Future.wait([
       _storage.delete(key: _accessTokenKey),
       _storage.delete(key: _refreshTokenKey),
+      _storage.delete(key: _profileKey),
     ]);
   }
 }
@@ -1815,12 +1872,22 @@ class AuthController extends ChangeNotifier {
   static final Uri _logoutEndpoint = AppConfig.apiUri('/auth/logout');
   static final Uri _entitlementEndpoint = AppConfig.apiUri('/user/entitlement');
   static final Uri _deleteAccountEndpoint = AppConfig.apiUri('/user/account');
-  static final SecureTokenStorage _secureStorage = SecureTokenStorage();
-
-  AuthController() {
+  AuthController({
+    http.Client? client,
+    SecureTokenStorage? secureStorage,
+    bool enablePostAuthSideEffects = true,
+  })  : _client = client ?? http.Client(),
+        _ownsClient = client == null,
+        _secureStorage = secureStorage ?? SecureTokenStorage(),
+        _enablePostAuthSideEffects = enablePostAuthSideEffects {
     _activeAuthController = this;
     unawaited(restoreSession());
   }
+
+  final http.Client _client;
+  final bool _ownsClient;
+  final SecureTokenStorage _secureStorage;
+  final bool _enablePostAuthSideEffects;
 
   bool _isInitializing = true;
   bool _isLoggedIn = false;
@@ -1882,7 +1949,7 @@ class AuthController extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final response = await http
+      final response = await _client
           .post(
             endpoint,
             headers: const {'Content-Type': 'application/json'},
@@ -1893,7 +1960,7 @@ class AuthController extends ChangeNotifier {
 
       if (response.statusCode >= 200 && response.statusCode < 300) {
         await _applyAuthenticatedResponse(data);
-        if (endpoint == _registerEndpoint) {
+        if (_enablePostAuthSideEffects && endpoint == _registerEndpoint) {
           unawaited(
             _authenticatedPost(
               AppConfig.apiUri('/auth/email-verification/request'),
@@ -1901,8 +1968,9 @@ class AuthController extends ChangeNotifier {
             ).catchError((Object _) => http.Response('', 503)),
           );
         }
-        await NotificationService.instance.requestPermissionsGracefully();
-        await NotificationService.instance.scheduleDailyReviewReminder();
+        if (_enablePostAuthSideEffects) {
+          unawaited(_configurePostAuthNotifications());
+        }
         return true;
       }
 
@@ -1928,6 +1996,19 @@ class AuthController extends ChangeNotifier {
     }
   }
 
+  Future<void> _configurePostAuthNotifications() async {
+    try {
+      await NotificationService.instance.requestPermissionsGracefully();
+      await NotificationService.instance.scheduleDailyReviewReminder();
+    } catch (error, stack) {
+      await TelemetryService.instance.recordError(
+        error,
+        stack,
+        source: 'post_auth_notifications',
+      );
+    }
+  }
+
   Future<void> restoreSession() async {
     try {
       final session = await _secureStorage.readSession();
@@ -1935,6 +2016,15 @@ class AuthController extends ChangeNotifier {
       _token = session.accessToken;
       _activeJwtToken = session.accessToken;
       _activeRefreshToken = session.refreshToken;
+      if (session.userId != null && session.email != null) {
+        _userId = session.userId;
+        _email = session.email;
+        _displayName = session.displayName;
+        _currentStreak = session.currentStreak;
+        _hasCompletedOnboarding = session.hasCompletedOnboarding;
+        _isPro = session.isPro;
+        _isLoggedIn = true;
+      }
       await refreshAccessToken(clearOnFailure: true);
     } catch (_) {
       await _clearLocalSession();
@@ -1956,8 +2046,9 @@ class AuthController extends ChangeNotifier {
   Future<bool> _performRefresh({required bool clearOnFailure}) async {
     final refreshToken = _activeRefreshToken;
     if (refreshToken == null || refreshToken.isEmpty) return false;
+    var tokenWasRejected = false;
     try {
-      final response = await http
+      final response = await _client
           .post(
             _refreshEndpoint,
             headers: const {'Content-Type': 'application/json'},
@@ -1968,10 +2059,13 @@ class AuthController extends ChangeNotifier {
         await _applyAuthenticatedResponse(_decodeJsonObject(response.body));
         return true;
       }
+      tokenWasRejected = response.statusCode == 400 ||
+          response.statusCode == 401 ||
+          response.statusCode == 403;
     } catch (_) {
-      // Session cleanup below provides a deterministic signed-out state.
+      // Keep the cached profile signed in while offline or during server outages.
     }
-    if (clearOnFailure) {
+    if (clearOnFailure && tokenWasRejected) {
       await _clearLocalSession();
       notifyListeners();
     }
@@ -1997,6 +2091,12 @@ class AuthController extends ChangeNotifier {
     await _secureStorage.writeSession(
       accessToken: accessToken,
       refreshToken: refreshToken,
+      userId: _userId!,
+      email: _email ?? '',
+      displayName: _displayName,
+      currentStreak: _currentStreak,
+      hasCompletedOnboarding: _hasCompletedOnboarding,
+      isPro: _isPro,
     );
     _activeReviewSyncController?.onAuthenticatedUser(_userId!);
   }
@@ -2044,6 +2144,7 @@ class AuthController extends ChangeNotifier {
 
   void markOnboardingCompleted() {
     _hasCompletedOnboarding = true;
+    unawaited(_persistCurrentSession());
     unawaited(NotificationService.instance.scheduleDailyReviewReminder());
     notifyListeners();
   }
@@ -2060,6 +2161,7 @@ class AuthController extends ChangeNotifier {
 
       if (response.statusCode >= 200 && response.statusCode < 300) {
         _isPro = _boolFromJson(data['is_pro']);
+        await _persistCurrentSession();
         return _isPro;
       }
 
@@ -2130,7 +2232,7 @@ class AuthController extends ChangeNotifier {
     final refreshToken = _activeRefreshToken;
     if (refreshToken != null && refreshToken.isNotEmpty) {
       try {
-        await http
+        await _client
             .post(
               _logoutEndpoint,
               headers: const {'Content-Type': 'application/json'},
@@ -2157,6 +2259,34 @@ class AuthController extends ChangeNotifier {
     _hasCompletedOnboarding = false;
     _isPro = false;
     _isLoggedIn = false;
+  }
+
+  Future<void> _persistCurrentSession() async {
+    final accessToken = _activeJwtToken;
+    final refreshToken = _activeRefreshToken;
+    final userId = _userId;
+    if (accessToken == null ||
+        refreshToken == null ||
+        userId == null ||
+        (_email ?? '').isEmpty) {
+      return;
+    }
+    await _secureStorage.writeSession(
+      accessToken: accessToken,
+      refreshToken: refreshToken,
+      userId: userId,
+      email: _email!,
+      displayName: _displayName,
+      currentStreak: _currentStreak,
+      hasCompletedOnboarding: _hasCompletedOnboarding,
+      isPro: _isPro,
+    );
+  }
+
+  @override
+  void dispose() {
+    if (_ownsClient) _client.close();
+    super.dispose();
   }
 }
 
@@ -2290,7 +2420,11 @@ class _GsatEnglishAppState extends ConsumerState<GsatEnglishApp> {
     if (!auth.isInitializing && !_nativeSplashRemoved) {
       _nativeSplashRemoved = true;
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        FlutterNativeSplash.remove();
+        try {
+          FlutterNativeSplash.remove();
+        } catch (_) {
+          // A missing native splash channel must not block the first frame.
+        }
       });
     }
     final appMode = ref.watch(appModeControllerProvider).mode;
@@ -2305,6 +2439,13 @@ class _GsatEnglishAppState extends ConsumerState<GsatEnglishApp> {
     return MaterialApp.router(
       title: 'GSAT_Max',
       debugShowCheckedModeBanner: false,
+      locale: const Locale('zh', 'TW'),
+      supportedLocales: const [Locale('zh', 'TW'), Locale('en', 'US')],
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
       routerConfig: router,
       builder: (context, child) {
         final app = child ?? const SizedBox.shrink();
@@ -2575,10 +2716,8 @@ class LoginScreen extends ConsumerStatefulWidget {
 }
 
 class _LoginScreenState extends ConsumerState<LoginScreen> {
-  final TextEditingController _emailController =
-      TextEditingController(text: 'student@example.com');
-  final TextEditingController _passwordController =
-      TextEditingController(text: 'password123');
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _displayNameController = TextEditingController();
   bool _isRegisterMode = false;
   bool _acceptedLegalTerms = false;
@@ -2629,7 +2768,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Build a smarter daily routine for vocab, reading, and writing practice.',
+                    '為台灣高中生打造的學測英文訓練：單字、閱讀、文法與寫作，一站完成。',
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                           color: kTextTertiary,
                           height: 1.45,
@@ -2641,7 +2780,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       controller: _displayNameController,
                       textInputAction: TextInputAction.next,
                       decoration: const InputDecoration(
-                        labelText: 'Display name',
+                        labelText: '顯示名稱',
                         prefixIcon: Icon(Icons.badge_outlined),
                       ),
                     ),
@@ -2652,7 +2791,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     keyboardType: TextInputType.emailAddress,
                     textInputAction: TextInputAction.next,
                     decoration: const InputDecoration(
-                      labelText: 'Email',
+                      labelText: '電子郵件',
                       prefixIcon: Icon(Icons.mail_outline_rounded),
                     ),
                   ),
@@ -2662,10 +2801,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     obscureText: true,
                     onSubmitted: (_) => _submit(auth),
                     decoration: InputDecoration(
-                      labelText: 'Password',
+                      labelText: '密碼',
                       prefixIcon: const Icon(Icons.lock_outline_rounded),
-                      helperText:
-                          _isRegisterMode ? 'Use at least 8 characters.' : null,
+                      helperText: _isRegisterMode ? '請使用至少 8 個字元。' : null,
                     ),
                   ),
                   if (_isRegisterMode) ...[
@@ -2690,7 +2828,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             activeColor: kNeonGreen,
                             controlAffinity: ListTileControlAffinity.leading,
                             title: const Text(
-                              'I agree to the Terms of Service and understand that AI-generated evaluations may contain errors.',
+                              '我同意服務條款，並了解 AI 產生的評量可能包含錯誤。',
                               style: TextStyle(height: 1.35),
                             ),
                           ),
@@ -2701,7 +2839,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               child: TextButton.icon(
                                 onPressed: () => context.push('/legal'),
                                 icon: const Icon(Icons.gavel_outlined),
-                                label: const Text('View Terms & Privacy'),
+                                label: const Text('查看服務條款與隱私權政策'),
                               ),
                             ),
                           ),
@@ -2726,10 +2864,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         : const Icon(Icons.arrow_forward_rounded),
                     label: Text(
                       auth.isBusy
-                          ? 'Connecting...'
+                          ? '連線中...'
                           : _isRegisterMode
-                              ? 'Create account'
-                              : 'Start practicing',
+                              ? '建立帳號'
+                              : '開始練習',
                     ),
                   ),
                   if (!_isRegisterMode) ...[
@@ -2742,11 +2880,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           TextButton(
                             onPressed:
                                 auth.isBusy ? null : _requestPasswordReset,
-                            child: const Text('Forgot password?'),
+                            child: const Text('忘記密碼？'),
                           ),
                           TextButton(
                             onPressed: () => context.push('/legal'),
-                            child: const Text('Terms & Privacy'),
+                            child: const Text('條款與隱私權'),
                           ),
                         ],
                       ),
@@ -2766,9 +2904,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               });
                             },
                       child: Text(
-                        _isRegisterMode
-                            ? 'I already have an account'
-                            : 'Create an account',
+                        _isRegisterMode ? '我已經有帳號' : '建立新帳號',
                       ),
                     ),
                   ),
@@ -2793,7 +2929,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           ..showSnackBar(
             const SnackBar(
               content: Text(
-                'Please agree to the Terms of Service before creating an account.',
+                '建立帳號前，請先同意服務條款。',
               ),
               behavior: SnackBarBehavior.floating,
             ),
@@ -3158,14 +3294,14 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
           children: [
             const SizedBox(height: 8),
             Text(
-              'Welcome to your GSAT launch scan',
+              '歡迎進行學測起始診斷',
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.w900,
                   ),
             ),
             const SizedBox(height: 8),
             Text(
-              'Answer five quick AI-calibrated items so we can build your first review deck.',
+              '完成 5 題快速診斷，我們會依結果建立第一組複習單字與能力雷達。',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: kTextTertiary,
                     height: 1.42,
@@ -3504,14 +3640,14 @@ class _ProfileGeneratedCard extends StatelessWidget {
               ),
               const SizedBox(height: 18),
               Text(
-                'Profile Generated',
+                '學習檔案已建立',
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                       fontWeight: FontWeight.w900,
                     ),
               ),
               const SizedBox(height: 8),
               Text(
-                'Your first GSAT review deck and skill radar are ready.',
+                '你的第一組學測複習卡與能力雷達已準備完成。',
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: kTextTertiary,
@@ -3577,10 +3713,8 @@ class MainScreen extends ConsumerWidget {
             const SizedBox(width: 8),
           ],
           IconButton(
-            tooltip: 'Log out',
-            onPressed: () {
-              unawaited(ref.read(authControllerProvider).logout());
-            },
+            tooltip: '登出',
+            onPressed: () => _confirmLogout(context, ref),
             icon: const Icon(Icons.logout_rounded),
           ),
           const SizedBox(width: 8),
@@ -3606,7 +3740,7 @@ class MainScreen extends ConsumerWidget {
         heroTag: 'zen-mode-fab',
         onPressed: () => context.push('/zen'),
         icon: const Icon(Icons.self_improvement_rounded),
-        label: const Text('Zen'),
+        label: const Text('專注'),
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: navigationShell.currentIndex,
@@ -3619,31 +3753,54 @@ class MainScreen extends ConsumerWidget {
           BottomNavigationBarItem(
             icon: Icon(Icons.home_outlined),
             activeIcon: Icon(Icons.home_rounded),
-            label: 'Home',
+            label: '首頁',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.quiz_outlined),
             activeIcon: Icon(Icons.quiz_rounded),
-            label: 'Diagnostic',
+            label: '診斷',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.menu_book_outlined),
             activeIcon: Icon(Icons.menu_book_rounded),
-            label: 'Reading',
+            label: '閱讀',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.edit_note_outlined),
             activeIcon: Icon(Icons.edit_note_rounded),
-            label: 'Writing',
+            label: '寫作',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person_outline_rounded),
             activeIcon: Icon(Icons.person_rounded),
-            label: 'Profile',
+            label: '個人',
           ),
         ],
       ),
     );
+  }
+
+  Future<void> _confirmLogout(BuildContext context, WidgetRef ref) async {
+    final shouldLogout = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('確定要登出嗎？'),
+        content: const Text('尚未同步的單字複習會保留在此裝置，登入後可繼續同步。'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: const Text('取消'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: const Text('登出'),
+          ),
+        ],
+      ),
+    );
+    if (shouldLogout == true) {
+      await ref.read(authControllerProvider).logout();
+    }
   }
 }
 
@@ -4320,7 +4477,8 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
       final auth = ref.read(authControllerProvider);
       final userId = auth.userId;
       if (userId == null) throw StateError('Sign in before purchasing Pro.');
-      final result = await PurchaseService.instance.purchaseMonthly(userId);
+      final result =
+          await ref.read(purchaseServiceProvider).purchaseMonthly(userId);
       if (!mounted) return;
       if (result.status == PurchaseFlowStatus.cancelled) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -4373,7 +4531,7 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
       if (userId == null) {
         throw StateError('Sign in before restoring purchases.');
       }
-      final result = await PurchaseService.instance.restore(userId);
+      final result = await ref.read(purchaseServiceProvider).restore(userId);
       if (!mounted) return;
       if (result.status != PurchaseFlowStatus.restored) {
         setState(() => _errorMessage = result.message);
@@ -4620,14 +4778,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Settings')),
+      appBar: AppBar(title: const Text('設定')),
       body: AppPage(
         children: [
           const PageIntro(
             icon: Icons.settings_rounded,
-            title: 'Settings',
-            subtitle:
-                'Tune audio, reminders, offline data, and account controls.',
+            title: '設定中心',
+            subtitle: '調整語音、提醒、離線資料與帳號安全。',
           ),
           const SizedBox(height: 18),
           if (_isLoading)
@@ -4645,7 +4802,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         const SizedBox(width: 10),
                         Expanded(
                           child: Text(
-                            'TTS Speech Rate',
+                            'TTS 語音速度',
                             style: Theme.of(context).textTheme.titleMedium,
                           ),
                         ),
@@ -4660,7 +4817,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'A slower pace helps with listening and shadowing practice.',
+                      '較慢的速度適合聽力辨識與跟讀練習。',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color: kTextTertiary,
                             height: 1.35,
@@ -4687,7 +4844,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 ),
                 leading: const Icon(Icons.notifications_active_outlined),
                 title: const Text(
-                  'Daily Reminder Time',
+                  '每日提醒時間',
                   style: TextStyle(fontWeight: FontWeight.w900),
                 ),
                 subtitle: Text(
@@ -4707,12 +4864,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 ),
                 leading: const Icon(Icons.event_available_rounded),
                 title: const Text(
-                  'GSAT Target Date',
+                  '學測目標日期',
                   style: TextStyle(fontWeight: FontWeight.w900),
                 ),
                 subtitle: Text(
                   _targetExamDate == null
-                      ? 'Set your exam date for an accurate study countdown.'
+                      ? '設定考試日期，取得正確的讀書倒數。'
                       : '${_targetExamDate!.year}/${_targetExamDate!.month.toString().padLeft(2, '0')}/${_targetExamDate!.day.toString().padLeft(2, '0')}',
                   style: const TextStyle(color: kTextSecondary),
                 ),
@@ -4734,7 +4891,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         const SizedBox(width: 10),
                         Expanded(
                           child: Text(
-                            'Weekly Report Persona',
+                            '每週報告語氣',
                             style: Theme.of(context).textTheme.titleMedium,
                           ),
                         ),
@@ -4777,7 +4934,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         const SizedBox(width: 10),
                         Expanded(
                           child: Text(
-                            'Help & Safety',
+                            '協助與安全',
                             style: Theme.of(context).textTheme.titleMedium,
                           ),
                         ),
@@ -4785,7 +4942,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Reach support or report problematic AI output directly from the app.',
+                      '可直接聯絡客服，或回報不適當、錯誤的 AI 內容。',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color: kTextTertiary,
                             height: 1.35,
@@ -4799,17 +4956,17 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         OutlinedButton.icon(
                           onPressed: _contactSupport,
                           icon: const Icon(Icons.email_outlined),
-                          label: const Text('Contact Support'),
+                          label: const Text('聯絡客服'),
                         ),
                         OutlinedButton.icon(
                           onPressed: _reportInappropriateContent,
                           icon: const Icon(Icons.flag_outlined),
-                          label: const Text('Report Inappropriate Content'),
+                          label: const Text('回報不適當內容'),
                         ),
                         TextButton.icon(
                           onPressed: () => context.push('/legal'),
                           icon: const Icon(Icons.policy_outlined),
-                          label: const Text('Terms & Privacy'),
+                          label: const Text('條款與隱私權'),
                         ),
                       ],
                     ),
@@ -4825,12 +4982,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Offline Data',
+                      '離線資料',
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Clear cached flashcards while keeping your account and backend progress intact.',
+                      '清除本機快取單字卡，不會刪除帳號與後端學習進度。',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color: kTextTertiary,
                             height: 1.35,
@@ -4840,7 +4997,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     OutlinedButton.icon(
                       onPressed: _clearOfflineCache,
                       icon: const Icon(Icons.cleaning_services_outlined),
-                      label: const Text('Clear Offline Cache'),
+                      label: const Text('清除離線快取'),
                     ),
                   ],
                 ),
@@ -4870,7 +5027,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         Icon(Icons.warning_amber_rounded, color: kDangerRed),
                         SizedBox(width: 10),
                         Text(
-                          'Danger Zone',
+                          '帳號危險區',
                           style: TextStyle(
                             color: kDangerRed,
                             fontWeight: FontWeight.w900,
@@ -4881,7 +5038,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      'Delete Account',
+                      '刪除帳號',
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                             color: kDangerRed,
                             fontWeight: FontWeight.w900,
@@ -4889,7 +5046,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Permanently delete your account and learning data from this service.',
+                      '永久刪除此服務中的帳號與學習資料，此操作無法復原。',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color: kTextTertiary,
                             height: 1.35,
@@ -4908,7 +5065,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             : Icons.delete_forever_rounded,
                       ),
                       label: Text(
-                        _isDeleting ? 'Deleting...' : 'Delete Account',
+                        _isDeleting ? '刪除中...' : '刪除帳號',
                       ),
                     ),
                   ],
@@ -4979,30 +5136,24 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     if (picked == null) return;
 
     try {
-      final response = await _authenticatedPatch(
-        AppConfig.apiUri('/user/target-exam-date'),
-        body: jsonEncode({'target_exam_date': picked.toIso8601String()}),
-      ).timeout(const Duration(seconds: 8));
+      final updatedDate = await TargetExamDateService(
+        endpoint: AppConfig.apiUri('/user/target-exam-date'),
+      )
+          .update(
+            requestedDate: picked,
+            send: (uri, body) => _authenticatedPatch(uri, body: body),
+          )
+          .timeout(const Duration(seconds: 8));
       if (!mounted) return;
-      if (response.statusCode >= 200 && response.statusCode < 300) {
-        final data = _decodeJsonObject(response.body);
-        setState(() {
-          _targetExamDate = DateTime.tryParse(
-                _stringFromAny(data['target_exam_date'], fallback: ''),
-              ) ??
-              picked;
-        });
-        ScaffoldMessenger.of(context)
-          ..hideCurrentSnackBar()
-          ..showSnackBar(
-            const SnackBar(
-              content: Text('GSAT target date updated.'),
-              behavior: SnackBarBehavior.floating,
-            ),
-          );
-        return;
-      }
-      throw HttpException('Server returned ${response.statusCode}.');
+      setState(() => _targetExamDate = updatedDate);
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          const SnackBar(
+            content: Text('GSAT target date updated.'),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
     } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context)
@@ -5406,7 +5557,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        auth.displayName ?? 'GSAT Learner',
+                        auth.displayName ?? '學測學習者',
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
                               fontWeight: FontWeight.w900,
                             ),
@@ -5429,16 +5580,16 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   OutlinedButton.icon(
                     onPressed: () => context.push('/paywall'),
                     icon: const Icon(Icons.workspace_premium_rounded),
-                    label: const Text('Go Pro'),
+                    label: const Text('升級 Pro'),
                   ),
                 ],
                 IconButton(
-                  tooltip: 'Settings',
+                  tooltip: '設定',
                   onPressed: () => context.push('/settings'),
                   icon: const Icon(Icons.settings_rounded),
                 ),
                 IconButton(
-                  tooltip: 'Refresh stats',
+                  tooltip: '重新整理統計',
                   onPressed: _isLoading ? null : _loadStats,
                   icon: const Icon(Icons.refresh_rounded),
                 ),
@@ -5474,12 +5625,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Final Week Cheat Sheet',
+                            '考前一週弱點講義',
                             style: Theme.of(context).textTheme.titleMedium,
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            'Print your hardest vocab and grammar misses for last-minute review.',
+                            '匯出最需要加強的單字與文法錯題，方便列印衝刺。',
                             style: Theme.of(context)
                                 .textTheme
                                 .bodyMedium
@@ -5504,9 +5655,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         ? const Icon(Icons.hourglass_top_rounded)
                         : const Icon(Icons.download_rounded),
                     label: Text(
-                      _isDownloadingCheatSheet
-                          ? 'Preparing PDF...'
-                          : 'Download Exam Cheat Sheet (PDF)',
+                      _isDownloadingCheatSheet ? 'PDF 準備中...' : '下載考前弱點講義（PDF）',
                     ),
                   ),
                 ),
@@ -5529,7 +5678,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             children: [
               Expanded(
                 child: _ProfileStatCard(
-                  label: 'Words mastered',
+                  label: '已掌握單字',
                   value: stats.totalWordsMastered.toString(),
                   icon: Icons.bolt_rounded,
                   color: kNeonGreen,
@@ -5538,7 +5687,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               const SizedBox(width: 12),
               Expanded(
                 child: _ProfileStatCard(
-                  label: 'Grammar avg',
+                  label: '文法平均',
                   value: '${stats.averageGrammarScore.toStringAsFixed(1)}/5',
                   icon: Icons.psychology_alt_rounded,
                   color: kElectricBlue,
@@ -5548,7 +5697,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           ),
           const SizedBox(height: 12),
           _ProfileStatCard(
-            label: 'Essays written',
+            label: '已完成作文',
             value: stats.totalEssaysWritten.toString(),
             icon: Icons.edit_note_rounded,
             color: const Color(0xFFF59E0B),
@@ -5558,14 +5707,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             children: [
               Expanded(
                 child: Text(
-                  'Skill Radar',
+                  '能力雷達',
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.w900,
                       ),
                 ),
               ),
               IconButton(
-                tooltip: 'Share Progress',
+                tooltip: '分享學習進度',
                 onPressed: () => ShareCaptureService.shareBoundary(
                   context: context,
                   boundaryKey: _radarShareKey,
@@ -5917,6 +6066,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       AppConfig.apiUri('/user/daily-schedule');
   static final Uri _weeklyReportEndpoint =
       AppConfig.apiUri('/user/weekly-report');
+  final MissionProgressStore _missionProgressStore = MissionProgressStore();
 
   List<ReviewFlashcard> _queue = const [];
   List<DailyExpansionQuestion> _expansionQuestions = const [];
@@ -5935,6 +6085,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   bool _hasCachedReviewSnapshot = false;
   Offset _dismissOffset = Offset.zero;
   String? _loadError;
+  String? _offlineNotice;
   String? _expansionError;
   String? _missionError;
 
@@ -5984,6 +6135,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           dueCount: _queue.length,
           isLoading: _isLoading,
         ),
+        if (_offlineNotice != null) ...[
+          const SizedBox(height: 12),
+          _StatusBanner(
+            message: _offlineNotice!,
+            icon: Icons.cloud_off_rounded,
+            color: kElectricBlue,
+            backgroundColor: kElectricBlue,
+          ),
+        ],
         const SizedBox(height: 18),
         if (_isExpansionLoading)
           const GrammarSkeleton()
@@ -6022,6 +6182,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         else if (!_isExpansionLoading &&
             _expansionError == null &&
             _expansionQuestions.isEmpty &&
+            _loadError == null &&
             currentCard == null)
           const _ReviewCompleteState()
         else if (!_isExpansionLoading &&
@@ -6158,6 +6319,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       if (response.statusCode >= 200 && response.statusCode < 300) {
         final schedule =
             StudyMissionSchedule.fromJson(_decodeJsonObject(response.body));
+        final userId = _activeAuthController?.userId ?? 0;
+        final localOverrides = userId > 0
+            ? await _missionProgressStore.readOverrides(
+                userId: userId,
+                day: DateTime.now(),
+              )
+            : <int, bool>{};
+        if (!mounted) return;
         setState(() {
           _missionSchedule = schedule;
           _completedMissionIndexes
@@ -6166,12 +6335,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               schedule.tasks
                   .asMap()
                   .entries
-                  .where((entry) => entry.value.status == 'completed')
+                  .where((entry) =>
+                      localOverrides[entry.value.id] ??
+                      entry.value.status == 'completed')
                   .map((entry) => entry.key),
             );
           _isMissionLoading = false;
           _missionError = null;
         });
+        if (userId > 0 && localOverrides.isNotEmpty) {
+          unawaited(
+            _replayMissionOverrides(
+              schedule: schedule,
+              userId: userId,
+              overrides: localOverrides,
+            ),
+          );
+        }
       } else {
         setState(() {
           _isMissionLoading = false;
@@ -6203,6 +6383,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final schedule = _missionSchedule;
     if (schedule == null || index < 0 || index >= schedule.tasks.length) return;
     final task = schedule.tasks[index];
+    final userId = _activeAuthController?.userId ?? 0;
     final wasCompleted = _completedMissionIndexes.contains(index);
     final shouldComplete = !wasCompleted;
     setState(() {
@@ -6217,24 +6398,62 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ? HapticFeedback.mediumImpact()
           : HapticFeedback.selectionClick(),
     );
+    if (userId > 0) {
+      await _missionProgressStore.setOverride(
+        userId: userId,
+        day: DateTime.now(),
+        taskId: task.id,
+        completed: shouldComplete,
+      );
+    }
 
     try {
       final response = await _authenticatedPatch(
         AppConfig.apiUri('/user/daily-schedule/tasks/${task.id}'),
         body: jsonEncode({'completed': shouldComplete}),
       ).timeout(const Duration(seconds: 8));
-      if (response.statusCode >= 200 && response.statusCode < 300) return;
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        if (userId > 0) {
+          await _missionProgressStore.clearOverride(
+            userId: userId,
+            day: DateTime.now(),
+            taskId: task.id,
+          );
+        }
+        return;
+      }
       throw HttpException('Server returned ${response.statusCode}.');
     } catch (_) {
       if (!mounted) return;
-      setState(() {
-        if (wasCompleted) {
-          _completedMissionIndexes.add(index);
-        } else {
-          _completedMissionIndexes.remove(index);
+      _showHomeSnack(
+        'Task saved on this device. It will sync when the backend is reachable.',
+      );
+    }
+  }
+
+  Future<void> _replayMissionOverrides({
+    required StudyMissionSchedule schedule,
+    required int userId,
+    required Map<int, bool> overrides,
+  }) async {
+    for (final task in schedule.tasks) {
+      final completed = overrides[task.id];
+      if (completed == null) continue;
+      try {
+        final response = await _authenticatedPatch(
+          AppConfig.apiUri('/user/daily-schedule/tasks/${task.id}'),
+          body: jsonEncode({'completed': completed}),
+        ).timeout(const Duration(seconds: 8));
+        if (response.statusCode >= 200 && response.statusCode < 300) {
+          await _missionProgressStore.clearOverride(
+            userId: userId,
+            day: DateTime.now(),
+            taskId: task.id,
+          );
         }
-      });
-      _showHomeSnack('Task update was not saved. Please try again online.');
+      } catch (_) {
+        return;
+      }
     }
   }
 
@@ -6364,6 +6583,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       _queue = cachedCards;
       _isLoading = cachedCards.isEmpty;
       _loadError = null;
+      _offlineNotice = null;
     });
 
     try {
@@ -6387,42 +6607,43 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           _queue = cards;
           _isLoading = false;
           _loadError = null;
+          _offlineNotice = null;
         });
         await _cacheReviewCards(cards);
         if (cards.isEmpty) {
           unawaited(NotificationService.instance.cancelTodaysReviewReminder());
         }
       } else {
-        _useOfflineCacheOrMocks(
+        _useOfflineCache(
           cachedCards,
           'Review server returned ${response.statusCode}; using cached cards.',
         );
       }
     } on TimeoutException {
       if (!mounted) return;
-      _useOfflineCacheOrMocks(
-          cachedCards, 'Offline mode: review server timed out.');
+      _useOfflineCache(cachedCards, 'Offline mode: review server timed out.');
     } on SocketException {
       if (!mounted) return;
-      _useOfflineCacheOrMocks(
-          cachedCards, 'Offline mode: backend is unreachable.');
+      _useOfflineCache(cachedCards, 'Offline mode: backend is unreachable.');
     } catch (_) {
       if (!mounted) return;
-      _useOfflineCacheOrMocks(
-          cachedCards, 'Offline mode: using local review cache.');
+      _useOfflineCache(cachedCards, 'Offline mode: using local review cache.');
     }
   }
 
-  void _useOfflineCacheOrMocks(
+  void _useOfflineCache(
     List<ReviewFlashcard> cachedCards,
     String message,
   ) {
     setState(() {
-      _queue = _hasCachedReviewSnapshot ? cachedCards : _mockReviewCards;
+      _queue = cachedCards;
       _isLoading = false;
-      _loadError = _hasCachedReviewSnapshot && cachedCards.isEmpty
-          ? 'Offline mode: you are all caught up from your last saved deck.'
-          : message;
+      _loadError = _hasCachedReviewSnapshot ? null : message;
+      _offlineNotice = _hasCachedReviewSnapshot
+          ? cachedCards.isEmpty
+              ? 'Offline: your last synced deck has no due cards.'
+              : '$message Progress is saved locally until sync resumes.'
+          : null;
     });
   }
 
@@ -6553,16 +6774,14 @@ class _TodayMissionDashboard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        isWeeklyReportDay
-                            ? 'Weekly Report'
-                            : 'Today\'s Mission',
+                        isWeeklyReportDay ? '本週學習報告' : '今日任務',
                         style: Theme.of(context).textTheme.titleLarge,
                       ),
                       const SizedBox(height: 4),
                       Text(
                         isWeeklyReportDay
-                            ? 'Sunday reflection is ready · Focus: ${_conceptLabel(schedule.focusSkill)}'
-                            : 'AI-assigned sprint · Focus: ${_conceptLabel(schedule.focusSkill)}',
+                            ? '週日回顧已就緒 · 本週重點：${_conceptLabel(schedule.focusSkill)}'
+                            : 'AI 安排的衝刺任務 · 今日重點：${_conceptLabel(schedule.focusSkill)}',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                               color: kTextTertiary,
                               height: 1.35,
@@ -6586,9 +6805,7 @@ class _TodayMissionDashboard extends StatelessWidget {
                         : Icons.article_rounded,
                   ),
                   label: Text(
-                    isLoadingWeeklyReport
-                        ? 'Generating report...'
-                        : 'Open Weekly Report',
+                    isLoadingWeeklyReport ? '報告產生中...' : '開啟本週報告',
                   ),
                 ),
               ),
@@ -6598,7 +6815,7 @@ class _TodayMissionDashboard extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(
-                    '$completed of $total tasks complete',
+                    '已完成 $completed / $total 項任務',
                     style: Theme.of(context).textTheme.labelLarge?.copyWith(
                           color: kTextSecondary,
                           fontWeight: FontWeight.w900,
@@ -6677,7 +6894,7 @@ class _TodayMissionDashboard extends StatelessWidget {
             ),
             const SizedBox(height: 6),
             Text(
-              '${(schedule.upwardCurve * 100).round()}% of the climb mapped toward exam day',
+              '距離考試日的學習曲線已推進 ${(schedule.upwardCurve * 100).round()}%',
               style: const TextStyle(color: kTextTertiary, fontSize: 12),
             ),
             const SizedBox(height: 18),
@@ -6696,7 +6913,7 @@ class _TodayMissionDashboard extends StatelessWidget {
               child: FilledButton.icon(
                 onPressed: onStartReview,
                 icon: const Icon(Icons.style_rounded),
-                label: const Text('Start Vocab Review'),
+                label: const Text('開始單字複習'),
               ),
             ),
           ],
@@ -6953,20 +7170,20 @@ class _CountdownChip extends StatelessWidget {
 
 String _missionTaskLabel(StudyMissionTask task) {
   return switch (task.type) {
-    'vocab' => 'Vocabulary Sprint',
-    'grammar' || 'grammar_concept' => 'Grammar Concept Drill',
-    'mixed_questions' => 'Mixed Questions Sandbox',
-    'reading_practice' => 'Reading Practice',
-    'writing_sprint' => 'Writing Sprint',
-    'final_review' => 'Final Week Review',
+    'vocab' => '單字衝刺',
+    'grammar' || 'grammar_concept' => '文法觀念訓練',
+    'mixed_questions' => '混合題訓練',
+    'reading_practice' => '閱讀練習',
+    'writing_sprint' => '寫作衝刺',
+    'final_review' => '考前總複習',
     _ => _conceptLabel(task.type),
   };
 }
 
 String _missionTaskMeta(StudyMissionTask task) {
   final parts = <String>[];
-  if (task.count != null) parts.add('${task.count} items');
-  if (task.minutes != null) parts.add('${task.minutes} min');
+  if (task.count != null) parts.add('${task.count} 題');
+  if (task.minutes != null) parts.add('${task.minutes} 分鐘');
   if (task.topic != null) parts.add(task.topic!);
   return parts.join(' · ');
 }
@@ -7289,58 +7506,11 @@ String _stringFromJson(
   return fallback;
 }
 
-const List<ReviewFlashcard> _mockReviewCards = [
-  ReviewFlashcard(
-    id: 'mock-substantial',
-    vocabId: 1,
-    word: 'substantial',
-    meaning: '大量的；重要的',
-    exampleSentence:
-        'The new reading plan made a substantial difference in her test score.',
-    interval: 1,
-    repetitions: 0,
-    easeFactor: 2.3,
-    metrics: PerformanceMetrics(
-      totalTimeSeconds: 1.9,
-      tokensPerSecond: 21.4,
-      totalTokens: 41,
-    ),
-  ),
-  ReviewFlashcard(
-    id: 'mock-nevertheless',
-    vocabId: 2,
-    word: 'nevertheless',
-    meaning: '然而；儘管如此',
-    exampleSentence:
-        'The article was difficult; nevertheless, he finished it carefully.',
-    interval: 2,
-    repetitions: 1,
-    easeFactor: 2.5,
-  ),
-  ReviewFlashcard(
-    id: 'mock-evaluate',
-    vocabId: 3,
-    word: 'evaluate',
-    meaning: '評估',
-    exampleSentence:
-        'Teachers evaluate essays by looking at content, grammar, and clarity.',
-    interval: 1,
-    repetitions: 0,
-    easeFactor: 2.2,
-    metrics: PerformanceMetrics(
-      totalTimeSeconds: 2.4,
-      tokensPerSecond: 18.7,
-      totalTokens: 45,
-    ),
-  ),
-];
-
 enum _MemoryRating {
-  hard('Hard (Again)', Icons.refresh_rounded, Color(0xFFDC2626), 2,
-      Offset(-1.4, 0)),
-  good('Good (1 Day)', Icons.thumb_up_alt_outlined, Color(0xFF2563EB), 4,
+  hard('困難（再複習）', Icons.refresh_rounded, Color(0xFFDC2626), 2, Offset(-1.4, 0)),
+  good('記得（1 天）', Icons.thumb_up_alt_outlined, Color(0xFF2563EB), 4,
       Offset(1.4, 0)),
-  easy('Easy (4 Days)', Icons.rocket_launch_outlined, Color(0xFF047857), 5,
+  easy('簡單（4 天）', Icons.rocket_launch_outlined, Color(0xFF047857), 5,
       Offset(0, -1.2));
 
   const _MemoryRating(
@@ -7397,7 +7567,7 @@ class _ReviewHeroHeader extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Vocab Review Arena',
+                  '單字複習場',
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
                         color: kTextPrimary,
                         fontWeight: FontWeight.w900,
@@ -7405,9 +7575,7 @@ class _ReviewHeroHeader extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  isLoading
-                      ? 'Loading today\'s review deck...'
-                      : '$dueCount due ${dueCount == 1 ? 'card' : 'cards'} remaining',
+                  isLoading ? '正在載入今日複習卡...' : '今天還有 $dueCount 張待複習單字卡',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: kTextSecondary,
                       ),
@@ -7416,7 +7584,7 @@ class _ReviewHeroHeader extends StatelessWidget {
             ),
           ),
           IconButton(
-            tooltip: 'Error Ledger',
+            tooltip: '錯題本',
             onPressed: () => context.push('/error-ledger'),
             icon: const Icon(Icons.fact_check_outlined),
           ),
@@ -8075,7 +8243,7 @@ class _ReviewCompleteState extends StatelessWidget {
               ),
               const SizedBox(height: 20),
               Text(
-                'You\'re all caught up for today!',
+                '今天的複習全部完成！',
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.w900,
@@ -8083,7 +8251,7 @@ class _ReviewCompleteState extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                'Nice run. Come back tomorrow to keep the streak alive.',
+                '做得很好，明天再回來延續你的學習節奏。',
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: kTextTertiary,
@@ -9012,41 +9180,29 @@ class _TimeAttackSimulatorScreenState
       throw StateError('Full mock exam generation failed.');
     }
 
-    var job = _decodeJsonObject(response.body);
-    final jobId = _stringFromAny(job['id'], fallback: '');
-    if (jobId.isEmpty) {
-      throw const FormatException('Mock exam job response is missing an id.');
-    }
-    for (var attempt = 0; attempt < 50; attempt++) {
-      final status = _stringFromAny(job['status'], fallback: 'queued');
-      if (status == 'completed') {
-        final result = job['result'];
-        if (result is! Map) {
-          throw const FormatException('Completed mock exam job has no result.');
-        }
-        return TimeAttackExam.fromJson(Map<String, dynamic>.from(result));
-      }
-      if (status == 'failed') {
-        throw StateError(
-          _stringFromAny(job['error_message'],
-              fallback: 'Mock exam generation failed.'),
-        );
-      }
-      if (mounted) {
+    final completedJob = await const BackgroundJobPoller().waitForCompletion(
+      initialJob: _decodeJsonObject(response.body),
+      onStatus: (status) {
+        if (!mounted) return;
         setState(() {
           _loadMessage = status == 'running'
               ? 'Building and validating all 56 GSAT questions...'
               : 'Your exam is queued. Preparing the generation worker...';
         });
-      }
-      await Future<void>.delayed(const Duration(seconds: 2));
-      final poll = await _authenticatedGet(AppConfig.apiUri('/jobs/$jobId'));
-      if (poll.statusCode < 200 || poll.statusCode >= 300) {
-        throw StateError('Mock exam job polling failed.');
-      }
-      job = _decodeJsonObject(poll.body);
+      },
+      fetch: (jobId) async {
+        final poll = await _authenticatedGet(AppConfig.apiUri('/jobs/$jobId'));
+        if (poll.statusCode < 200 || poll.statusCode >= 300) {
+          throw StateError('Mock exam job polling failed.');
+        }
+        return _decodeJsonObject(poll.body);
+      },
+    );
+    final result = completedJob['result'];
+    if (result is! Map) {
+      throw const FormatException('Completed mock exam job has no result.');
     }
-    throw TimeoutException('Mock exam generation did not finish in time.');
+    return TimeAttackExam.fromJson(Map<String, dynamic>.from(result));
   }
 
   Future<void> _cacheExam(TimeAttackExam exam) async {
@@ -11048,7 +11204,7 @@ class FlashcardSkeleton extends StatelessWidget {
     return SkeletonShimmer(
       child: CleanCard(
         child: Container(
-          constraints: const BoxConstraints(minHeight: 330),
+          height: 330,
           padding: const EdgeInsets.all(22),
           child: Column(
             children: [
@@ -14774,87 +14930,78 @@ class _DiagnosticScreenState extends State<DiagnosticScreen> {
       children: [
         const PageIntro(
           icon: Icons.psychology_alt_rounded,
-          title: 'Diagnostic',
-          subtitle:
-              'Upload an exam paper and get a personalized review plan from AI.',
+          title: '診斷中心',
+          subtitle: '上傳考卷、找出弱點，讓 AI 建立個人化複習計畫。',
         ),
         const SizedBox(height: 18),
         ActionPanel(
           icon: Icons.timer_outlined,
-          title: 'Full Exam Simulator',
-          description:
-              'Run a 100-minute time-attack GSAT session with reading, grammar, and writing under pressure.',
-          buttonLabel: 'Start simulator',
+          title: '完整學測模擬考',
+          description: '以 100 分鐘限時完成閱讀、文法與寫作，練習正式考試節奏。',
+          buttonLabel: '開始模擬考',
           heroTag: 'time-attack-simulator-flow',
           onPressed: () => context.push('/exam-simulator'),
         ),
         const SizedBox(height: 16),
         ActionPanel(
           icon: Icons.quiz_outlined,
-          title: 'Grammar Quiz',
-          description:
-              'Generate one adaptive GSAT-style grammar question with instant explanation.',
-          buttonLabel: 'Start quiz',
+          title: '文法測驗',
+          description: '產生符合學測難度的適性文法題，作答後立即查看解析。',
+          buttonLabel: '開始測驗',
           heroTag: 'grammar-quiz-flow',
           onPressed: () => context.push('/grammar-quiz'),
         ),
         const SizedBox(height: 16),
         ActionPanel(
           icon: Icons.fact_check_outlined,
-          title: 'Error Ledger',
-          description:
-              'Review saved grammar misses and clear them with AI redemption drills.',
-          buttonLabel: 'Open ledger',
+          title: '錯題本',
+          description: '集中複習曾答錯的文法觀念，並用 AI 救贖挑戰重新攻克。',
+          buttonLabel: '開啟錯題本',
           heroTag: 'error-ledger-flow',
           onPressed: () => context.push('/error-ledger'),
         ),
         const SizedBox(height: 16),
         ActionPanel(
           icon: Icons.account_tree_outlined,
-          title: 'Discourse Training',
-          description:
-              'Practice 篇章結構 by dragging key sentences back into a coherent article.',
-          buttonLabel: 'Start discourse',
+          title: '篇章結構訓練',
+          description: '拖曳關鍵句回正確段落，練習判斷文章脈絡與銜接。',
+          buttonLabel: '開始篇章結構',
           heroTag: 'discourse-training-flow',
           onPressed: () => context.push('/discourse'),
         ),
         const SizedBox(height: 16),
         ActionPanel(
           icon: Icons.dashboard_customize_outlined,
-          title: 'Mixed Questions Sandbox',
-          description:
-              'Practice GSAT 混合題 with dual texts, MCQs, and partial-credit short answers.',
-          buttonLabel: 'Start mixed set',
+          title: '混合題訓練',
+          description: '練習雙文本、選擇題與可獲部分分數的簡答題。',
+          buttonLabel: '開始混合題',
           heroTag: 'mixed-questions-flow',
           onPressed: () => context.push('/mixed-questions'),
         ),
         const SizedBox(height: 16),
         ActionPanel(
           icon: Icons.translate_rounded,
-          title: 'Translation Practice',
-          description:
-              'Train 中翻英 with strict GSAT deductions and red-marked correction targets.',
-          buttonLabel: 'Start translation',
+          title: '中翻英練習',
+          description: '依學測標準嚴格扣分，並標示需要修正的字詞。',
+          buttonLabel: '開始中翻英',
           heroTag: 'translation-practice-flow',
           onPressed: () => context.push('/translation-practice'),
         ),
         const SizedBox(height: 16),
         ActionPanel(
           icon: Icons.extension_rounded,
-          title: 'Dynamic Cloze Test',
-          description:
-              'Drag high-frequency GSAT phrasal verbs and collocations into 文意選填 blanks.',
-          buttonLabel: 'Start cloze',
+          title: '動態文意選填',
+          description: '將學測高頻片語與搭配詞拖入正確空格。',
+          buttonLabel: '開始文意選填',
           heroTag: 'cloze-practice-flow',
           onPressed: () => context.push('/cloze-practice'),
         ),
         const SizedBox(height: 16),
         ActionPanel(
           icon: Icons.upgrade_rounded,
-          title: 'Sentence Level-Up',
-          description:
-              'Rewrite basic sentences with advanced grammar for stronger GSAT writing.',
-          buttonLabel: 'Start level-up',
+          title: '句子升級',
+          description: '使用進階句型改寫基礎句，提升學測英文寫作表現。',
+          buttonLabel: '開始句子升級',
           heroTag: 'sentence-level-up-flow',
           onPressed: () => context.push('/sentence-level-up'),
         ),
@@ -14866,12 +15013,12 @@ class _DiagnosticScreenState extends State<DiagnosticScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Exam paper image',
+                  '考卷圖片',
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  'Take a clear photo or choose one from your gallery. Make sure all questions are readable.',
+                  '請拍攝清楚照片或從相簿選取圖片，並確認題目與作答都能辨識。',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: kTextTertiary,
                         height: 1.4,
@@ -14886,7 +15033,7 @@ class _DiagnosticScreenState extends State<DiagnosticScreen> {
                             ? null
                             : () => _pickImage(ImageSource.camera),
                         icon: const Icon(Icons.photo_camera_outlined),
-                        label: const Text('Camera'),
+                        label: const Text('相機'),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -14896,7 +15043,7 @@ class _DiagnosticScreenState extends State<DiagnosticScreen> {
                             ? null
                             : () => _pickImage(ImageSource.gallery),
                         icon: const Icon(Icons.photo_library_outlined),
-                        label: const Text('Gallery'),
+                        label: const Text('相簿'),
                       ),
                     ),
                   ],
@@ -14913,7 +15060,7 @@ class _DiagnosticScreenState extends State<DiagnosticScreen> {
             onPressed: _isUploading ? null : _submitForAnalysis,
             icon: const Icon(Icons.auto_awesome_rounded),
             label: Text(
-              _isUploading ? 'Analyzing...' : 'Submit for AI Analysis',
+              _isUploading ? '分析中...' : '送出 AI 分析',
             ),
           ),
         ],
@@ -14921,7 +15068,7 @@ class _DiagnosticScreenState extends State<DiagnosticScreen> {
           const SizedBox(height: 16),
           UnifiedErrorState(
             message: _errorMessage!,
-            title: 'Diagnostic hit a snag',
+            title: '診斷暫時無法完成',
             onRetry:
                 _selectedImage == null ? _clearMessages : _submitForAnalysis,
           ),
@@ -14965,12 +15112,40 @@ class _DiagnosticScreenState extends State<DiagnosticScreen> {
       setState(() {
         _errorMessage = _permissionMessage(source, error);
       });
+      if (source == ImageSource.camera) {
+        unawaited(_offerGalleryFallback());
+      }
     } catch (_) {
       if (!mounted) return;
       setState(() {
         _errorMessage =
             'Unable to open ${source == ImageSource.camera ? 'camera' : 'gallery'}. Please try again.';
       });
+    }
+  }
+
+  Future<void> _offerGalleryFallback() async {
+    if (!mounted) return;
+    final useGallery = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('相機目前無法使用'),
+        content: const Text('要改從相簿選取考卷圖片嗎？'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: const Text('取消'),
+          ),
+          FilledButton.icon(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            icon: const Icon(Icons.photo_library_outlined),
+            label: const Text('開啟相簿'),
+          ),
+        ],
+      ),
+    );
+    if (useGallery == true && mounted) {
+      await _pickImage(ImageSource.gallery);
     }
   }
 
@@ -15033,6 +15208,14 @@ class _DiagnosticScreenState extends State<DiagnosticScreen> {
           _expansionJobStatus = _nullableString(data['expansion_job_status']);
           _diagnosticMetrics = PerformanceMetrics.maybeFromResponse(data);
         });
+        final jobId = _nullableString(data['expansion_job_id']);
+        final jobStatus = _nullableString(data['expansion_job_status']);
+        if (jobId != null &&
+            jobId.isNotEmpty &&
+            jobStatus != 'completed' &&
+            jobStatus != 'failed') {
+          unawaited(_pollExpansionJob(jobId, jobStatus ?? 'queued'));
+        }
       } else if (_isAiQuotaLimitResponse(
         http.Response(responseBody, response.statusCode),
       )) {
@@ -15083,6 +15266,56 @@ class _DiagnosticScreenState extends State<DiagnosticScreen> {
     }
   }
 
+  Future<void> _pollExpansionJob(String jobId, String initialStatus) async {
+    try {
+      final completed = await const BackgroundJobPoller(
+        maxAttempts: 45,
+      ).waitForCompletion(
+        initialJob: {'id': jobId, 'status': initialStatus},
+        onStatus: (status) {
+          if (!mounted) return;
+          setState(() => _expansionJobStatus = status);
+        },
+        fetch: (id) async {
+          final response =
+              await _authenticatedGet(AppConfig.apiUri('/jobs/$id'));
+          if (response.statusCode < 200 || response.statusCode >= 300) {
+            throw StateError('Expansion job polling failed.');
+          }
+          return _decodeJsonObject(response.body);
+        },
+      );
+      if (!mounted) return;
+      final result = completed['result'];
+      final resultMap = result is Map<String, dynamic>
+          ? result
+          : result is Map
+              ? Map<String, dynamic>.from(result)
+              : const <String, dynamic>{};
+      final generatedCount = PerformanceMetrics._asInt(
+        resultMap['created_count'] ?? resultMap['question_count'],
+      );
+      setState(() {
+        _expansionJobStatus = 'completed';
+        if (generatedCount > _expansionQuizCount) {
+          _expansionQuizCount = generatedCount;
+        }
+      });
+    } on BackgroundJobFailed catch (error) {
+      if (!mounted) return;
+      setState(() {
+        _expansionJobStatus = 'failed';
+        _errorMessage =
+            'Expansion question generation failed: ${error.message}';
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _expansionJobStatus = 'retry needed';
+      });
+    }
+  }
+
   void _clearMessages() {
     setState(() {
       _errorMessage = null;
@@ -15101,8 +15334,8 @@ class _DiagnosticScreenState extends State<DiagnosticScreen> {
 
     if (code.contains('denied') || code.contains('restricted')) {
       return isCamera
-          ? 'Camera permission was denied. Enable camera access in Settings to take a photo.'
-          : 'Photo library permission was denied. Enable photo access in Settings to choose an image.';
+          ? '相機權限遭拒，請到系統設定開啟權限，或改從相簿選取。'
+          : '相簿權限遭拒，請到系統設定開啟照片存取權限。';
     }
 
     return error.message ??
@@ -15505,9 +15738,8 @@ class _ReadingVocabScreenState extends State<ReadingVocabScreen> {
       children: [
         const PageIntro(
           icon: Icons.translate_rounded,
-          title: 'Reading & Vocab',
-          subtitle:
-              'Tap any English word in the passage to save it to your vocabulary list.',
+          title: '閱讀與單字',
+          subtitle: '點選文章中的任何英文單字，即可加入個人單字庫。',
         ),
         const SizedBox(height: 18),
         CleanCard(
@@ -15558,9 +15790,7 @@ class _ReadingVocabScreenState extends State<ReadingVocabScreen> {
                             : Icons.auto_awesome_outlined,
                       ),
                       label: Text(
-                        _isGenerating
-                            ? 'Generating passage...'
-                            : 'Generate AI passage',
+                        _isGenerating ? '文章產生中...' : '產生 AI 閱讀文章',
                       ),
                     ),
                     PassageAudioButton(text: _article),
@@ -16047,9 +16277,8 @@ class _WritingScreenState extends State<WritingScreen> {
       children: [
         const PageIntro(
           icon: Icons.rate_review_rounded,
-          title: 'Writing',
-          subtitle:
-              'Type an essay or upload handwriting for AI grading and revision ideas.',
+          title: '英文寫作',
+          subtitle: '輸入作文或上傳手寫稿，取得 AI 評分、訂正與改寫建議。',
         ),
         const SizedBox(height: 18),
         CleanCard(
@@ -16058,8 +16287,7 @@ class _WritingScreenState extends State<WritingScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Essay type',
-                    style: Theme.of(context).textTheme.titleMedium),
+                Text('作文類型', style: Theme.of(context).textTheme.titleMedium),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<GsatEssayType>(
                   value: _essayType,
@@ -16113,7 +16341,7 @@ class _WritingScreenState extends State<WritingScreen> {
                       const SizedBox(width: 10),
                       Expanded(
                         child: Text(
-                          'Prompt image',
+                          '題目圖片',
                           style: Theme.of(context).textTheme.titleMedium,
                         ),
                       ),
@@ -16122,8 +16350,8 @@ class _WritingScreenState extends State<WritingScreen> {
                   const SizedBox(height: 8),
                   Text(
                     _essayType == GsatEssayType.chartAnalysis
-                        ? 'Upload the chart or graph the essay should analyze.'
-                        : 'Upload the picture prompt the essay should describe.',
+                        ? '上傳這篇作文要分析的圖表或統計圖。'
+                        : '上傳這篇作文要描述的題目圖片。',
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: kTextTertiary,
                           height: 1.4,
@@ -16137,9 +16365,7 @@ class _WritingScreenState extends State<WritingScreen> {
                             _showPhotoSourceSheet(_WritingImageTarget.prompt),
                     icon: const Icon(Icons.add_photo_alternate_outlined),
                     label: Text(
-                      _promptImage == null
-                          ? 'Upload prompt image'
-                          : 'Replace prompt image',
+                      _promptImage == null ? '上傳題目圖片' : '更換題目圖片',
                     ),
                   ),
                 ],
@@ -16158,8 +16384,7 @@ class _WritingScreenState extends State<WritingScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Type your essay',
-                    style: Theme.of(context).textTheme.titleMedium),
+                Text('輸入英文作文', style: Theme.of(context).textTheme.titleMedium),
                 const SizedBox(height: 10),
                 TextField(
                   controller: _essayController,
@@ -16167,7 +16392,7 @@ class _WritingScreenState extends State<WritingScreen> {
                   maxLines: 16,
                   textInputAction: TextInputAction.newline,
                   decoration: const InputDecoration(
-                    hintText: 'Paste or type your GSAT-style essay here...',
+                    hintText: '在此貼上或輸入符合學測格式的英文作文...',
                     alignLabelWithHint: true,
                   ),
                 ),
@@ -16191,7 +16416,7 @@ class _WritingScreenState extends State<WritingScreen> {
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
-                        'Handwritten essay',
+                        '手寫作文',
                         style: Theme.of(context).textTheme.titleMedium,
                       ),
                     ),
@@ -16199,7 +16424,7 @@ class _WritingScreenState extends State<WritingScreen> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Upload a clear photo if you wrote your essay on paper.',
+                  '若作文寫在紙上，請上傳清楚、完整的照片。',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: kTextTertiary,
                         height: 1.4,
@@ -16213,9 +16438,7 @@ class _WritingScreenState extends State<WritingScreen> {
                           _WritingImageTarget.handwritten),
                   icon: const Icon(Icons.add_photo_alternate_outlined),
                   label: Text(
-                    _handwrittenEssay == null
-                        ? 'Upload handwritten essay photo'
-                        : 'Replace photo',
+                    _handwrittenEssay == null ? '上傳手寫作文照片' : '更換照片',
                   ),
                 ),
               ],
@@ -16241,7 +16464,7 @@ class _WritingScreenState extends State<WritingScreen> {
           icon: _isSubmitting
               ? const Icon(Icons.hourglass_top_rounded)
               : const Icon(Icons.auto_awesome_rounded),
-          label: Text(_isSubmitting ? 'Grading...' : 'Submit for AI Grading'),
+          label: Text(_isSubmitting ? '評分中...' : '送出 AI 評分'),
         ),
         if (_isSubmitting) ...[
           const SizedBox(height: 16),
@@ -16278,12 +16501,12 @@ class _WritingScreenState extends State<WritingScreen> {
               children: [
                 ListTile(
                   leading: const Icon(Icons.photo_camera_outlined),
-                  title: const Text('Take a photo'),
+                  title: const Text('使用相機拍照'),
                   onTap: () => Navigator.of(context).pop(ImageSource.camera),
                 ),
                 ListTile(
                   leading: const Icon(Icons.photo_library_outlined),
-                  title: const Text('Choose from gallery'),
+                  title: const Text('從相簿選取'),
                   onTap: () => Navigator.of(context).pop(ImageSource.gallery),
                 ),
               ],

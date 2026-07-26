@@ -1,0 +1,5942 @@
+[
+  {
+    "word": "shape",
+    "translation": "形狀, 形態, 外形, 形式, 身材；定形, 使成形, 塑造, 計劃, 使符合",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "He could barely make out their shapes.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "contribution",
+    "translation": "捐助, 捐助之物, 貢獻；貢獻, 捐款, 補助品",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "I am proud of my contribution in advancing the project.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "senior",
+    "translation": "年長者, 資深者, 畢業班學生；年長的, 高階的, 資深的",
+    "part_of_speech": "adj.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "The senior prom.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "cash",
+    "translation": "現金；兌現",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "There is a desperate shortage of hard cash.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "gas",
+    "translation": "氣體, 汽油, 瓦斯；氣體; 煤氣; 瓦斯; 毒氣",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "He stepped on the gas.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "born",
+    "translation": "天生的；bear的過去分詞",
+    "part_of_speech": "adj.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "He was a child born of adultery.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "beat",
+    "translation": "心跳(聲), 打, 敲打聲, 拍子；打, 拍打, 打敗",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "In the old days a policeman walked a beat and knew all his people by name.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "works",
+    "translation": "工程, 工廠, 工事, 活動部件, 機件, 著作, 作品, 善行, 德行；工廠, 工場",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "A hotdog with the works.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "reform",
+    "translation": "改革, 改正, 改造；改革, 改過, 革新, 重整",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "Justice was for sale before the reform of the law courts.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "pair",
+    "translation": "一雙, 一對, 一副；(使)成對",
+    "part_of_speech": "v.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "The two old friends paired off.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "agent",
+    "translation": "代理商, 政府代表, 動原, 媒介；代理程式",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "Their research uncovered new disease agents.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "annual",
+    "translation": "年刊, 年報；每年的, 一年一次的, 全年的, 一年生的",
+    "part_of_speech": "adj.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "A border of annual flowering plants.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "associate",
+    "translation": "同伴, 夥伴, 關聯的事物；使聯合, 使發生聯絡",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "He had to consult his associate before continuing.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "presence",
+    "translation": "出席, 面前, 存在, 儀態, 風度；出現",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "He tested for the presence of radon.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "protection",
+    "translation": "保護, 防衛, 貿易保護制度；保護",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "The witnesses demanded police protection.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "nuclear",
+    "translation": "核子的, 原子能的, 核的, 中心的；核的",
+    "part_of_speech": "adj.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "Annexation of the suburban fringe by the nuclear metropolis.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "collect",
+    "translation": "收集, 聚集, 集中, 蒐集；由收到者付款的",
+    "part_of_speech": "v.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "We collected over a million dollars in outstanding debts.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "queen",
+    "translation": "王后, 女王；立為女王",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "Paris is the queen of cities.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "master",
+    "translation": "主人, 碩士, 大師, 母機；主人的, 主要的",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "A master of the violin.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "meaning",
+    "translation": "意義, 含義, 目的, 意圖；意味深長的",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "What is the meaning of this sentence.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "vote",
+    "translation": "投票, 選舉, 選票, 表決, 選舉權, 得票數；投票, 選舉",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "There were only 17 votes in favor of the motion.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "rich",
+    "translation": "富裕的, 富饒的, 濃厚的, 貴重的",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "Only the very rich benefit from this legislation.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "huge",
+    "translation": "極大的, 巨大的, 無限的",
+    "part_of_speech": "adj.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "Huge government spending.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "employ",
+    "translation": "僱用；僱用, 使用, 使從事於",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "He was in the employ of the city.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "release",
+    "translation": "釋放, 發洩, 豁免, 發行, 釋放證書；釋放, 解除, 放鬆, 豁免, 免除, 釋出, 放棄, 讓與",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "A new release from the London Symphony Orchestra.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "exercise",
+    "translation": "行使, 執行, 運動, 練習, 作業；運用, 練習, 運動",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "The doctor recommended regular exercise.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "consequence",
+    "translation": "結果, 重要性；結果, 後果, 推斷",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "His decision had depressing consequences for business.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "commercial",
+    "translation": "商業的, 商用的, 商品化的；商業廣告節目",
+    "part_of_speech": "adj.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "A commercial attache.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "adult",
+    "translation": "成人, 成蟲；成年的, 成熟的",
+    "part_of_speech": "adj.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "An adult animal.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "relatively",
+    "translation": "相對地, 比較地, 相當地, 相關地；相對地",
+    "part_of_speech": "adv.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "The situation is relatively calm now.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "august",
+    "translation": "八月；威嚴的, 令人敬畏的",
+    "part_of_speech": "adj.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "Of august lineage.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "slowly",
+    "translation": "慢慢地, 遲緩地",
+    "part_of_speech": "adv.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "He spoke slowly.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "relevant",
+    "translation": "有關聯的, 有關係的, 適當的, 相應的；有關的, 相關的",
+    "part_of_speech": "adj.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "The scientist corresponds with colleagues in order to learn about matters relevant to her own research.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "beginning",
+    "translation": "開始",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "The beginning of the war.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "apparently",
+    "translation": "表面上, 清楚地, 顯然地",
+    "part_of_speech": "adv.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "Irrigation often produces bumper crops from apparently desert land.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "safe",
+    "translation": "保險箱, 冷藏室；安全的, 可靠的, 平安的, 穩健的, 有把握的",
+    "part_of_speech": "adj.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "You will be safe here.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "speed",
+    "translation": "速率, 速度, 迅速；加速, 超速, 快進",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "The project advanced with gratifying speed.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "proportion",
+    "translation": "比例, 比率, 均衡, 部分, 面積；使成比例, 使均衡",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "A building of vast proportions.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "consideration",
+    "translation": "考慮, 原因；考慮, 思考, 報酬",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "Another consideration is the time it would take.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "assessment",
+    "translation": "評估, 估定, 評定的款額；評估",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "The assessment for repairs outraged the club's membership.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "latter",
+    "translation": "後者的, 較後的, 近來的",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "Tom and Dick were both heroes but only the latter is remembered today.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "emerge",
+    "translation": "浮現, 形成, 出現, (事實)顯露",
+    "part_of_speech": "v.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "He felt new emotions emerge.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "regional",
+    "translation": "地方的, 地域性的；區的, 部位的",
+    "part_of_speech": "adj.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "A regional dialect.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "mark",
+    "translation": "標誌, 分數, 馬克, 痕跡, 斑點, 靶子, 刻度, 記號, 符號, 戳記, 標準, 起跑線；做標記於, 留意, 打分數, 表明, 標誌, 記錄",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "She made good marks in algebra.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "separate",
+    "translation": "獨立件, 抽印本；分開的, 各別的, 單獨的, 分隔的",
+    "part_of_speech": "v.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "Separate the wheat from the chaff.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "shoot",
+    "translation": "射擊, 狩獵, 芽, 射傷, 發射, 發芽, 急流, 推力, 攝影, 急送, 滑運道, 浪費；射擊, 射中, 損毀, 拍攝, 噴出, 投射, 揮出, 飛速行進, 揮霍, 給...注射",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "They hold a shoot every weekend during the summer.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "practical",
+    "translation": "實際的, 現實的, 實用性的；事實上的, 實際上的, 接近...的",
+    "part_of_speech": "adj.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "He is a very practical person.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "understanding",
+    "translation": "理解, 諒解；協商, 協議, 諒解",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "He has virtually no understanding of social cause and effect.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "aim",
+    "translation": "目標, 瞄準, 擊中目標的能力；對準目標, 致力, 打算",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "It was created with the conscious aim of answering immediate needs.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "credit",
+    "translation": "信用, 信任, 榮譽, 貸款, 學分；歸功於, 讚頌, 信任, 相信",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "He was given credit for his work.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "impact",
+    "translation": "衝擊, 衝突, 影響, 效果；擠入, 撞擊, 壓緊, 對...發生影響",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "The book had an important impact on my thinking.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "danger",
+    "translation": "危險, 威脅；危險, 危險物, 危機",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "You are in no danger.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "progress",
+    "translation": "進步, 發展, 前進；進步, 進行",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "Great progress in the arts.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "path",
+    "translation": "路徑, 小路, 道路, 途徑, 路線, 軌道；路徑; DOS內部命令:設定DOS讀取程式的路徑",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "The path of virtue.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "key",
+    "translation": "鑰匙, 鍵, 解答, 關鍵, 要害, 基調, 線索, 答案, 暗礁；調音, 鎖上, 提供線索",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "The key to development is economic integration.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "track",
+    "translation": "軌跡, 足跡, 徑跡, 小道, 軌道, 磁軌, 途徑；循路而行, 追蹤, 透過, 用纖拉",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "The track of an animal.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "reaction",
+    "translation": "反應, 反作用, 反動；反應",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "There was a chemical reaction of the lime with the ground water.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "video",
+    "translation": "影像, 電視；影象的, 電視的",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "She is a star of screen and video.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "appoint",
+    "translation": "任命, 指定, 下令；派, 派任, 任命",
+    "part_of_speech": "v.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "He was appointed deputy manager.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "merely",
+    "translation": "只",
+    "part_of_speech": "adv.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "I was merely asking.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "instead",
+    "translation": "作為替代, 反而",
+    "part_of_speech": "adv.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "Felix became a herpetologist instead.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "distance",
+    "translation": "距離, 遠方, 遙遠；位距",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "I could see it in the distance.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "regular",
+    "translation": "規則的, 常例的, 有秩序的, 整齊的, 等邊的, 定期的, 經常的, 合格的, 常備軍的；正規軍, 正式隊員",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "He is one of the party regulars.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "link",
+    "translation": "環, 連結物, 連結, 火把；連結, 聯合, 挽住",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "The walls are held together with metal links placed in the wet mortar during construction.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "gold",
+    "translation": "黃金, 錢財, 金塊, 金色, 寶貴；金的, 似金的, 金色的, 金制的",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "He admired the gold of her hair.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "comment",
+    "translation": "註解, 批評, 評論, 備註；評論, 註解",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "From time to time she contributed a personal comment on his account.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "due",
+    "translation": "應得的東西, 應付款；到期的, 應得的, 應付的, 約定的",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "Give the devil his due.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "content",
+    "translation": "內容, 滿足, 意義, 要旨；滿足的, 滿意的",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "He emptied the contents of his pockets.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "conclusion",
+    "translation": "結論, 結尾, 推論；締結, 結論, 推論",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "His conclusion took the evidence into account.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "chief",
+    "translation": "領袖, 酋長, 長官, 主要部分；主要的, 首位的",
+    "part_of_speech": "adj.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "The chief aim of living.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "drink",
+    "translation": "飲料, 酒；喝, 喝酒",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "I asked for a hot drink.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "politics",
+    "translation": "政治, 政治學, 政見, 政治活動；政治, 政治學, 政綱",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "Office politics is often counterproductive.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "reply",
+    "translation": "答覆, 回答, 答辯；答覆, 回答, 回擊, 反響, 答辯",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "He growled his reply.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "observe",
+    "translation": "覺察到, 遵守, 注意到, 慶祝；注意, 評論",
+    "part_of_speech": "v.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "Please observe the reaction of these two chemicals.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "skin",
+    "translation": "皮膚, 皮；剝皮, 在...植皮",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "Your skin is the largest organ of your body.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "belief",
+    "translation": "信念, 相信, 信仰",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "It strengthened my belief in his sincerity.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "bag",
+    "translation": "袋子, 袋狀物；使膨大, 裝袋, 獵獲",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "He stuffed his laundry into a large bag.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "strike",
+    "translation": "罷工, 打擊, 毆打；打, 撞擊, 衝擊, 侵襲, 取消, 結算, 打掉, 罷工, 刺透, 使生根, 遇見",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "The strike lasted more than a month before it was settled.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "alone",
+    "translation": "孤獨的, 單獨的, 獨自的；獨自地",
+    "part_of_speech": "adj.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "Could be alone in a crowded room.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "sight",
+    "translation": "景觀, 視力, 眼界, 閱讀, 見解, 意見；看見, 瞄準",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "The sight of his wife brought him back to reality.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "reality",
+    "translation": "實在, 事實, 實體, 逼真；現實, 實在存在的事物, 實在性",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "For them demons were as much a part of reality as trees were.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "winter",
+    "translation": "冬季, 蕭條期, 衰退期；冬天的",
+    "part_of_speech": "v.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "We wintered on the Riviera.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "inside",
+    "translation": "內部, 內臟, 內幕；內部的, 秘密的, 戶內的",
+    "part_of_speech": "adj.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "He reached into his inside jacket pocket.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "estate",
+    "translation": "不動產, (人生的)階段, 階層, 財產；房地產, 遺產, 財產",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "The family owned a large estate on Long Island.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "ring",
+    "translation": "環, 環形物, 拳擊場, 戒指, 角逐, 小集團, 鈴聲, 鐘聲, 聲調；包圍, 套住, 按鈴, 敲鐘",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "It has the ring of sincerity.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "additional",
+    "translation": "附加的, 另外的, 額外的；加添的, 附加的",
+    "part_of_speech": "adj.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "Called for additional troops.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "possibly",
+    "translation": "可能, 也許",
+    "part_of_speech": "adv.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "We may possibly run into them at the concert.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "respond",
+    "translation": "以...回答；回答, 響應, 回報, 有反應, 承擔責任",
+    "part_of_speech": "v.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "The cancer responded to the aggressive therapy.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "clothes",
+    "translation": "衣服",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "He always bought his clothes at the same store.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "active",
+    "translation": "活躍的, 起作用的, 積極的, 有效的, 主動的, 活性的, 現行的, 現役的；主動語態, 積極分子",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "`The boy threw the ball' uses the active voice.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "vehicle",
+    "translation": "交通工具, 車輛, 傳播媒介；載體; 運載體; 漆料",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "His editorials provided a vehicle for his political views.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "debt",
+    "translation": "債務, 罪過；借款, 欠款, 債務",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "He is badly in debt.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "objective",
+    "translation": "目的, 目標, 宗旨, 賓格, 實物；客觀的, 如實的, 無偏見的, 賓格的",
+    "part_of_speech": "adj.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "An objective appraisal.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "largely",
+    "translation": "大量地, 很多地, 大半地",
+    "part_of_speech": "adv.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "These accounts are largely inactive.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "arrange",
+    "translation": "安排, 排列, 達成協議；重排",
+    "part_of_speech": "v.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "Arrange the books on the shelves in chronological order.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "survive",
+    "translation": "比...活得長, 生存, 生還, 倖免於；活下來, 倖存",
+    "part_of_speech": "v.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "These superstitions survive in the backwaters of America.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "powerful",
+    "translation": "有力的, 有權力的, 強大的；強力的",
+    "part_of_speech": "adj.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "The most powerful government in western Europe.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "telephone",
+    "translation": "電話, 電話機；打電話",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "I talked to him on the telephone.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "carefully",
+    "translation": "小心地, 謹慎地",
+    "part_of_speech": "adv.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "They watched carefully.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "hole",
+    "translation": "孔, 洞, 穴, 漏洞；挖洞, 掘坑",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "He played 18 holes.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "battle",
+    "translation": "戰役；戰鬥",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "Grant won a decisive victory in the battle of Chickamauga.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "nevertheless",
+    "translation": "然而, 雖然如此；然而",
+    "part_of_speech": "adv.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "While we disliked each other, nevertheless we agreed.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "colleague",
+    "translation": "同事, 同僚",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "The surgeon consulted his colleagues.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "complex",
+    "translation": "綜合體, 情結, 絡合物；複雜的, 組合的",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "The complex of shopping malls, houses, and roads created a new town.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "impossible",
+    "translation": "不可能的, 難以置信的, 令人無法忍受的",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "His assignment verged on the impossible.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "concentrate",
+    "translation": "濃縮, 精選；集中, 專心",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "The concentrate of contemporary despair.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "confidence",
+    "translation": "信心；可靠",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "After that failure he lost his confidence.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "mainly",
+    "translation": "主要地, 大抵",
+    "part_of_speech": "adv.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "He is mainly interested in butterflies.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "generation",
+    "translation": "一代, 一世, 產生；生殖, 世代",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "They had to wait a generation for that prejudice to fade.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "lift",
+    "translation": "舉起, 幫助, 昂揚, 電梯；升高, 提高, 鼓舞, 清償, 空運, 舉起, 剽竊",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "Some actresses have more than one face lift.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "painting",
+    "translation": "畫, 繪畫, 油漆；塗漆",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "A small painting by Picasso.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "sample",
+    "translation": "樣品, 範例, 樣本；抽樣, 嘗試",
+    "part_of_speech": "v.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "Sample the regional dishes.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "cross",
+    "translation": "十字架, 十字架形物件, 交叉, 十字標, 交叉路, 磨難, 雜交；生氣的, 交叉的, 相反的",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "That is his cross to bear.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "warm",
+    "translation": "暖和的, 暖的, 溫暖的, 熱烈的, 興奮的, 激烈的, 多情的, 色情的；使溫暖, 弄熱, 使興奮, 使充滿仇恨",
+    "part_of_speech": "v.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "The soup warmed slowly on the stove.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "commitment",
+    "translation": "委託, 交押, 承擔義務, 贊助；院禁",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "A man of energy and commitment.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "ship",
+    "translation": "船, 艦；以船運送, 裝船, 運送",
+    "part_of_speech": "v.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "Ship the cargo in the hold of the vessel.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "plus",
+    "translation": "加上, 加, 外加；正的, 附加的",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "Four plus three equals seven.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "volume",
+    "translation": "冊, 卷, 體積, 容量, 大量, 許多, 份量, 音量；成團捲起",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "The gas expanded to twice its original volume.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "somewhere",
+    "translation": "到某處, 在某處",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "They moved to somewhere in Spain.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "middle",
+    "translation": "中央, 中間, 腰部；中央的, 中庸的, 中間的",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "A whole is that which has beginning, middle, and end.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "currently",
+    "translation": "現在, 當前, 一般, 普通；當前",
+    "part_of_speech": "adv.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "Currently they live in Connecticut.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "judge",
+    "translation": "法官, 裁判員, 審判官, 鑑定人；審理, 鑑定, 判斷, 判決, 裁定",
+    "part_of_speech": "v.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "I cannot judge some works of modern art.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "threat",
+    "translation": "恐嚇, 惡兆, 威脅；威脅",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "Earthquakes are a constant threat in Japan.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "conflict",
+    "translation": "戰鬥, 衝突, 矛盾, 爭執；爭執, 戰鬥, 衝突, 牴觸",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "The harder the conflict the more glorious the triumph.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "manner",
+    "translation": "樣子, 禮貌, 風格；方式, 方法, 樣式",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "Her dignified manner.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "entirely",
+    "translation": "完全, 全然, 一概",
+    "part_of_speech": "adv.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "Entirely satisfied with the meal.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "fresh",
+    "translation": "新鮮的, 新奇的, 另外的, 淡的, 精神飽滿的, 冒失的；最新地, 剛剛",
+    "part_of_speech": "adj.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "The cow is fresh.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "background",
+    "translation": "背景, 背景資料；背景, 後臺",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "He is a lawyer with a sports background.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "yard",
+    "translation": "碼, 庭院, 工場；堆置場",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "It was a small house with almost no yard.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "touch",
+    "translation": "觸覺, 碰, 觸, 機靈, 輕觸, 格調, 少許, 缺點, 彈力；接觸, 觸控, 觸及, 使接觸, 達到, 涉及, 影響到, 使輕度受害, 感動",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "He longed for the touch of her hand.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "engine",
+    "translation": "引擎, 發動機, 機車；安裝發動機於",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "An engine of change.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "stuff",
+    "translation": "原料, 要素, 東西, 材料, 素質, 織品, 廢物, 廢話；裝填",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "Wheat is the stuff they use to make bread.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "introduction",
+    "translation": "介紹, 傳入, 採用, 初步",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "They resisted the introduction of impractical alternatives.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "previously",
+    "translation": "先, 先前, 以前, 前, (非正式)過早, 過急, 在前, 在...以前, 在先；先前地",
+    "part_of_speech": "adv.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "She had previously lived in Chicago.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "domestic",
+    "translation": "家庭的, 國內的, 馴養的；家庭的, 家用的",
+    "part_of_speech": "adj.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "Domestic issues such as tax rate and highway construction.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "author",
+    "translation": "作家, 作家的著作, 創始人；作者, 著作人, 本人",
+    "part_of_speech": "v.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "She authored this play.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "administration",
+    "translation": "行政, 管理, 政府機關；給藥",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "He claims that the present administration is corrupt.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "sexual",
+    "translation": "性的, 性別的；性的; 性慾的",
+    "part_of_speech": "adj.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "The intimate (or sexual) relations between husband and wife.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "tonight",
+    "translation": "今晚, 今夜",
+    "part_of_speech": "adv.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "Drop by tonight.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "prefer",
+    "translation": "寧可, 較喜歡, 提出；給予優先權, 優先償還, 提出",
+    "part_of_speech": "v.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "Some people prefer camping to staying in hotels.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "ordinary",
+    "translation": "平常的, 普通的, 平凡的；平常的人(或事)",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "Not out of the ordinary.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "cheap",
+    "translation": "便宜的, 不值錢的, 可鄙的；便宜地",
+    "part_of_speech": "adj.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "It would have been cheap at twice the price.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "threaten",
+    "translation": "恐嚇, 威脅, 預示...的凶兆；威脅, 恫嚇, 可能來臨",
+    "part_of_speech": "v.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "He threatened me when I tried to call the police.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "relief",
+    "translation": "減輕, 解除, 救濟, 安慰, 調劑, 浮雕, 換班, (地勢的)起伏；緩減, 減輕, 浮雕(繪畫中)",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "As he heard the news he was suddenly flooded with relief.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "demonstrate",
+    "translation": "示範, 證明；示威",
+    "part_of_speech": "v.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "This decision demonstrates his sense of fairness.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "commit",
+    "translation": "委託(託付), 犯罪, 指派...作戰, 使承擔義務；犯, 做, 把...交託給",
+    "part_of_speech": "v.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "I commit my soul to God.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "technical",
+    "translation": "技術上的, 專門的, 工業的, 嚴格根據法律的；技巧",
+    "part_of_speech": "adj.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "His technical innovation was his brushwork.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "grant",
+    "translation": "授予, 授予物, 允許；允許, 承認, 授與",
+    "part_of_speech": "v.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "Funds are granted to qualified researchers.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "actual",
+    "translation": "真實的, 實際的, 現行的；實際死亡率",
+    "part_of_speech": "adj.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "The predicted temperature and the actual temperature were markedly different.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "strange",
+    "translation": "奇怪的, 陌生的, 生疏的, 不熟悉的, 不可思議的, 外行的, 外地的, 異鄉的",
+    "part_of_speech": "adj.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "A strange exaltation that was indefinable.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "repeat",
+    "translation": "重複, 反覆；重做, 重複, 複述, 使再現, 複製",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "The events today were a repeat of yesterday's.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "bus",
+    "translation": "公共汽車；匯流排; 匯流條; 母線",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "He always rode the bus to work.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "regulation",
+    "translation": "規則, 管理, 調整；調整; 規章; 規則; 調節",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "Short haircuts were the regulation.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "coffee",
+    "translation": "咖啡, 咖啡色；咖啡, 咖啡豆",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "He ordered a cup of coffee.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "wage",
+    "translation": "工資, 報應, 報償；開展, 進行",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "Wages were paid by check.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "song",
+    "translation": "歌, 曲, 鳴聲, 歌唱, 歌曲, 詩歌",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "A successful musical must have at least three good songs.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "row",
+    "translation": "排, 行, 街道, 划船, 吵鬧；使成排, 劃, 划船, 參加(賽船), 痛罵",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "A row of chairs.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "acquire",
+    "translation": "獲得, 學到；目標鎖定",
+    "part_of_speech": "v.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "Children acquire language at an amazing rate.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "sleep",
+    "translation": "睡眠, 靜止, 昏迷, 麻木, 長眠, 冬眠；睡覺, 睡眠, 靜止",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "He didn't get enough sleep last night.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "feed",
+    "translation": "飼料, 一餐, 飼養；喂, 飼養, 放牧, 靠...為生",
+    "part_of_speech": "v.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "Feed the guests the nuts.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "fairly",
+    "translation": "美觀地, 公平地, 相當地, 清楚地",
+    "part_of_speech": "adv.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "He is fairly clever with computers.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "wood",
+    "translation": "木材, 木製品；植林於, 給...新增木柴",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "Metal woods are now standard.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "excellent",
+    "translation": "優良的, 傑出的, 出色的",
+    "part_of_speech": "adj.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "Made an excellent speech.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "internal",
+    "translation": "內在的, 國內的；內的, 內部的",
+    "part_of_speech": "adj.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "Internal mechanism of a toy.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "tour",
+    "translation": "旅遊, 觀光旅行, 任期；旅行, 周遊, 巡迴",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "They took an extended tour of Europe.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "interview",
+    "translation": "面談, 訪問, 接見, 面試；接見, 對...進行面談(試)",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "My interviews with teenagers revealed a weakening of religious bonds.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "dinner",
+    "translation": "晚餐, 正餐, 宴會",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "Dinner will be at 8.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "traffic",
+    "translation": "交通, 通行, 運輸, 交通量, 貿易, 交易, 交往, 通訊量；交易, 做買賣",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "Heavy traffic overloaded the trunk lines.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "exhibition",
+    "translation": "表現, 展覽會, 展覽品；投藥, 展覽, 展出",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "A remarkable exhibition of musicianship.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "launch",
+    "translation": "下水, 汽艇, 發射；使下水, 發射, 發動",
+    "part_of_speech": "v.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "Launch the space shuttle.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "sheet",
+    "translation": "床單, 張, 紙張, 印刷品, 裹屍布, 薄片；蓋上被單, 遍佈",
+    "part_of_speech": "v.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "The rain was sheeting down during the monsoon.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "quick",
+    "translation": "快的, 迅速的, 敏捷的, 靈敏的, 急速的；快",
+    "part_of_speech": "adj.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "Was quick to make friends.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "equally",
+    "translation": "相等地, 同樣地, 平等地",
+    "part_of_speech": "adv.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "They were equally beautiful.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "bridge",
+    "translation": "橋, 艦橋, 橋樑, 橋牌；架橋於, 跨越",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "His letters provided a bridge across the centuries.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "appearance",
+    "translation": "出現, 露面, 外觀, 外表, 出版；外觀, 版面",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "I tried to describe his appearance to the police.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "soft",
+    "translation": "軟的, 溫和的, 柔和的, 柔滑的, 溫柔的, 軟弱的, 坡度小的, 笨的, 紙幣的；柔軟的東西, 笨人, 紙幣",
+    "part_of_speech": "adj.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "He was soft on his children.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "quiet",
+    "translation": "安靜, 閒適, 平靜；安靜的, 靜止的, 寂靜的, 樸素的, 從容的, 暗中的",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "The street was quiet.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "potential",
+    "translation": "潛在性, 可能性, 潛力, 潛能, 勢, 位；有潛力的, 可能的, 潛在的",
+    "part_of_speech": "adj.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "A potential problem.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "limit",
+    "translation": "界限, 邊界, 限度, 極限, 限制；限制, 限定",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "To the limit of his ability.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "improvement",
+    "translation": "進步, 改善, 利用；改善, 好轉, 進步",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "Their improvements increased the value of the property.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "description",
+    "translation": "描述, 說明, 種類；說明書(物品), 品名種類, 貨物名稱",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "Every description of book was there.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "construction",
+    "translation": "建築, 構造, 建築物；施工",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "During the construction we had to take a detour.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "session",
+    "translation": "期間, 開庭期, 會議, 學期；會話, 對話, 會晤, 通用任務程式",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "It was the opening session of the legislature.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "religious",
+    "translation": "宗教性的, 虔誠的, 宗教上的, 嚴謹的；修道士, 出家人",
+    "part_of_speech": "adj.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "A member of a religious order.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "northern",
+    "translation": "北方人；北方的, 向北的, 自北方來的",
+    "part_of_speech": "adj.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "The northern suburbs.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "flat",
+    "translation": "平坦的, 單調的, 無力的, 淺的, 蕭條的, 乾脆的, 無聊的；平直地, 斷然地",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "The salt flats of Utah.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "discipline",
+    "translation": "訓練, 紀律；訓練, 懲罰",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "In what discipline is his doctorate?",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "contrast",
+    "translation": "差別, 對比, 對照物；使對比",
+    "part_of_speech": "v.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "The middle school teacher contrasted her best student's work with that of her weakest student.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "increasingly",
+    "translation": "逐漸地, 漸增地",
+    "part_of_speech": "adv.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "She became increasingly depressed.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "existence",
+    "translation": "存在, 生存；存在, 存在狀態, 實體",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "Laws in existence for centuries.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "distribution",
+    "translation": "分配；分佈",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "Worldwide in distribution.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "proper",
+    "translation": "適當的, 固有的, 高尚的, 專屬的；完全地, 徹底地",
+    "part_of_speech": "adj.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "Proper medical treatment.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "deliver",
+    "translation": "遞送, 陳述, 釋放, 發表, 引渡, 投遞, 交付；交運",
+    "part_of_speech": "v.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "Our local super market delivers.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "retain",
+    "translation": "保持, 保有, 留住, 記得, 付定金聘請；保留, 留存",
+    "part_of_speech": "v.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "This soil retains water.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "broad",
+    "translation": "寬廣的, 遼闊的, 廣大的, 顯著的；寬闊地",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "A broad is a woman who can throw a mean punch.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "audience",
+    "translation": "聽眾, 觀眾, 讀者；聽訟, 觀眾, 聽眾",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "The audience applauded.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "crisis",
+    "translation": "危機, 危險期, 緊要關頭；危象; 驟退, 臨界, 極期",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "They went bankrupt during the economic crisis.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "loan",
+    "translation": "貸款, 借出；借, 供應貨款, 借給",
+    "part_of_speech": "v.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "Loan me some money.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "code",
+    "translation": "程式碼, 密碼, 法規, 法典；把...編碼",
+    "part_of_speech": "v.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "Code the pieces with numbers so that you can identify them later.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "representative",
+    "translation": "代表, 眾議員, 典型；描寫的, 表現的, 代理的, 代表的, 代議制的, 典型的",
+    "part_of_speech": "adj.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "A representative modern play.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "cultural",
+    "translation": "文化的, 教養的, 修養的；培養的",
+    "part_of_speech": "adj.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "A person of broad cultural interests.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "usual",
+    "translation": "平常的, 通常的",
+    "part_of_speech": "adj.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "Grew the usual vegetables.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "unable",
+    "translation": "不能的, 不會的；無能力的, 無資格的, 沒有辦法的",
+    "part_of_speech": "adj.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "Unable to get to town without a car.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "belong",
+    "translation": "屬於, 合適",
+    "part_of_speech": "v.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "This book belongs to me.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "respect",
+    "translation": "尊敬, 尊重, 問候；尊敬, 注意, 遵守",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "It differs in that respect.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "attract",
+    "translation": "吸引, 誘惑；有吸引力",
+    "part_of_speech": "v.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "Her good looks attract the stares of many men.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "promise",
+    "translation": "諾言, 約定的事情, 有指望；允諾, 約定, 預示",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "There is little or no promise that he will recover.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "magazine",
+    "translation": "雜誌, 倉庫, 彈盒, 膠捲盒；卡片箱, 介質裝卸程式",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "It takes several years before a magazine starts to break even or make money.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "limited",
+    "translation": "有限制的, 有限的, 有限責任的；特別快車",
+    "part_of_speech": "adj.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "A limited success.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "formal",
+    "translation": "正式的, 形式的, 禮儀的, 拘於禮節的, 拘謹的；正式的社交活動",
+    "part_of_speech": "adj.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "Pay one's formal respects.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "writing",
+    "translation": "書寫, 著作, 筆跡, 作品；書寫",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "Writing was a form of therapy for him.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "reject",
+    "translation": "被拒之人, 被棄之物, 不合格品, 次品；拒絕, 抵制, 否決, 駁回, 丟棄, 嘔出",
+    "part_of_speech": "v.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "I reject the idea of starting a war.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "hide",
+    "translation": "獸皮, 跡象, 躲藏處；藏, 隱瞞, 遮避, 剝...的皮, 隱藏",
+    "part_of_speech": "v.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "Muslim women hide their faces.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "flight",
+    "translation": "飛行, 射程, 逃走, 飛躍, 飛機航程, 班機, 遷徙, 飛逝；遷徙",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "His flight was an indication of his guilt.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "assess",
+    "translation": "估定, 對...徵稅, 評定；估計, 估價, 確定(稅款罰款等)的金額",
+    "part_of_speech": "v.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "Our house hasn't been assessed in years.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "joint",
+    "translation": "連線處, 接合, 關節；共同的, 聯合的, 連線的, 合辦的",
+    "part_of_speech": "v.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "The carpenter jointed two pieces of wood.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "rain",
+    "translation": "雨, 下雨, 雨天；下雨",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "A rain of bullets.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "explanation",
+    "translation": "解釋, 說明, 辯解, 表明；解釋, 註釋, 說明",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "The explanation was very simple.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "consist",
+    "translation": "組成, 存在於, 一致",
+    "part_of_speech": "v.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "The payment consists in food.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "plate",
+    "translation": "碟, 盤子, 盆中物, 金屬板, 圖版, 金銀餐具, 印版, 金屬牌(照)；鍍金, 電鍍, 用金屬板固定, 給...裝鋼板, 為...制印版",
+    "part_of_speech": "n.",
+    "gsat_level": 3,
+    "gsat_frequency": 99,
+    "example_sentence": "A vegetable plate.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "ultimate",
+    "translation": "終極, 根本, 頂點, 基本原則；終極的, 根本的, 極限的, 最遠的, 最後的, 最大的",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 92,
+    "example_sentence": "The ultimate in luxury.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "publicity",
+    "translation": "名聲, 宣傳, 公開場合；宣傳, 廣告",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 92,
+    "example_sentence": "The publicity of the court room.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "alarm",
+    "translation": "驚恐, 警報, 警鐘；使驚恐, 警告",
+    "part_of_speech": "v.",
+    "gsat_level": 4,
+    "gsat_frequency": 92,
+    "example_sentence": "The empty house alarmed him.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "communicate",
+    "translation": "顯露, 傳達, 感染；通訊",
+    "part_of_speech": "v.",
+    "gsat_level": 4,
+    "gsat_frequency": 92,
+    "example_sentence": "Please communicate this message to all employees.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "stir",
+    "translation": "騷動, 轟動, 攪動, 監獄；移動, 搖動, 激起, 惹起, 攪拌",
+    "part_of_speech": "v.",
+    "gsat_level": 4,
+    "gsat_frequency": 92,
+    "example_sentence": "As the thunder started the sleeping children began to stir.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "funeral",
+    "translation": "葬禮, 出殯",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 92,
+    "example_sentence": "Hundreds of people attended his funeral.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "burst",
+    "translation": "破裂, 突發, 爆發；爆裂, 突發, 充滿",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 92,
+    "example_sentence": "The burst of an atom bomb creates enormous radiation aloft.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "volunteer",
+    "translation": "志願者；志願的",
+    "part_of_speech": "v.",
+    "gsat_level": 4,
+    "gsat_frequency": 92,
+    "example_sentence": "He volunteered the information.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "craft",
+    "translation": "技藝, 手藝, 詭計；精心製作",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 92,
+    "example_sentence": "He represented the craft of brewers.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "clever",
+    "translation": "聰明的, 精明的",
+    "part_of_speech": "adj.",
+    "gsat_level": 4,
+    "gsat_frequency": 92,
+    "example_sentence": "Too clever to be sound.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "wander",
+    "translation": "遊蕩, 漫步, 徘徊, 迷路, 離題, 蜿蜒；在...漫遊",
+    "part_of_speech": "v.",
+    "gsat_level": 4,
+    "gsat_frequency": 92,
+    "example_sentence": "The wandering Jew.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "exploit",
+    "translation": "功績, 勳績；開發, 利用, 開拓, 剝削",
+    "part_of_speech": "v.",
+    "gsat_level": 4,
+    "gsat_frequency": 92,
+    "example_sentence": "He exploit the new taxation system.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "flesh",
+    "translation": "肉, 肉體, 肉慾, 人性, 親屬, 人類, 眾生, 人體；以肉喂, 激起...的殺戳情緒, 使肥, 賦以血肉",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 92,
+    "example_sentence": "The spirit is willing but the flesh is weak.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "swim",
+    "translation": "游泳, 漂浮, 潮流, 眩暈；游泳, 遊, 漂浮, 浸, 覆蓋, 充溢, 大量擁有, 旋轉, 眩暈",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "They took a short swim in the pool.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "pray",
+    "translation": "祈禱, 懇求, 請",
+    "part_of_speech": "v.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "Pray to the Lord.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "asleep",
+    "translation": "睡著的, 長眠的, 麻木的；熟睡地",
+    "part_of_speech": "adj.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "Were all asleep when the phone rang.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "govern",
+    "translation": "統治, 支配, 管理",
+    "part_of_speech": "v.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "His belief in God governs his conduct.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "equivalent",
+    "translation": "同等物, 等價物, 相等物；相等的, 相當的, 同意義的",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "Send two dollars or the equivalent in stamps.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "sharply",
+    "translation": "銳利地, 嚴厲地, 厲害地；劇烈地",
+    "part_of_speech": "adv.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "She was being sharply questioned.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "rival",
+    "translation": "對手, 競爭者；競爭的",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "He had respect for his rivals.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "mate",
+    "translation": "配偶, 對手, 助手, (象棋)將死；使配對, 使一致, 結伴, (象棋)將死",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "He loved the mare and all her mates.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "hurry",
+    "translation": "匆忙, 急忙, 急促；急派, 催促",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "In a hurry to lock the door.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "upstairs",
+    "translation": "樓上的；在樓上, 向樓上, 處於更高地位",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "No one was allowed to see the upstairs.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "evolution",
+    "translation": "進化, 發展, 進展, (氣體)放出, 開方；進化, 演化, 旋出",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "The evolution of Greek civilization.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "format",
+    "translation": "開本, 版式, 形式, 格式；格式化",
+    "part_of_speech": "v.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "Format this letter so it can be printed out.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "softly",
+    "translation": "柔和地, 靜靜地, 溫柔地",
+    "part_of_speech": "adv.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "Speak softly but carry a big stick.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "sigh",
+    "translation": "嘆息；嘆息, 渴望",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "She heard the sigh of the wind in the trees.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "wise",
+    "translation": "明智的, 慎慮的, 聰明的, 博學的, 狡猾的, 機靈的；知道",
+    "part_of_speech": "adj.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "A wise and perceptive comment.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "weigh",
+    "translation": "稱...重量, 衡量, 把...壓彎, 考慮, 權衡, 起錨；稱分量, 有意義, 重壓, 起錨",
+    "part_of_speech": "v.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "The butcher weighed the chicken.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "sympathy",
+    "translation": "同情, 贊同, 憐憫, 慰問, 弔唁；交感, 同感, 感應, 同情",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "The two of them were in close sympathy.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "strip",
+    "translation": "長條, 條狀, 帶, 脫衣舞；脫衣, 被剝去, 剝奪, 拆卸",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "He felt a flat strip of muscle.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "strict",
+    "translation": "嚴厲的, 絕對的, 詳盡的, 嚴格的, 精確的；嚴格的, 精確的, 絕對的",
+    "part_of_speech": "adj.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "A strict vegetarian.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "ease",
+    "translation": "安樂, 安逸, 悠閒；使安樂, 使安心, 減輕, 放鬆",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "He rose through the ranks with apparent ease.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "collapse",
+    "translation": "崩潰, 倒塌, 虛脫；倒塌, 崩潰, 瓦解",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "The roof is in danger of collapse.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "bitter",
+    "translation": "苦的, 痛苦的, 懷恨的；刺骨",
+    "part_of_speech": "adj.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "Bitter about the divorce.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "plot",
+    "translation": "小塊土地, 地區圖, 圖, 陰謀, 情節；劃分, 繪圖, 密謀",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "They concocted a plot to discredit the governor.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "outer",
+    "translation": "外部的, 外面的, 在外的, 遠離中心的；外部的, 外面的, 外側的",
+    "part_of_speech": "adj.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "Spent hours adorning the outer man.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "machinery",
+    "translation": "機器, 機械裝置, 機構；機械",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "The complex machinery of negotiation.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "organ",
+    "translation": "風琴, 器官, 元件, 機構, 機關；風琴",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "The Census Bureau is an organ of the Commerce Department.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "illegal",
+    "translation": "違法的, 不合規定的；非法的, 犯規的",
+    "part_of_speech": "adj.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "An illegal chess move.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "confront",
+    "translation": "使面對, 對抗, 遭遇, 使對質, 比較；對證, 使對質, 比較",
+    "part_of_speech": "v.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "You must confront your opponent.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "anticipate",
+    "translation": "預期, 佔先, 加速, 提前使用；提前出現, 先期發生",
+    "part_of_speech": "v.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "This composition anticipates Impressionism.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "nowhere",
+    "translation": "無處, 到處都無",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "He came out of nowhere.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "attraction",
+    "translation": "吸引, 吸引人的事物, 吸引力；吸引",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "Her personality held a strange attraction for him.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "frequent",
+    "translation": "時常發生的, 頻繁的, 快速的；時常來訪, 常常聚集, 常與...交往",
+    "part_of_speech": "adj.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "A frequent guest.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "wipe",
+    "translation": "擦拭, 用力打, 凸輪；擦, 揩, 消滅, 塗上, 拭去",
+    "part_of_speech": "v.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "Wipe the blackboard.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "garage",
+    "translation": "車庫, 汽車修理廠, 機庫；把車送入修車場",
+    "part_of_speech": "v.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "We don't garage our car.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "wrap",
+    "translation": "外套, 圍巾, 包裹物, 限制, 約束, 秘密, 換行；包裝, 卷, 纏繞, 包, 裹, 覆蓋, 遮蔽, 隱藏, 掩護",
+    "part_of_speech": "v.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "Wrap the baby before taking her out.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "slope",
+    "translation": "傾斜, 斜坡, 斜率, 扛槍姿勢；使傾斜, 弄斜, 扛",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "He climbed the steep slope.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "informal",
+    "translation": "非正式的, 不拘禮的, 通俗的；非正式的, 日常使用的",
+    "part_of_speech": "adj.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "Conservative people unaccustomed to informal dress.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "ally",
+    "translation": "同盟者, 同盟國, 助手；使聯盟, 使聯合, 使有關係",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "He's a good ally in fight.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "potentially",
+    "translation": "可能地, 潛在地",
+    "part_of_speech": "adv.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "He is potentially dangerous.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "flexible",
+    "translation": "易曲的, 靈活的, 柔順的, 能變形的, 可通融的；能屈的",
+    "part_of_speech": "adj.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "Slim flexible birches.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "native",
+    "translation": "本地人, 土產, 當地人；本國的, 與生俱來的, 自然的",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "The art of the natives of the northwest coast.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "discount",
+    "translation": "折扣, 貼現率；打折扣",
+    "part_of_speech": "v.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "I never discount these books-they sell like hot cakes.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "essay",
+    "translation": "隨筆, 短文, 評論, 企圖；試圖",
+    "part_of_speech": "v.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "The infant had essayed a few wobbly steps.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "evaluate",
+    "translation": "評估, 評價, 賦值",
+    "part_of_speech": "v.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "How do you evaluate this grant proposal?",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "bound",
+    "translation": "躍, 回跳, 範圍, 邊界；受約束的, 裝有封面的, 有義務的, 關聯的, 被束縛的, 準備去...的, 便秘的",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "What he did was beyond the bounds of acceptable behavior.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "reverse",
+    "translation": "相反, 背面, 倒退, 挫折, 失敗；反面的, 相反的, 反向的, 顛倒的",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "We thought Sue was older than Bill but just the reverse was true.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "modest",
+    "translation": "謙遜的, 羞怯的, 端莊的, 適度的；適當的",
+    "part_of_speech": "adj.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "A modest apartment.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "invitation",
+    "translation": "邀請, 請柬, 引誘；邀請, 招待, 吸引",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "An invitation to lunch.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "generous",
+    "translation": "慷慨的, 有雅量的, 大量的, 豐富的",
+    "part_of_speech": "adj.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "A generous donation.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "trick",
+    "translation": "詭計, 欺詐, 謀略, 惡作劇, 習慣, 決竅；愚弄, 欺騙, 裝飾",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "He played a trick on me.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "roughly",
+    "translation": "概略地, 粗糙地, 粗暴地",
+    "part_of_speech": "adv.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "He was pushed roughly aside.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "excuse",
+    "translation": "原諒, 申辯, 做為...的託辭；致歉, 理由, 饒恕, 藉口",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "He kept finding excuses to stay.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "cancel",
+    "translation": "取消, 撤消, 蓋銷(郵票)；取消, 刪去, 抵銷, 蓋銷",
+    "part_of_speech": "v.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "Cancel the dinner party.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "automatic",
+    "translation": "自動手槍, 自動機械；自動的, 機械的, 必然的, 無意識的",
+    "part_of_speech": "adj.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "A budget deficit that caused automatic spending cuts.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "ambition",
+    "translation": "野心, 志向",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "His ambition is to own his own business.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "weekly",
+    "translation": "週刊, 週報；每週的, 一週一次的, 週刊的",
+    "part_of_speech": "adv.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "She visited her aunt weekly.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "logical",
+    "translation": "合乎邏輯的, 合理的；邏輯的, 符合邏輯的",
+    "part_of_speech": "adj.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "Rain was a logical expectation, given the time of year.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "harm",
+    "translation": "傷害, 害處；傷害, 損害",
+    "part_of_speech": "v.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "These pills won't harm your system.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "electrical",
+    "translation": "電的, 有關電的；電的",
+    "part_of_speech": "adj.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "An electrical engineer.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "logic",
+    "translation": "邏輯, 邏輯學, 推理的方法, 推理, 邏輯性；邏輯",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "It made a certain kind of logic.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "flame",
+    "translation": "火焰, 火舌, 熱情, 光輝；焚燒, 用火焰給...滅菌, 用火焰傳送(訊號), 點燃, 激動",
+    "part_of_speech": "v.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "The sky seemed to flame in the Hawaiian sunset.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "bare",
+    "translation": "赤裸的, 缺少的, 無遮蔽的, 坦率的；使赤裸, 露出",
+    "part_of_speech": "v.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "Bare your breasts.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "crash",
+    "translation": "嘩啦聲, 猛撞, 崩潰, 粗布；撞碎, 破碎, (使)...墜毀",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "They are still investigating the crash of the TWA plane.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "resort",
+    "translation": "度假勝地, 手段, 憑藉, 常去之地；訴諸, 常去",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "An appeal to his uncle was his last resort.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "inspire",
+    "translation": "使感動, 激發, 啟示, 吸入, 鼓舞, 產生, 使生靈感；吸入, 賦予靈感",
+    "part_of_speech": "v.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "The lung cancer patient cannot inspire air very well.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "shade",
+    "translation": "蔭, 陰暗, 遮光物, 燈罩, 簾, 濃淡, 微量, 底紋；漸變",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "It is much cooler in the shade.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "loud",
+    "translation": "大聲的, 不斷的, 喧吵的；高聲地, 大聲地",
+    "part_of_speech": "adj.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "A group of loud children.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "dare",
+    "translation": "挑戰, 挑動, 大膽；敢, 膽敢",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "He could never refuse a dare.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "valid",
+    "translation": "有確實根據的, 有法律效力的, 正當的, 正確的；有效的",
+    "part_of_speech": "adj.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "A valid inference.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "mineral",
+    "translation": "礦物, 無機物, 蘇打水；礦物的, 似礦物的",
+    "part_of_speech": "adj.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "The inorganic mineral world.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "suspicion",
+    "translation": "懷疑, 覺察, 嫌疑；懷疑, 疑心, 嫌疑",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "He tried to shield me from suspicion.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "prompt",
+    "translation": "激勵, 提示, 提醒物, 提詞, 付款期限；迅速的, 敏捷的, 立刻的, 提詞員的",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "The audience could hear his prompting.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "cotton",
+    "translation": "棉花；和諧, 有好感, 理解",
+    "part_of_speech": "v.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "Cotton to something.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "condemn",
+    "translation": "判刑, 責備, 譴責；定罪, 判刑, 宣告有罪",
+    "part_of_speech": "v.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "We condemn the racism in South Africa.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "swear",
+    "translation": "發誓, 咒罵, 使宣誓；發誓, 詛咒",
+    "part_of_speech": "v.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "Before God I swear I am innocent.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "grain",
+    "translation": "穀粒, 顆粒, 穀類, 紋理, 本質；(使)成穀粒",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "A grain of sand.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "pop",
+    "translation": "砰然聲, 槍擊, 含氣飲料, 流行音樂, 通俗藝術；流行的, 熱門的, 通俗的",
+    "part_of_speech": "v.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "Pop the pizza into the microwave oven.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "pile",
+    "translation": "堆, 大堆, 大廈, 建築群, 電池, 大量, 橋樁, 軟毛, 痔瘡；堆起, 堆積, 積累, 擠, 猛烈攻擊",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "For uniform color and texture tailors cut velvet with the pile running the same direction.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "identification",
+    "translation": "識別, 身份證明, 認同；鑑定; 鑑別; 鑑別法; 認證",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "The thief's identification was followed quickly by his arrest.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "rub",
+    "translation": "摩擦, 困難, 障礙, 磨損處；擦, 搓, 摩擦, 惹怒",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "He gave the hood a quick rub.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "spiritual",
+    "translation": "精神上的, 神聖的, 崇高的, 高尚的, 鬼的, 招魂術的；有關教會的事",
+    "part_of_speech": "adj.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "Lords temporal and spiritual.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "correspond",
+    "translation": "符合, 通訊, 相當；符合, 一致, 相當",
+    "part_of_speech": "v.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "My Russian pen pal and I have been corresponding for several years.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "bet",
+    "translation": "打賭, 賭注；打賭",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "He did it on a bet.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "acute",
+    "translation": "尖銳的, 敏銳的, 激烈的, 嚴重的, 急性的；急性的; 尖銳的",
+    "part_of_speech": "adj.",
+    "gsat_level": 4,
+    "gsat_frequency": 91,
+    "example_sentence": "The acute phase of the illness.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "urgent",
+    "translation": "緊急的, 急迫的, 催逼的；緊急的, 急迫的",
+    "part_of_speech": "adj.",
+    "gsat_level": 4,
+    "gsat_frequency": 90,
+    "example_sentence": "The urgent words `Hurry! Hurry!'.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "running",
+    "translation": "賽跑, 流出, 運轉；流動的, 跑著的, 連續的",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 90,
+    "example_sentence": "The coach put great emphasis on running.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "exact",
+    "translation": "精確的, 準確的, 精密的；強求, 急需",
+    "part_of_speech": "adj.",
+    "gsat_level": 4,
+    "gsat_frequency": 90,
+    "example_sentence": "Hit the exact center of the target.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "reliable",
+    "translation": "可靠的, 可信賴的；可靠的, 可信賴的, 確實的",
+    "part_of_speech": "adj.",
+    "gsat_level": 4,
+    "gsat_frequency": 90,
+    "example_sentence": "A reliable source of information.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "disturb",
+    "translation": "擾亂, 妨礙, 使不安；滋擾, 擾亂",
+    "part_of_speech": "v.",
+    "gsat_level": 4,
+    "gsat_frequency": 90,
+    "example_sentence": "Don't disturb the patient's wounds by moving him too rapidly!",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "pregnant",
+    "translation": "懷孕的, 充滿的, 思想豐富的, 成果豐碩的；妊娠的, 有孕的",
+    "part_of_speech": "adj.",
+    "gsat_level": 4,
+    "gsat_frequency": 90,
+    "example_sentence": "A silence pregnant with suspense.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "hesitate",
+    "translation": "猶豫, 遲疑, 躊躇, 支吾, 停頓",
+    "part_of_speech": "v.",
+    "gsat_level": 4,
+    "gsat_frequency": 90,
+    "example_sentence": "Authorities hesitate to quote exact figures.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "translate",
+    "translation": "翻譯, 解釋, 轉化, 轉變為, 調動；翻譯, 被譯",
+    "part_of_speech": "v.",
+    "gsat_level": 4,
+    "gsat_frequency": 90,
+    "example_sentence": "I have to translate when my in-laws from Austria visit the U.S.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "explosion",
+    "translation": "爆發, 激增, 爆炸(聲)；爆炸",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 90,
+    "example_sentence": "The explosion of the firecrackers awoke the children.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "swallow",
+    "translation": "燕子, 吞嚥, 喉；咽, 淹沒, 吞沒, 耗盡, 輕信, 忍受, 抑制",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 90,
+    "example_sentence": "One swallow of the liquid was enough.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "farming",
+    "translation": "農業, 耕作",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 90,
+    "example_sentence": "Farming is a strenuous life.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "bite",
+    "translation": "咬, 一口；咬, 刺痛, 穿透",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 90,
+    "example_sentence": "After fishing for an hour he still had not had a bite.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "tap",
+    "translation": "輕打, 水龍頭；輕打, 輕敲, 敲打出, 選擇, 裝上嘴子, 使流出, 開發, 分接, 向...乞討",
+    "part_of_speech": "v.",
+    "gsat_level": 4,
+    "gsat_frequency": 90,
+    "example_sentence": "Tap one's memory.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "greet",
+    "translation": "問候, 致敬, 歡迎, 映入眼簾",
+    "part_of_speech": "v.",
+    "gsat_level": 4,
+    "gsat_frequency": 90,
+    "example_sentence": "The President was greeted with catcalls.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "curious",
+    "translation": "好奇的, 求知的, 古怪的",
+    "part_of_speech": "adj.",
+    "gsat_level": 4,
+    "gsat_frequency": 90,
+    "example_sentence": "A curious hybrid accent.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "removal",
+    "translation": "移動, 移居, 遷移, 排除, 切除；切除, 除去",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 90,
+    "example_sentence": "He had surgery for the removal of a malignancy.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "cloth",
+    "translation": "布料, 織品, 布；布",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 90,
+    "example_sentence": "Woven cloth originated in Mesopotamia around 5000 BC.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "interior",
+    "translation": "內部, 內政；內部的, 心靈的, 內地的, 內政的",
+    "part_of_speech": "adj.",
+    "gsat_level": 4,
+    "gsat_frequency": 90,
+    "example_sentence": "An interior scene.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "ceremony",
+    "translation": "典禮, 儀式, 禮節；典禮, 儀式",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 90,
+    "example_sentence": "A ceremony commemorating Pearl Harbor.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "taxi",
+    "translation": "計程車；乘計程車",
+    "part_of_speech": "v.",
+    "gsat_level": 4,
+    "gsat_frequency": 90,
+    "example_sentence": "The plane taxied down the runway.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "formally",
+    "translation": "正式地, 形式上",
+    "part_of_speech": "adv.",
+    "gsat_level": 4,
+    "gsat_frequency": 90,
+    "example_sentence": "The club will be formally recognized.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "laughter",
+    "translation": "笑, 笑聲；笑, 大笑",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 90,
+    "example_sentence": "He enjoyed the laughter of the crowd.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "cinema",
+    "translation": "電影院, 電影",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 90,
+    "example_sentence": "This story would be good cinema.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "satellite",
+    "translation": "人造衛星；伴行靜脈, 陪靜脈, 陪病部, 隨體, 衛星",
+    "part_of_speech": "adj.",
+    "gsat_level": 4,
+    "gsat_frequency": 90,
+    "example_sentence": "A city and its satellite communities.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "nearby",
+    "translation": "附近的, 近旁的；在附近, 近旁地",
+    "part_of_speech": "adj.",
+    "gsat_level": 4,
+    "gsat_frequency": 90,
+    "example_sentence": "The nearby towns.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "shine",
+    "translation": "光澤, 陽光；使發光",
+    "part_of_speech": "v.",
+    "gsat_level": 4,
+    "gsat_frequency": 90,
+    "example_sentence": "His talent shines.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "rope",
+    "translation": "繩, 索, 粗繩, 絞索, 決竅；捆, 縛, 綁, 圈起, 以繩將...繫住",
+    "part_of_speech": "v.",
+    "gsat_level": 4,
+    "gsat_frequency": 90,
+    "example_sentence": "Rope the bag securely.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "pond",
+    "translation": "池塘；築成池塘",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 90,
+    "example_sentence": "The pond was too small for sailing.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "thoroughly",
+    "translation": "徹底地, 絕對地, 透徹地, 詳盡地, 周到地, 完全地, 完善地, 全面地",
+    "part_of_speech": "adv.",
+    "gsat_level": 4,
+    "gsat_frequency": 90,
+    "example_sentence": "We searched the files thoroughly.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "disappointed",
+    "translation": "失望的",
+    "part_of_speech": "adj.",
+    "gsat_level": 4,
+    "gsat_frequency": 90,
+    "example_sentence": "Disappointed expectations and thwarted ambitions.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "trap",
+    "translation": "圈套, 陷阱, 詭計, 存水彎；設圈套, 設陷阱",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 90,
+    "example_sentence": "The exam was full of trap questions.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "celebration",
+    "translation": "慶祝, 慶典",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 90,
+    "example_sentence": "The celebration of marriage.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "everyday",
+    "translation": "每天的, 日常的, 平常的",
+    "part_of_speech": "adj.",
+    "gsat_level": 4,
+    "gsat_frequency": 90,
+    "example_sentence": "A placid everyday scene.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "spell",
+    "translation": "符咒, 魅力, 輪值, 輪班, 工作時間, 一次發作；拼寫, 拼成, 琢磨, 理解, 招致, 輪換, 迷住",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 90,
+    "example_sentence": "A spell of work.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "interrupt",
+    "translation": "中斷, 妨礙, 插嘴；打斷",
+    "part_of_speech": "v.",
+    "gsat_level": 4,
+    "gsat_frequency": 90,
+    "example_sentence": "We interrupt the program for the following messages.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "brand",
+    "translation": "商標, 牌子, 烙印；打烙印於",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 90,
+    "example_sentence": "There's a new brand of hero in the movies now.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "squeeze",
+    "translation": "緊握, 擠, 榨, 榨取, 佣金；緊握, 擠, 榨取",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 90,
+    "example_sentence": "He gave her cheek a playful squeeze.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "overlook",
+    "translation": "俯瞰, 遠眺, 沒注意到；眺望, 俯瞰到的景色",
+    "part_of_speech": "v.",
+    "gsat_level": 4,
+    "gsat_frequency": 90,
+    "example_sentence": "The apartment overlooks the Hudson.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "delight",
+    "translation": "高興, 愉快；使高興, 樂於",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 90,
+    "example_sentence": "His delight to see her was obvious to all.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "forgive",
+    "translation": "原諒, 寬恕, 免除；免除, 寬恕, 原諒",
+    "part_of_speech": "v.",
+    "gsat_level": 4,
+    "gsat_frequency": 90,
+    "example_sentence": "She cannot forgive him for forgetting her birthday.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "frightened",
+    "translation": "受驚嚇的, 受驚的, (非正式)害怕...的",
+    "part_of_speech": "adj.",
+    "gsat_level": 4,
+    "gsat_frequency": 90,
+    "example_sentence": "The frightened child cowered in the corner.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "wound",
+    "translation": "創傷, 傷口, 傷疤, 傷害, 痛苦；傷害, 損害, 使受傷",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 90,
+    "example_sentence": "He feared that mentioning it might reopen the wound.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "battery",
+    "translation": "電池, 毆打；蓄電池",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 90,
+    "example_sentence": "Took a battery of achievement tests.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "fighting",
+    "translation": "戰鬥的, 容易引起爭鬥的, 適於格鬥的, 好鬥的, 好戰的, 鬥爭的, 搏鬥的；戰鬥, 鬥爭, 搏鬥",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 90,
+    "example_sentence": "There was fighting in the streets.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "expected",
+    "translation": "預期的；預料的",
+    "part_of_speech": "adj.",
+    "gsat_level": 4,
+    "gsat_frequency": 90,
+    "example_sentence": "Prepared for the expected attack.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "typically",
+    "translation": "代表性地；作為特色地",
+    "part_of_speech": "adv.",
+    "gsat_level": 4,
+    "gsat_frequency": 90,
+    "example_sentence": "Tom was typically hostile.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "toy",
+    "translation": "玩具, 小玩藝兒, 小型的東西, 消遣；供玩耍的, 作為玩具的",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 90,
+    "example_sentence": "Private airplanes are a rich man's toy.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "brush",
+    "translation": "刷子, 毛筆, 爭吵；刷",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 90,
+    "example_sentence": "He gave his hair a quick brush.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "rhythm",
+    "translation": "旋律, 節奏, 韻律, 勻稱, 張弛節律；節律",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 90,
+    "example_sentence": "The piece has a fast rhythm.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "innocent",
+    "translation": "無罪的, 不懂事的, 無知的；天真的人, 笨蛋",
+    "part_of_speech": "adj.",
+    "gsat_level": 4,
+    "gsat_frequency": 90,
+    "example_sentence": "An innocent child.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "desert",
+    "translation": "沙漠, 應得的賞罰, 功勞；沙漠的, 不毛的",
+    "part_of_speech": "v.",
+    "gsat_level": 4,
+    "gsat_frequency": 90,
+    "example_sentence": "The mother deserted her children.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "romantic",
+    "translation": "浪漫的, 風流的, 傳奇性的, 誇大的, 空想的, 浪漫派的",
+    "part_of_speech": "adj.",
+    "gsat_level": 4,
+    "gsat_frequency": 90,
+    "example_sentence": "A romantic adventure.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "mess",
+    "translation": "食堂, 伙食, 用膳, 一份食品, 混亂, 亂七八糟, 困境；將...弄糟, 妨礙, 使紊亂, 使就餐",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 90,
+    "example_sentence": "The house was a mess.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "controversial",
+    "translation": "爭論的, 論爭的, 被議論的",
+    "part_of_speech": "adj.",
+    "gsat_level": 4,
+    "gsat_frequency": 90,
+    "example_sentence": "The issue of the death penalty is highly controversial.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "temple",
+    "translation": "聖堂, 廟宇, 教堂, 禮拜堂, 太陽穴, 鬢角；顳顬, 顳部",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 90,
+    "example_sentence": "The veins in his temple throbbed.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "piano",
+    "translation": "鋼琴",
+    "part_of_speech": "adj.",
+    "gsat_level": 4,
+    "gsat_frequency": 90,
+    "example_sentence": "The piano passages in the composition.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "traditionally",
+    "translation": "傳統上；傳說上；習慣上",
+    "part_of_speech": "adv.",
+    "gsat_level": 4,
+    "gsat_frequency": 90,
+    "example_sentence": "Traditionally, we eat fried foods on Hanukah.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "oral",
+    "translation": "口試；口頭的, 口述的, 口部的",
+    "part_of_speech": "adj.",
+    "gsat_level": 4,
+    "gsat_frequency": 90,
+    "example_sentence": "An oral tradition.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "physically",
+    "translation": "按自然規律, 完全地, 實際上, 真正地, 身體上地",
+    "part_of_speech": "adv.",
+    "gsat_level": 4,
+    "gsat_frequency": 89,
+    "example_sentence": "It is physically impossible.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "specially",
+    "translation": "特別地, 專門地",
+    "part_of_speech": "adv.",
+    "gsat_level": 4,
+    "gsat_frequency": 89,
+    "example_sentence": "A specially arranged dinner.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "hire",
+    "translation": "租金, 租用, 僱用；僱請, 出租",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 89,
+    "example_sentence": "The new hires need special training.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "closed",
+    "translation": "關閉的, 限於少數人的；關閉指令",
+    "part_of_speech": "v.",
+    "gsat_level": 4,
+    "gsat_frequency": 89,
+    "example_sentence": "The windows closed with a loud bang.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "straightforward",
+    "translation": "筆直的, 率直的, 明確的, 簡單的, 直接的",
+    "part_of_speech": "adj.",
+    "gsat_level": 4,
+    "gsat_frequency": 89,
+    "example_sentence": "A straightforward set of instructions.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "counter",
+    "translation": "計算器, 計算者, 櫃檯, 籌碼；反方向的, 相反的",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 89,
+    "example_sentence": "A counter may be used to stiffen the material around the heel and to give support to the foot.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "convenient",
+    "translation": "方便的, 合宜的；適當的, 合理而可行的, 方便的",
+    "part_of_speech": "adj.",
+    "gsat_level": 4,
+    "gsat_frequency": 89,
+    "example_sentence": "A convenient excuse for not going.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "mixed",
+    "translation": "混合的, 形形色色的, 弄糊塗的；混合的",
+    "part_of_speech": "adj.",
+    "gsat_level": 4,
+    "gsat_frequency": 89,
+    "example_sentence": "A mixed program of baroque and contemporary music.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "float",
+    "translation": "漂流物, 浮舟, 漂浮, 浮萍, 彩車；浮動, 飄動, 散播, 搖擺, 動搖, 浮動",
+    "part_of_speech": "v.",
+    "gsat_level": 4,
+    "gsat_frequency": 89,
+    "example_sentence": "He floated the logs down the river.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "artificial",
+    "translation": "人造的, 假的, 非原地產的；人工的, 人造的, 偉牟",
+    "part_of_speech": "adj.",
+    "gsat_level": 4,
+    "gsat_frequency": 89,
+    "example_sentence": "An artificial diamond.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "flag",
+    "translation": "標誌, 旗標, 旗子, 訊號旗, 菖蒲；懸旗, 打旗號, 鋪石板",
+    "part_of_speech": "v.",
+    "gsat_level": 4,
+    "gsat_frequency": 89,
+    "example_sentence": "Flag this file so that I can recognize it immediately.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "uniform",
+    "translation": "制服；統一的, 一律的, 始終如一的",
+    "part_of_speech": "v.",
+    "gsat_level": 4,
+    "gsat_frequency": 89,
+    "example_sentence": "The guards were uniformed.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "heating",
+    "translation": "加熱, 供熱, 暖氣裝置, 供暖系統, 暖氣裝置；加熱的, 供暖的",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 89,
+    "example_sentence": "The heating system wasn't working.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "fade",
+    "translation": "褪色, 消失, 凋謝；使褪色",
+    "part_of_speech": "v.",
+    "gsat_level": 4,
+    "gsat_frequency": 89,
+    "example_sentence": "The scene begins to fade.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "naked",
+    "translation": "裸體的, 無裝飾的, 無保護的, 赤貧的；裸露的",
+    "part_of_speech": "adj.",
+    "gsat_level": 4,
+    "gsat_frequency": 89,
+    "example_sentence": "Naked from the waist up.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "superior",
+    "translation": "長者, 佔優勢的人, 上級；上級的, 出眾的, 高傲的",
+    "part_of_speech": "adj.",
+    "gsat_level": 4,
+    "gsat_frequency": 89,
+    "example_sentence": "Superior wisdom derived from experience.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "strictly",
+    "translation": "嚴格地, 確實地",
+    "part_of_speech": "adv.",
+    "gsat_level": 4,
+    "gsat_frequency": 89,
+    "example_sentence": "We talked strictly business.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "freeze",
+    "translation": "凍結, 冷凍, 僵硬, 楞住；使結冰, 使凍住, 使呆住",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 89,
+    "example_sentence": "A nuclear freeze.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "disadvantage",
+    "translation": "缺點, 不利, 壞處",
+    "part_of_speech": "v.",
+    "gsat_level": 4,
+    "gsat_frequency": 89,
+    "example_sentence": "This rule clearly disadvantages me.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "shore",
+    "translation": "海岸, 海濱, 斜撐柱；把...送上岸, 支撐, 支援",
+    "part_of_speech": "v.",
+    "gsat_level": 4,
+    "gsat_frequency": 89,
+    "example_sentence": "Shore and buttress an old building.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "desperately",
+    "translation": "拼命地；絕望地；極度地",
+    "part_of_speech": "adv.",
+    "gsat_level": 4,
+    "gsat_frequency": 89,
+    "example_sentence": "The soil desperately needed potash.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "warmth",
+    "translation": "溫暖, 溫情, 暖和, 激動, 生氣",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 89,
+    "example_sentence": "An agreeable warmth in the house.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "lightly",
+    "translation": "輕輕地, 少許, 不費力地",
+    "part_of_speech": "adv.",
+    "gsat_level": 4,
+    "gsat_frequency": 89,
+    "example_sentence": "One cannot say such things lightly.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "mentally",
+    "translation": "心理上, 精神上, 智力上；精神上, 智力上",
+    "part_of_speech": "adv.",
+    "gsat_level": 4,
+    "gsat_frequency": 89,
+    "example_sentence": "He suffered mentally.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "uncertain",
+    "translation": "不確定的, 無常的, 不確信的, 不可預測的；不確定的, 未定的, 不確信的",
+    "part_of_speech": "adj.",
+    "gsat_level": 4,
+    "gsat_frequency": 89,
+    "example_sentence": "Uncertain of his convictions.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "heel",
+    "translation": "腳後跟, 踵, 後部, 傾側；尾隨, 裝以鞋跟, 傾側, 追趕",
+    "part_of_speech": "v.",
+    "gsat_level": 4,
+    "gsat_frequency": 89,
+    "example_sentence": "The balloon heeled over.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "beg",
+    "translation": "乞求, 乞討, 請求",
+    "part_of_speech": "v.",
+    "gsat_level": 4,
+    "gsat_frequency": 89,
+    "example_sentence": "I beg you to stop!",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "toilet",
+    "translation": "廁所, 梳妝；梳妝, 打扮, 上廁所",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 89,
+    "example_sentence": "Pensions are in the toilet.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "menu",
+    "translation": "選單, (功能)選擇單；選單",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 89,
+    "example_sentence": "The menu was in French.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "chemistry",
+    "translation": "化學, 化學過程；化學",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 89,
+    "example_sentence": "The chemistry of soil.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "nail",
+    "translation": "釘子, 指甲；用釘釘牢, 使固定, 截住, 揭露",
+    "part_of_speech": "v.",
+    "gsat_level": 4,
+    "gsat_frequency": 89,
+    "example_sentence": "Nail the board onto the wall.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "virus",
+    "translation": "病毒, 濾過性病毒, 毒害；病毒",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 89,
+    "example_sentence": "Bigotry is a virus that must not be allowed to spread.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "skirt",
+    "translation": "裙子, 下襬, 邊緣, 郊區；位於...邊緣, 繞過, 迴避",
+    "part_of_speech": "v.",
+    "gsat_level": 4,
+    "gsat_frequency": 89,
+    "example_sentence": "She skirted the problem.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "wildlife",
+    "translation": "野生動植物",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 89,
+    "example_sentence": "Chemicals could kill all the wildlife.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "emphasize",
+    "translation": "強調, 加強語氣, 著重",
+    "part_of_speech": "v.",
+    "gsat_level": 4,
+    "gsat_frequency": 89,
+    "example_sentence": "Dr. Jones emphasizes exercise in addition to a change in diet.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "confused",
+    "translation": "困惑的, 混亂的",
+    "part_of_speech": "v.",
+    "gsat_level": 4,
+    "gsat_frequency": 89,
+    "example_sentence": "The constant attention of the young man confused her.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "spare",
+    "translation": "剩餘, 備用品, 備件, 備用零件, 備用輪胎；多餘的, 備用的, 空閒的, 節約的, 瘦的",
+    "part_of_speech": "v.",
+    "gsat_level": 4,
+    "gsat_frequency": 89,
+    "example_sentence": "I'll spare you from having to apologize formally.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "stroke",
+    "translation": "筆劃, 打, 中風, 撫, 摩, 衝程；劃尾槳, 撫, 摩, 劃去",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 89,
+    "example_sentence": "It took two strokes to get out of the bunker.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "realistic",
+    "translation": "現實的, 逼真的, 現實主義的, 實在論的",
+    "part_of_speech": "adj.",
+    "gsat_level": 4,
+    "gsat_frequency": 89,
+    "example_sentence": "A realistic description.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "intelligent",
+    "translation": "聰明的, 智慧的, 瞭解的",
+    "part_of_speech": "adj.",
+    "gsat_level": 4,
+    "gsat_frequency": 89,
+    "example_sentence": "Is there intelligent life in the universe?",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "unhappy",
+    "translation": "不快樂的, 不幸的, 不適當的",
+    "part_of_speech": "adj.",
+    "gsat_level": 4,
+    "gsat_frequency": 89,
+    "example_sentence": "Unhappy over her departure.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "correctly",
+    "translation": "對, 正確, 恰當, 符合一般性準則, 符合行為準則, 端正, 符合",
+    "part_of_speech": "adv.",
+    "gsat_level": 4,
+    "gsat_frequency": 89,
+    "example_sentence": "The flower had been correctly depicted by his son.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "unfair",
+    "translation": "不公平的, 不正直的, 不正當的；不正直的, 不公平的, 偏頗的",
+    "part_of_speech": "adj.",
+    "gsat_level": 4,
+    "gsat_frequency": 89,
+    "example_sentence": "Used unfair methods.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "continent",
+    "translation": "大陸, 洲；自制的",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 89,
+    "example_sentence": "There are seven continents.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "consume",
+    "translation": "消耗, 消費, 消滅；耗盡, 毀滅",
+    "part_of_speech": "v.",
+    "gsat_level": 4,
+    "gsat_frequency": 89,
+    "example_sentence": "This car consumes a lot of gas.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "unite",
+    "translation": "聯合, 接合, 混合；使聯合, 統一, 使粘合, 使結合",
+    "part_of_speech": "v.",
+    "gsat_level": 4,
+    "gsat_frequency": 89,
+    "example_sentence": "She unites charm with a good business sense.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "liberty",
+    "translation": "自由, 特權, 許可, 冒失；自由, 自由權, 自由區域",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 89,
+    "example_sentence": "Liberty of opinion.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "grave",
+    "translation": "墓穴, 墳墓, 終結, 死亡；莊重的, 嚴肅的, 重大的, 低沉的",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 89,
+    "example_sentence": "He went to his grave without forgiving me.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "truck",
+    "translation": "卡車, 貨車, 對...進行交易, 來往, 實物工資, (供應市場的)蔬菜, 廢物, 廢話；對...進行交易, 交往, 以卡車運輸",
+    "part_of_speech": "v.",
+    "gsat_level": 4,
+    "gsat_frequency": 89,
+    "example_sentence": "Truck fresh vegetables across the mountains.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "ridiculous",
+    "translation": "荒謬的, 可笑的",
+    "part_of_speech": "adj.",
+    "gsat_level": 4,
+    "gsat_frequency": 89,
+    "example_sentence": "Her conceited assumption of universal interest in her rather dull children was ridiculous.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "avenue",
+    "translation": "大街, 途徑, 林蔭路",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 89,
+    "example_sentence": "They explored every avenue they could think of.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "midnight",
+    "translation": "午夜, 子夜, 半夜；午夜的, 半夜的",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 89,
+    "example_sentence": "Young children should not be allowed to stay up until midnight.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "carrier",
+    "translation": "運送者, 郵遞員, 帶菌者；載波",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 89,
+    "example_sentence": "The bonds were transmitted by carrier.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "painful",
+    "translation": "痛苦的, 困難的, 令人煩惱的；疼痛的",
+    "part_of_speech": "adj.",
+    "gsat_level": 4,
+    "gsat_frequency": 89,
+    "example_sentence": "Worked with painful slowness.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "fantasy",
+    "translation": "幻想, 想象的產物；幻想",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 89,
+    "example_sentence": "A schoolgirl fantasy.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "aggressive",
+    "translation": "侵略的, 挑畔的, 進取的；侵略的, 愛挑釁的, 行為過火的",
+    "part_of_speech": "adj.",
+    "gsat_level": 4,
+    "gsat_frequency": 89,
+    "example_sentence": "An aggressive businessman.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "flying",
+    "translation": "飛的, 飄揚的, 飛速的；飛行, 飛花",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 89,
+    "example_sentence": "Flying was still an exciting adventure for him.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "dialogue",
+    "translation": "對話；用對話表達",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 89,
+    "example_sentence": "He has read Plato's Dialogues in the original Greek.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "fool",
+    "translation": "愚人, 受騙者, 奶油拌水果；愚弄, 欺騙, 浪費",
+    "part_of_speech": "v.",
+    "gsat_level": 4,
+    "gsat_frequency": 89,
+    "example_sentence": "You can't fool me!",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "educate",
+    "translation": "教育, 培養, 訓練",
+    "part_of_speech": "v.",
+    "gsat_level": 4,
+    "gsat_frequency": 89,
+    "example_sentence": "We must educate our youngsters better.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "sadly",
+    "translation": "悲痛地, 悲慘地, 悲傷地, 說來遺憾",
+    "part_of_speech": "adv.",
+    "gsat_level": 4,
+    "gsat_frequency": 89,
+    "example_sentence": "Sadly he died before he could see his grandchild.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "amazing",
+    "translation": "令人驚異的",
+    "part_of_speech": "adj.",
+    "gsat_level": 4,
+    "gsat_frequency": 89,
+    "example_sentence": "She does an amazing amount of work.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "shame",
+    "translation": "羞恥, 羞愧, 恥辱；使羞愧, 侮辱",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 89,
+    "example_sentence": "One mistake brought shame to all his family.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "separation",
+    "translation": "分離, 分居, 缺口, 退職；分離",
+    "part_of_speech": "n.",
+    "gsat_level": 4,
+    "gsat_frequency": 89,
+    "example_sentence": "Fragile items require separation and cushioning.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "sandwich",
+    "translation": "三明治, 夾心麵包, 夾層板；插入, 夾入, 把...製成三明治",
+    "part_of_speech": "v.",
+    "gsat_level": 4,
+    "gsat_frequency": 89,
+    "example_sentence": "She was sandwiched in her airplane seat between two fat men.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "enjoyable",
+    "translation": "可從中得到樂趣的, 令人愉快的",
+    "part_of_speech": "adj.",
+    "gsat_level": 5,
+    "gsat_frequency": 78,
+    "example_sentence": "The company was enjoyable.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "weed",
+    "translation": "雜草, 野草；除草",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 78,
+    "example_sentence": "Weed the garden.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "ink",
+    "translation": "墨水, 墨汁；塗墨水於, 簽署, 加墨水",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 78,
+    "example_sentence": "They inked the contract.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "decay",
+    "translation": "衰退, 腐敗；(使)衰退, (使)腐敗",
+    "part_of_speech": "n.",
+    "gsat_level": 5,
+    "gsat_frequency": 78,
+    "example_sentence": "The corpse was in an advanced state of decay.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "mushroom",
+    "translation": "蘑菇形物, 蘑菇, 暴發戶；迅速生長, 迅速增加, 採蘑菇",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 78,
+    "example_sentence": "We went mushrooming in the Fall.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "portable",
+    "translation": "可攜帶的, 可搬運的, 可移動的；可移植的",
+    "part_of_speech": "adj.",
+    "gsat_level": 5,
+    "gsat_frequency": 78,
+    "example_sentence": "A portable television set.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "betray",
+    "translation": "出賣, 背叛, 辜負, 暴露；出賣, 背叛, 洩漏",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 78,
+    "example_sentence": "Her smile betrayed her true feelings.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "carrot",
+    "translation": "胡蘿蔔",
+    "part_of_speech": "n.",
+    "gsat_level": 5,
+    "gsat_frequency": 78,
+    "example_sentence": "Carrot and stick.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "sticky",
+    "translation": "粘的, 有粘性的, 頑固的",
+    "part_of_speech": "adj.",
+    "gsat_level": 5,
+    "gsat_frequency": 78,
+    "example_sentence": "Felt sticky and chilly at the same time.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "attempted",
+    "translation": "企圖的；未遂的",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 78,
+    "example_sentence": "The police attempted to stop the thief.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "curiously",
+    "translation": "好奇地",
+    "part_of_speech": "adv.",
+    "gsat_level": 5,
+    "gsat_frequency": 77,
+    "example_sentence": "Had a curiously husky voice.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "spy",
+    "translation": "間諜, 偵探, 偵察；偵察, 找出, 發現",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 77,
+    "example_sentence": "Spy for the Russians.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "choke",
+    "translation": "窒息, 阻塞, 噎, 抑制；窒息, 阻塞, 噎",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 77,
+    "example_sentence": "Choke a carburetor.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "tease",
+    "translation": "揶揄, 戲弄, 逗惹；戲弄, 取笑, 強求, 梳理, 使起毛",
+    "part_of_speech": "n.",
+    "gsat_level": 5,
+    "gsat_frequency": 77,
+    "example_sentence": "He ignored their teases.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "bureaucratic",
+    "translation": "官僚的；機僚化的",
+    "part_of_speech": "adj.",
+    "gsat_level": 5,
+    "gsat_frequency": 77,
+    "example_sentence": "His bureaucratic behavior annoyed his colleagues.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "lately",
+    "translation": "近來, 最近",
+    "part_of_speech": "adv.",
+    "gsat_level": 5,
+    "gsat_frequency": 77,
+    "example_sentence": "Lately the rules have been enforced.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "cushion",
+    "translation": "墊子, 橡皮軟墊；加墊褥, 緩衝, 掩蓋",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 77,
+    "example_sentence": "Cushion the blow.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "textbook",
+    "translation": "教科書",
+    "part_of_speech": "n.",
+    "gsat_level": 5,
+    "gsat_frequency": 77,
+    "example_sentence": "His economics textbook is in its tenth edition.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "spoon",
+    "translation": "匙, 調羹, 匙形工具；以匙舀起, 調情, 使成匙狀",
+    "part_of_speech": "n.",
+    "gsat_level": 5,
+    "gsat_frequency": 77,
+    "example_sentence": "He added two spoons of sugar.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "decorative",
+    "translation": "裝飾性的",
+    "part_of_speech": "adj.",
+    "gsat_level": 5,
+    "gsat_frequency": 77,
+    "example_sentence": "The buildings were utilitarian rather than decorative.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "bake",
+    "translation": "烘焙, 烤；烤麵包",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 77,
+    "example_sentence": "Bake the potatoes.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "infect",
+    "translation": "傳染, 感染",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 77,
+    "example_sentence": "Your children have infected you with this head cold.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "indoor",
+    "translation": "戶內的, 室內的",
+    "part_of_speech": "adj.",
+    "gsat_level": 5,
+    "gsat_frequency": 77,
+    "example_sentence": "Indoor activities for a rainy day.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "orbit",
+    "translation": "軌道, 常軌, 眼眶；繞...軌道而行",
+    "part_of_speech": "n.",
+    "gsat_level": 5,
+    "gsat_frequency": 77,
+    "example_sentence": "He plotted the orbit of the moon.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "ski",
+    "translation": "滑雪橇；滑雪",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 77,
+    "example_sentence": "We love to ski the Rockies.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "confusing",
+    "translation": "令人困惑的；混淆的；混亂的",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 76,
+    "example_sentence": "You are confusing me with the other candidate.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "noticeable",
+    "translation": "顯而易見的, 顯著的, 值得注意的",
+    "part_of_speech": "adj.",
+    "gsat_level": 5,
+    "gsat_frequency": 76,
+    "example_sentence": "Noticeable shadows under her eyes.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "amusing",
+    "translation": "有趣的, 引人發笑的",
+    "part_of_speech": "adj.",
+    "gsat_level": 5,
+    "gsat_frequency": 76,
+    "example_sentence": "An amusing speaker.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "ample",
+    "translation": "大量的, 充足的, 豐富的",
+    "part_of_speech": "adj.",
+    "gsat_level": 5,
+    "gsat_frequency": 76,
+    "example_sentence": "Had ample food for the party.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "heal",
+    "translation": "痊癒；使復原, 使和解, 治癒",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 76,
+    "example_sentence": "The wound is healing slowly.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "vacant",
+    "translation": "空的, 空白的, 空虛的, 空閒的, 茫然的, 空缺的；空的, 空虛的, 閒暇的",
+    "part_of_speech": "adj.",
+    "gsat_level": 5,
+    "gsat_frequency": 76,
+    "example_sentence": "The throne is never vacant.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "sadness",
+    "translation": "悲哀, 悲傷",
+    "part_of_speech": "n.",
+    "gsat_level": 5,
+    "gsat_frequency": 76,
+    "example_sentence": "She tired of his perpetual sadness.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "finished",
+    "translation": "完成的, 完結的, 精巧的, 完美的",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 76,
+    "example_sentence": "He finished the dishes.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "tidy",
+    "translation": "椅子的背罩, 裝雜物的容器；整齊的, 有條理的",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 76,
+    "example_sentence": "Tidy up your room!",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "hardship",
+    "translation": "艱難, 辛苦, 苦難；受苦, 吃苦, 苦難",
+    "part_of_speech": "n.",
+    "gsat_level": 5,
+    "gsat_frequency": 76,
+    "example_sentence": "A life of hardship.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "purse",
+    "translation": "錢包, 小錢袋, 金錢, 募捐款, 囊狀物；縮攏, 皺起",
+    "part_of_speech": "n.",
+    "gsat_level": 5,
+    "gsat_frequency": 76,
+    "example_sentence": "He made the contribution out of his own purse.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "hopeless",
+    "translation": "無希望的, 絕望的, 不可救藥的",
+    "part_of_speech": "adj.",
+    "gsat_level": 5,
+    "gsat_frequency": 76,
+    "example_sentence": "In an agony of hopeless grief.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "circus",
+    "translation": "馬戲團, 馬戲, 競技場",
+    "part_of_speech": "n.",
+    "gsat_level": 5,
+    "gsat_frequency": 76,
+    "example_sentence": "He ran away from home to join the circus.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "undo",
+    "translation": "解開, 取消, 破壞, 毀滅, 擾亂；鬆開",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 76,
+    "example_sentence": "I wish I could undo my actions.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "mat",
+    "translation": "墊, 叢, 襯邊；粗糙的, 無光澤的",
+    "part_of_speech": "n.",
+    "gsat_level": 5,
+    "gsat_frequency": 76,
+    "example_sentence": "A mat of weeds and grass.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "accustomed",
+    "translation": "慣常的, 習慣了的",
+    "part_of_speech": "adj.",
+    "gsat_level": 5,
+    "gsat_frequency": 76,
+    "example_sentence": "Accustomed to doing her own work.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "erupt",
+    "translation": "爆發；噴出",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 76,
+    "example_sentence": "Unrest erupted in the country.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "ambiguous",
+    "translation": "不明確的, 模稜兩可的；意思含糊的, 模稜兩可的, 曖昧的",
+    "part_of_speech": "adj.",
+    "gsat_level": 5,
+    "gsat_frequency": 76,
+    "example_sentence": "The polling had a complex and equivocal (or ambiguous) message for potential female candidates.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "sew",
+    "translation": "縫紉, 縫合, 縫；縫紉",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 76,
+    "example_sentence": "Can the seamstress sew me a suit by next week?",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "lazy",
+    "translation": "懶惰的, 怠惰的, 緩慢的；懶散",
+    "part_of_speech": "adj.",
+    "gsat_level": 5,
+    "gsat_frequency": 76,
+    "example_sentence": "Up a lazy river.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "harmful",
+    "translation": "有害的, 傷害的",
+    "part_of_speech": "adj.",
+    "gsat_level": 5,
+    "gsat_frequency": 76,
+    "example_sentence": "Too much sun is harmful to the skin.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "shiny",
+    "translation": "有光澤的, 發光的, 輝煌的, 磨光的, 磨損的",
+    "part_of_speech": "adj.",
+    "gsat_level": 5,
+    "gsat_frequency": 76,
+    "example_sentence": "Saw the moon like a shiny dime on a deep blue velvet carpet.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "bleed",
+    "translation": "流血, 悲痛, 滲出；使出血, 榨取",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 76,
+    "example_sentence": "Bleed the radiators.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "porter",
+    "translation": "大樓管理員, 門房, 搬運工人, 侍者, 服務員；搬運車; 搬運工人",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 76,
+    "example_sentence": "They portered the food up Mount Kilimanjaro for the tourists.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "authentic",
+    "translation": "可靠的, 可信的, 真正的；被認證的, 確認的, 可信的",
+    "part_of_speech": "adj.",
+    "gsat_level": 5,
+    "gsat_frequency": 76,
+    "example_sentence": "An authentic account by an eyewitness.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "antique",
+    "translation": "古董, 古物；古老的, 古風的, 舊式的, 過時的",
+    "part_of_speech": "adj.",
+    "gsat_level": 5,
+    "gsat_frequency": 76,
+    "example_sentence": "The beautiful antique French furniture.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "scenery",
+    "translation": "風景, 景色, 舞臺佈景",
+    "part_of_speech": "n.",
+    "gsat_level": 5,
+    "gsat_frequency": 76,
+    "example_sentence": "They worked all night painting the scenery.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "mankind",
+    "translation": "人類, 男性",
+    "part_of_speech": "n.",
+    "gsat_level": 5,
+    "gsat_frequency": 76,
+    "example_sentence": "She always used `humankind' because `mankind' seemed to slight the women.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "violently",
+    "translation": "猛烈地, 激烈地, 極端地",
+    "part_of_speech": "adv.",
+    "gsat_level": 5,
+    "gsat_frequency": 76,
+    "example_sentence": "They attacked violently.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "collision",
+    "translation": "碰撞, 衝突, 牴觸；衝突",
+    "part_of_speech": "n.",
+    "gsat_level": 5,
+    "gsat_frequency": 76,
+    "example_sentence": "The collision of the particles resulted in an exchange of energy and a change of direction.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "thickness",
+    "translation": "厚度, 密度, 愚鈍, 含混不清；厚度",
+    "part_of_speech": "n.",
+    "gsat_level": 5,
+    "gsat_frequency": 76,
+    "example_sentence": "Judging from the thickness of his speech he had been drinking heavily.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "litter",
+    "translation": "垃圾, 雜亂, 轎, 擔架；亂丟, 鋪草, 弄亂",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 75,
+    "example_sentence": "Cigar butts littered the ground.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "wounded",
+    "translation": "受傷的；受傷者; 受傷的, 受了損害的",
+    "part_of_speech": "n.",
+    "gsat_level": 5,
+    "gsat_frequency": 75,
+    "example_sentence": "They had to leave the wounded where they fell.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "stocking",
+    "translation": "長襪；馬足水腫; 長襪",
+    "part_of_speech": "n.",
+    "gsat_level": 5,
+    "gsat_frequency": 75,
+    "example_sentence": "He supervised the stocking of the stream with trout.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "sore",
+    "translation": "悲傷的, 痛的, 引起痛苦的；痛處, 潰瘍, 瘡",
+    "part_of_speech": "adj.",
+    "gsat_level": 5,
+    "gsat_frequency": 75,
+    "example_sentence": "It was a sore trial to him.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "picnic",
+    "translation": "野餐, 遠足, 愉快的經歷；去野餐, 遠足",
+    "part_of_speech": "n.",
+    "gsat_level": 5,
+    "gsat_frequency": 75,
+    "example_sentence": "Marketing this product will be no picnic.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "interruption",
+    "translation": "打擾, 中斷, 障礙物；間斷, 阻斷, 中止",
+    "part_of_speech": "n.",
+    "gsat_level": 5,
+    "gsat_frequency": 75,
+    "example_sentence": "The telephone is an annoying interruption.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "dam",
+    "translation": "水壩, 障礙；控制, 築壩",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 75,
+    "example_sentence": "Dam the gorges of the Yangtse River.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "curved",
+    "translation": "彎曲的；弄彎的",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 75,
+    "example_sentence": "The road curved sharply.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "thunder",
+    "translation": "雷, 雷聲；打雷, 轟隆地響, 怒喝",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 75,
+    "example_sentence": "The bus thundered down the road.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "disgusting",
+    "translation": "令人厭惡的",
+    "part_of_speech": "adj.",
+    "gsat_level": 5,
+    "gsat_frequency": 75,
+    "example_sentence": "A disgusting smell.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "comrade",
+    "translation": "同志, 夥伴",
+    "part_of_speech": "n.",
+    "gsat_level": 5,
+    "gsat_frequency": 75,
+    "example_sentence": "Comrades in arms.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "abnormal",
+    "translation": "反常的, 不規則的, 變態的, 畸形的；畸形的人",
+    "part_of_speech": "adj.",
+    "gsat_level": 5,
+    "gsat_frequency": 75,
+    "example_sentence": "Abnormal powers of concentration.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "politely",
+    "translation": "有禮貌地, 文雅地, 客氣地",
+    "part_of_speech": "adv.",
+    "gsat_level": 5,
+    "gsat_frequency": 75,
+    "example_sentence": "The policeman answered politely, `Now look here, lady...'.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "wildly",
+    "translation": "狂暴地, 激動地, 狂熱地, 魯莽地, 輕率地",
+    "part_of_speech": "adv.",
+    "gsat_level": 5,
+    "gsat_frequency": 75,
+    "example_sentence": "The storyline is wildly unrealistic.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "sideways",
+    "translation": "向旁邊, 向側面地；旁邊的, 向側面的",
+    "part_of_speech": "adv.",
+    "gsat_level": 5,
+    "gsat_frequency": 75,
+    "example_sentence": "Turned sideways to show the profile.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "calmly",
+    "translation": "平靜地, 安靜地, 冷靜地",
+    "part_of_speech": "adv.",
+    "gsat_level": 5,
+    "gsat_frequency": 75,
+    "example_sentence": "He spoke calmly to the rioting students.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "dusty",
+    "translation": "灰塵多的, 無聊的, 含糊的, 粉末狀的",
+    "part_of_speech": "adj.",
+    "gsat_level": 5,
+    "gsat_frequency": 75,
+    "example_sentence": "A dusty pile of books.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "bark",
+    "translation": "樹皮, 吠聲；吠, 叫罵",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 75,
+    "example_sentence": "She barked into the dictaphone.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "stove",
+    "translation": "火爐, 窯；用火爐烤",
+    "part_of_speech": "n.",
+    "gsat_level": 5,
+    "gsat_frequency": 75,
+    "example_sentence": "Dinner was already on the stove.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "amused",
+    "translation": "愉快的, 被逗樂的",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 75,
+    "example_sentence": "The play amused the ladies.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "pest",
+    "translation": "令人討厭之物, 有害之物, 害蟲, 瘟疫；鼠疫, 瘟疫",
+    "part_of_speech": "n.",
+    "gsat_level": 5,
+    "gsat_frequency": 75,
+    "example_sentence": "He sprayed the garden to get rid of pests.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "spoken",
+    "translation": "口頭講的, 口語的；speak的過去分詞",
+    "part_of_speech": "adj.",
+    "gsat_level": 5,
+    "gsat_frequency": 75,
+    "example_sentence": "A spoken message.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "arctic",
+    "translation": "北極的, 極寒的；北極圈, 北極",
+    "part_of_speech": "adj.",
+    "gsat_level": 5,
+    "gsat_frequency": 75,
+    "example_sentence": "The Arctic summer.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "civilization",
+    "translation": "文明, 教化；文明, 文化, 文明國家的總稱",
+    "part_of_speech": "n.",
+    "gsat_level": 5,
+    "gsat_frequency": 75,
+    "example_sentence": "The people slowly progressed from barbarism to civilization.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "click",
+    "translation": "咔噠聲, 啪嗒聲；作咔噠聲",
+    "part_of_speech": "n.",
+    "gsat_level": 5,
+    "gsat_frequency": 75,
+    "example_sentence": "A click on the right button for example.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "license",
+    "translation": "執照, 許可證, 特許；許可, 特許",
+    "part_of_speech": "n.",
+    "gsat_level": 5,
+    "gsat_frequency": 75,
+    "example_sentence": "When liberty becomes license dictatorship is near.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "climbing",
+    "translation": "攀緣而登的, 上升的；攀登",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 75,
+    "example_sentence": "Sales were climbing after prices were lowered.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "learned",
+    "translation": "有學問的, 學術上的；learn的過去式和過去分詞",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 75,
+    "example_sentence": "She learned dancing from her sister.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "fireplace",
+    "translation": "壁爐",
+    "part_of_speech": "n.",
+    "gsat_level": 5,
+    "gsat_frequency": 75,
+    "example_sentence": "The fireplace was so large you could walk inside it.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "hug",
+    "translation": "緊抱, 擁抱；緊抱, 堅持, 使沾沾自喜",
+    "part_of_speech": "n.",
+    "gsat_level": 5,
+    "gsat_frequency": 75,
+    "example_sentence": "Come here and give me a big hug.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "worse",
+    "translation": "更壞的事, 更惡劣的事, 敗局；更壞的, 更惡劣的",
+    "part_of_speech": "n.",
+    "gsat_level": 5,
+    "gsat_frequency": 74,
+    "example_sentence": "For better or for worse.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "depressing",
+    "translation": "抑壓的, 沉悶的, 陰沉的",
+    "part_of_speech": "adj.",
+    "gsat_level": 5,
+    "gsat_frequency": 74,
+    "example_sentence": "The economic outlook is depressing.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "insult",
+    "translation": "侮辱, 無禮, 損害；損害, 侮辱, 攻擊",
+    "part_of_speech": "n.",
+    "gsat_level": 5,
+    "gsat_frequency": 74,
+    "example_sentence": "They yelled insults at the visiting team.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "imaginary",
+    "translation": "想像的, 虛構的, 假想的",
+    "part_of_speech": "adj.",
+    "gsat_level": 5,
+    "gsat_frequency": 74,
+    "example_sentence": "A small child's imaginary friends.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "subscribe",
+    "translation": "捐獻, 簽署；贊成, 同意, 捐款, 預訂, 認購",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 74,
+    "example_sentence": "I subscribe to your view on abortion.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "moving",
+    "translation": "動人的, 令人感動的, 鼓動的, 原動的, 活動的, 轉動的",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 74,
+    "example_sentence": "I'm moving my money to another bank.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "hopeful",
+    "translation": "有希望之人, 有前途之人；有希望的, 懷抱希望的, 保持樂觀的",
+    "part_of_speech": "n.",
+    "gsat_level": 5,
+    "gsat_frequency": 74,
+    "example_sentence": "Two executive hopefuls joined the firm.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "earthquake",
+    "translation": "地震",
+    "part_of_speech": "n.",
+    "gsat_level": 5,
+    "gsat_frequency": 74,
+    "example_sentence": "Selling the company caused an earthquake among the employees.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "sow",
+    "translation": "母豬, 懶胖女人；播種, 散佈, 使密佈",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 74,
+    "example_sentence": "She sowed sunflower seeds.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "transparent",
+    "translation": "透明的, 顯然的, 清晰的；透明",
+    "part_of_speech": "adj.",
+    "gsat_level": 5,
+    "gsat_frequency": 74,
+    "example_sentence": "A transparent explanation.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "skip",
+    "translation": "跳躍, 跳讀；跳越, 跳讀, 跳繩, 遺漏, 跳級",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 74,
+    "example_sentence": "Skip a stone across the pond.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "accidental",
+    "translation": "意外的, 偶然的, 非主要的, 附屬的；臨時記號, 次要方面",
+    "part_of_speech": "adj.",
+    "gsat_level": 5,
+    "gsat_frequency": 74,
+    "example_sentence": "An accidental shooting.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "web",
+    "translation": "網, 蛛絲, 蹼, 織物, 圈套, 捲筒紙；結網, 形成網",
+    "part_of_speech": "n.",
+    "gsat_level": 5,
+    "gsat_frequency": 74,
+    "example_sentence": "The trees cast a delicate web of shadows over the lawn.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "energetic",
+    "translation": "精力充沛的, 積極的",
+    "part_of_speech": "adj.",
+    "gsat_level": 5,
+    "gsat_frequency": 73,
+    "example_sentence": "An energetic fund raiser for the college.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "emotionally",
+    "translation": "在情緒上",
+    "part_of_speech": "adv.",
+    "gsat_level": 5,
+    "gsat_frequency": 73,
+    "example_sentence": "At the funeral he spoke emotionally.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "frost",
+    "translation": "霜, 冰凍, 冷漠；覆著霜, 凍結, 結霜",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 73,
+    "example_sentence": "Frost the glass.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "devotion",
+    "translation": "熱愛, 投入",
+    "part_of_speech": "n.",
+    "gsat_level": 5,
+    "gsat_frequency": 73,
+    "example_sentence": "Their devotion to each other was beautiful.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "singing",
+    "translation": "歌唱, 歌聲；振鳴; 蜂鳴",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 73,
+    "example_sentence": "She was singing while she was cooking.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "fairness",
+    "translation": "晴朗, 光明正大, 美麗；公正, 適當",
+    "part_of_speech": "n.",
+    "gsat_level": 5,
+    "gsat_frequency": 73,
+    "example_sentence": "The judge recognized the fairness of my claim.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "whistle",
+    "translation": "口哨, 汽笛, 嘯嘯聲, 口哨聲；吹口哨, 鳴汽笛, 發噓噓聲",
+    "part_of_speech": "n.",
+    "gsat_level": 5,
+    "gsat_frequency": 73,
+    "example_sentence": "The whistle signalled the end of the game.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "secretly",
+    "translation": "秘密地, 背地裡",
+    "part_of_speech": "adv.",
+    "gsat_level": 5,
+    "gsat_frequency": 73,
+    "example_sentence": "Met secretly to discuss the invasion plans.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "puzzle",
+    "translation": "難題, 迷惑；使困惑, 使為難",
+    "part_of_speech": "n.",
+    "gsat_level": 5,
+    "gsat_frequency": 73,
+    "example_sentence": "He loved to solve chessmate puzzles.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "proudly",
+    "translation": "傲慢地, 自大地, 得意洋洋地",
+    "part_of_speech": "adv.",
+    "gsat_level": 5,
+    "gsat_frequency": 73,
+    "example_sentence": "He walked proudly into town.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "educated",
+    "translation": "受過教育的, 有教養的",
+    "part_of_speech": "adj.",
+    "gsat_level": 5,
+    "gsat_frequency": 73,
+    "example_sentence": "An educated guess.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "harmless",
+    "translation": "無害處的, 未受損害的, 無辜的, 無惡意的；無害的, 無惡意的, 無損害的",
+    "part_of_speech": "adj.",
+    "gsat_level": 5,
+    "gsat_frequency": 73,
+    "example_sentence": "Rendered the bomb harmless.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "selfish",
+    "translation": "自私的, 利己主義的, 自我中心的",
+    "part_of_speech": "adj.",
+    "gsat_level": 5,
+    "gsat_frequency": 73,
+    "example_sentence": "Selfish men were...trying to make capital for themselves out of the sacred cause of civil rights.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "violate",
+    "translation": "違犯, 褻瀆, 違反, 侵犯, 妨礙；違犯, 違反",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 73,
+    "example_sentence": "This sentence violates the rules of syntax.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "intended",
+    "translation": "有意的, 故意的；未婚夫(妻)",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 73,
+    "example_sentence": "She was intended to become the director.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "hollow",
+    "translation": "洞, 窟窿, 山谷；空的, 虛偽的, 空腹的, 凹的",
+    "part_of_speech": "n.",
+    "gsat_level": 5,
+    "gsat_frequency": 73,
+    "example_sentence": "Hunger had caused the hollows in their cheeks.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "perfume",
+    "translation": "香水, 香氣, (悅人的)氣氛, 美名；灑香水於, 薰香, 使充滿香氣",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 73,
+    "example_sentence": "She perfumes herself every day.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "impatient",
+    "translation": "不耐煩的, 著急的, 急切的",
+    "part_of_speech": "adj.",
+    "gsat_level": 5,
+    "gsat_frequency": 73,
+    "example_sentence": "Impatient with the slower students.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "finely",
+    "translation": "雅緻地, 仔細地, 敏銳地, 微細地",
+    "part_of_speech": "adv.",
+    "gsat_level": 5,
+    "gsat_frequency": 73,
+    "example_sentence": "The surfaces were finely granular.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "incorrect",
+    "translation": "不正確的；不正確, 錯誤的, 不適當的",
+    "part_of_speech": "adj.",
+    "gsat_level": 5,
+    "gsat_frequency": 73,
+    "example_sentence": "An incorrect calculation.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "stripe",
+    "translation": "斑紋, 條紋；紋, 條紋",
+    "part_of_speech": "n.",
+    "gsat_level": 5,
+    "gsat_frequency": 73,
+    "example_sentence": "They earned their stripes in Kuwait.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "compass",
+    "translation": "指南針, 範圍, 音域；包圍, 達到, 圖謀, 理解",
+    "part_of_speech": "n.",
+    "gsat_level": 5,
+    "gsat_frequency": 73,
+    "example_sentence": "Within the compass of this article.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "simplify",
+    "translation": "單一化, 簡單化",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 73,
+    "example_sentence": "We had to simplify the instructions.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "contradictory",
+    "translation": "反駁的, 反對的, 抗辯的；矛盾因素, 對立物",
+    "part_of_speech": "adj.",
+    "gsat_level": 5,
+    "gsat_frequency": 73,
+    "example_sentence": "`perfect' and `imperfect' are contradictory terms.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "sorrow",
+    "translation": "悲傷, 哀惜, 不幸；悲傷, 懊悔, 遺憾",
+    "part_of_speech": "n.",
+    "gsat_level": 5,
+    "gsat_frequency": 73,
+    "example_sentence": "He tried to express his sorrow at her loss.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "snack",
+    "translation": "小吃, 點心, 快餐；吃零食, 吃快餐",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 73,
+    "example_sentence": "She never loses weight because she snacks between meals.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "fasten",
+    "translation": "拴緊, 使固定, 系, 集中於, 強加於；扣緊",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 72,
+    "example_sentence": "Fasten the lock onto the door.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "freshly",
+    "translation": "新, 新近, 精神飽滿",
+    "part_of_speech": "adv.",
+    "gsat_level": 5,
+    "gsat_frequency": 72,
+    "example_sentence": "A freshly cleaned floor.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "shave",
+    "translation": "修面, 刮鬍子, 倖免, 剃刀；修面, 剃, 修剪, 掠過",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 72,
+    "example_sentence": "Shave the radish.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "crisp",
+    "translation": "脆的, 新鮮的, 活潑的；(使)烘脆, (使)拳曲, (使)起皺",
+    "part_of_speech": "adj.",
+    "gsat_level": 5,
+    "gsat_frequency": 72,
+    "example_sentence": "The crisp snap of dry leaves underfoot.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "interpreter",
+    "translation": "直譯程式, 解釋者, 口譯者, 註釋器；註釋器",
+    "part_of_speech": "n.",
+    "gsat_level": 5,
+    "gsat_frequency": 72,
+    "example_sentence": "His paintings reveal a sensitive interpreter of nature.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "vice",
+    "translation": "惡習, 惡行, 罪惡, 墮落, 缺陷, 惡癖, 老虎鉗；鉗住",
+    "part_of_speech": "n.",
+    "gsat_level": 5,
+    "gsat_frequency": 72,
+    "example_sentence": "Vice offends the moral standards of the community.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "microwave",
+    "translation": "微波",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 72,
+    "example_sentence": "You can microwave the leftovers.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "microscope",
+    "translation": "顯微鏡",
+    "part_of_speech": "n.",
+    "gsat_level": 5,
+    "gsat_frequency": 72,
+    "example_sentence": "The invention of the microscope led to the discovery of the cell.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "mexican",
+    "translation": "墨西哥人, 墨西哥語；墨西哥的",
+    "part_of_speech": "adj.",
+    "gsat_level": 5,
+    "gsat_frequency": 72,
+    "example_sentence": "Mexican food is hot.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "anxiously",
+    "translation": "憂慮地, 不安地",
+    "part_of_speech": "adv.",
+    "gsat_level": 5,
+    "gsat_frequency": 72,
+    "example_sentence": "We watched anxiously.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "nervously",
+    "translation": "焦急地；神經質地；提心吊膽地",
+    "part_of_speech": "adv.",
+    "gsat_level": 5,
+    "gsat_frequency": 72,
+    "example_sentence": "We watched the stock market nervously.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "recycle",
+    "translation": "使再迴圈, 重新利用, 再製；再迴圈",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 72,
+    "example_sentence": "We must recycle the cardboard boxes.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "offshore",
+    "translation": "海面的, 吹向海面的, 近海的；向海面",
+    "part_of_speech": "adj.",
+    "gsat_level": 5,
+    "gsat_frequency": 72,
+    "example_sentence": "Offshore oil reserves.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "faintly",
+    "translation": "微弱地, 模糊地, 朦朧地",
+    "part_of_speech": "adv.",
+    "gsat_level": 5,
+    "gsat_frequency": 72,
+    "example_sentence": "Between him and the dim light a form was outlined faintly.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "clone",
+    "translation": "無性系；代用件",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 71,
+    "example_sentence": "People can clone a sheep nowadays.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "overhead",
+    "translation": "經常開支, 普通用費, 天花板；在頭上的, 高架的",
+    "part_of_speech": "adj.",
+    "gsat_level": 5,
+    "gsat_frequency": 71,
+    "example_sentence": "An overhead crossing.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "wrongly",
+    "translation": "錯誤地, 不恰當地, 不正確地, 不正直地, 不公正地",
+    "part_of_speech": "adv.",
+    "gsat_level": 5,
+    "gsat_frequency": 71,
+    "example_sentence": "Wouldst not play false and yet would wrongly win.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "sharpen",
+    "translation": "使尖銳, 使敏捷, 加重, 削尖；尖銳化, 變鋒利",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 71,
+    "example_sentence": "Sharpen the knives.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "ripe",
+    "translation": "成熟的, 熟練的, 成年的；成熟的",
+    "part_of_speech": "adj.",
+    "gsat_level": 5,
+    "gsat_frequency": 71,
+    "example_sentence": "The colonists were ripe for revolution.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "pleasing",
+    "translation": "令人喜愛的, 愉快的, 舒適的",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 71,
+    "example_sentence": "A pleasing sensation.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "tentative",
+    "translation": "試驗；試驗性的, 暫時的",
+    "part_of_speech": "adj.",
+    "gsat_level": 5,
+    "gsat_frequency": 71,
+    "example_sentence": "Just a tentative schedule.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "shocking",
+    "translation": "令人震驚的, 極壞的, 不正當的",
+    "part_of_speech": "adj.",
+    "gsat_level": 5,
+    "gsat_frequency": 71,
+    "example_sentence": "The most shocking book of its time.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "loosely",
+    "translation": "鬆弛地, 寬鬆地, 不緊",
+    "part_of_speech": "adv.",
+    "gsat_level": 5,
+    "gsat_frequency": 71,
+    "example_sentence": "His hands lay loosely.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "mend",
+    "translation": "改進, 修補, 好轉；修改, 改進, 加快, 修理",
+    "part_of_speech": "n.",
+    "gsat_level": 5,
+    "gsat_frequency": 71,
+    "example_sentence": "Her stockings had several mends.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "excite",
+    "translation": "刺激, 使興奮, 激勵",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 71,
+    "example_sentence": "Excite the audience.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "corrupt",
+    "translation": "腐敗的, 貪汙的, 訛誤充斥的；使腐爛, 腐蝕, 使惡化",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 71,
+    "example_sentence": "Socrates was accused of corrupting young men.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "digest",
+    "translation": "文摘；消化",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 70,
+    "example_sentence": "I cannot digest milk products.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "unfold",
+    "translation": "展開, 開啟, 披露, 開展, 挑明；伸展, 開花, 呈現",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 70,
+    "example_sentence": "A walk through town will unfold many interesting buildings.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "applaud",
+    "translation": "拍手喝彩, 稱讚, 贊同",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 70,
+    "example_sentence": "I applaud your efforts.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "scare",
+    "translation": "驚嚇, 恐慌；驚嚇, 使恐慌",
+    "part_of_speech": "n.",
+    "gsat_level": 5,
+    "gsat_frequency": 70,
+    "example_sentence": "A bomb scare led them to evacuate the building.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "upward",
+    "translation": "向上的；以上",
+    "part_of_speech": "adj.",
+    "gsat_level": 5,
+    "gsat_frequency": 70,
+    "example_sentence": "The cards were face upward.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "savage",
+    "translation": "未開化的, 野蠻的, 無禮的, 殘酷的, 原始的, 粗魯的, 未開發的；用暴力對付, 兇猛攻擊",
+    "part_of_speech": "adj.",
+    "gsat_level": 5,
+    "gsat_frequency": 70,
+    "example_sentence": "A savage people.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "aboard",
+    "translation": "在船上, 在火車上, 在飛機上；在...之上",
+    "part_of_speech": "adv.",
+    "gsat_level": 5,
+    "gsat_frequency": 70,
+    "example_sentence": "Their second homer with Bob Allison aboard.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "unmarried",
+    "translation": "未婚的, 單身的；未婚的, 獨身的",
+    "part_of_speech": "adj.",
+    "gsat_level": 5,
+    "gsat_frequency": 70,
+    "example_sentence": "Unmarried men and women.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "unload",
+    "translation": "卸貨；從...卸下, 擺脫...之負擔, 傾銷, 卸(貨)",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 70,
+    "example_sentence": "Unload the cargo.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "challenging",
+    "translation": "挑戰的, 引起爭論的",
+    "part_of_speech": "adj.",
+    "gsat_level": 5,
+    "gsat_frequency": 70,
+    "example_sentence": "Performed the most challenging task without a mistake.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "merry",
+    "translation": "快樂的, 愉快的, 嬉戲作樂的",
+    "part_of_speech": "adj.",
+    "gsat_level": 5,
+    "gsat_frequency": 70,
+    "example_sentence": "Have a merry Christmas.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "opposing",
+    "translation": "對面的, 反對的, 相反的, 相對的",
+    "part_of_speech": "adj.",
+    "gsat_level": 5,
+    "gsat_frequency": 70,
+    "example_sentence": "Opponent (or opposing) armies.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "muddy",
+    "translation": "泥濘的, 渾濁的, 模糊的；使汙濁, 使沾上泥汙",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 70,
+    "example_sentence": "Muddy the water.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "careless",
+    "translation": "粗心的, 不關心的, 無憂無慮的",
+    "part_of_speech": "adj.",
+    "gsat_level": 5,
+    "gsat_frequency": 70,
+    "example_sentence": "Careless about her clothes.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "cube",
+    "translation": "立方體, 立方",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 70,
+    "example_sentence": "Cube the cheese.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "outgoing",
+    "translation": "外出, 開支, 流出；喜歡外出的, 即將離職的, 樂於助人的",
+    "part_of_speech": "adj.",
+    "gsat_level": 5,
+    "gsat_frequency": 70,
+    "example_sentence": "An outgoing steamship.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "drawback",
+    "translation": "缺點, 退稅；退款, 退稅",
+    "part_of_speech": "n.",
+    "gsat_level": 5,
+    "gsat_frequency": 70,
+    "example_sentence": "He pointed out all the drawbacks to my plan.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "congratulations",
+    "translation": "祝賀詞, 祝賀語",
+    "part_of_speech": "n.",
+    "gsat_level": 5,
+    "gsat_frequency": 70,
+    "example_sentence": "I sent them my sincere congratulations on their marriage.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "sunset",
+    "translation": "日落, 晚年",
+    "part_of_speech": "adj.",
+    "gsat_level": 5,
+    "gsat_frequency": 70,
+    "example_sentence": "A program with a sunset provision.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "wax",
+    "translation": "蠟, 蠟狀物, 一陣發怒, 增加, (月亮)漸盈；變大, 增大, 月亮漸滿",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 70,
+    "example_sentence": "The moon is waxing.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "sour",
+    "translation": "酸的, 酸臭的, 發酵的, 慍怒的, 討厭的, 拙劣的, 不健全的；變酸, 發酵, 厭煩, 變壞",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 70,
+    "example_sentence": "The milk has soured.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "quarrel",
+    "translation": "吵架, 反目, 怨言, 方頭鑿；吵架, 爭論, 挑剔",
+    "part_of_speech": "n.",
+    "gsat_level": 5,
+    "gsat_frequency": 70,
+    "example_sentence": "They had a quarrel.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "spice",
+    "translation": "香料, 藥料, 香氣, 調味品, 情趣, 少許；加香料, 使添趣味",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 70,
+    "example_sentence": "Spice up the evening by inviting a belly dancer.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "junk",
+    "translation": "垃圾, 烏七八糟的東西, 舢板；清除",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 70,
+    "example_sentence": "Junk an old car.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "rounded",
+    "translation": "圓形的, 滾圓的, 完整的, 圓潤的",
+    "part_of_speech": "adj.",
+    "gsat_level": 5,
+    "gsat_frequency": 70,
+    "example_sentence": "Low rounded hills.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "thrill",
+    "translation": "震顫, 激動, 刺激性, 一陣激動；震顫, 顫抖, 激動",
+    "part_of_speech": "n.",
+    "gsat_level": 5,
+    "gsat_frequency": 70,
+    "example_sentence": "The thrills of space travel.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "morally",
+    "translation": "道德上, 德性上, 有道德地",
+    "part_of_speech": "adv.",
+    "gsat_level": 5,
+    "gsat_frequency": 70,
+    "example_sentence": "He acted morally under the circumstances.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "loaf",
+    "translation": "一條麵包, 塊, 遊蕩；遊手好閒, 虛度光陰",
+    "part_of_speech": "n.",
+    "gsat_level": 5,
+    "gsat_frequency": 70,
+    "example_sentence": "A loaf of cheese.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "irritate",
+    "translation": "激怒, 使發怒, 使興奮, 使發炎；引起不快",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 70,
+    "example_sentence": "It irritates me that she never closes the door after she leaves.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "coke",
+    "translation": "可口可樂, 焦炭；(使)成焦炭",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 69,
+    "example_sentence": "Petroleum oils coke after distillation.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "buffet",
+    "translation": "自助餐, 小賣部, 碗櫥, 毆打, 衝擊；連續打, 衝擊, 搏鬥",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 69,
+    "example_sentence": "Winds buffeted the tent.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "abundant",
+    "translation": "豐富的, 充分的, 大量的",
+    "part_of_speech": "adj.",
+    "gsat_level": 5,
+    "gsat_frequency": 69,
+    "example_sentence": "An abundant supply of water.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "handwriting",
+    "translation": "筆跡",
+    "part_of_speech": "n.",
+    "gsat_level": 5,
+    "gsat_frequency": 69,
+    "example_sentence": "She recognized his handwriting.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "deserted",
+    "translation": "被遺棄的, 廢棄的；被遺棄的, 無人的, 放棄的",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 69,
+    "example_sentence": "The mother deserted her children.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "racing",
+    "translation": "賽馬, 賽車；空轉, 急轉",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 69,
+    "example_sentence": "We are racing to find a cure for AIDS.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "disgust",
+    "translation": "厭惡, 嫌惡；令人厭惡",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 69,
+    "example_sentence": "This spoilt food disgusts me.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "hatch",
+    "translation": "孵化, 艙口；孵, 孵出, 策劃",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 69,
+    "example_sentence": "Young birds, fish, and reptiles hatch.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "comprehension",
+    "translation": "理解, 包含",
+    "part_of_speech": "n.",
+    "gsat_level": 5,
+    "gsat_frequency": 69,
+    "example_sentence": "How you can do that is beyond my comprehension.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "dine",
+    "translation": "用正餐, 進餐；宴請",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 69,
+    "example_sentence": "We often dine with friends in this restaurant.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "roundabout",
+    "translation": "迂迴的, 委婉的；迂迴路線",
+    "part_of_speech": "adj.",
+    "gsat_level": 5,
+    "gsat_frequency": 69,
+    "example_sentence": "A roundabout paragraph.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "nationwide",
+    "translation": "全國性的；全國的, 全國範圍的",
+    "part_of_speech": "adj.",
+    "gsat_level": 5,
+    "gsat_frequency": 69,
+    "example_sentence": "The event aroused nationwide interest.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "alcoholic",
+    "translation": "酒鬼, 酒精中毒者；酒精的",
+    "part_of_speech": "adj.",
+    "gsat_level": 5,
+    "gsat_frequency": 69,
+    "example_sentence": "Alcoholic expatriates in Paris.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "cock",
+    "translation": "公雞, 雄禽, 龍頭, 頭目, 錐形小乾草堆；使聳立, 使豎起, 堆成錐形小乾草堆",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 69,
+    "example_sentence": "Cock one's head.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "occupied",
+    "translation": "已佔用的；使用中的；無空閒的",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 69,
+    "example_sentence": "This event occupied a very short time.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "clap",
+    "translation": "拍手, 拍手聲, 霹靂聲, 花柳病；鼓掌, (使)啪地關上",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 68,
+    "example_sentence": "Clap two boards together.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "visa",
+    "translation": "簽證；簽發",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 68,
+    "example_sentence": "The list of speakers must be visaed.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "claw",
+    "translation": "爪, 螯, 抓傷；用爪抓, 挖, 搜刮",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 68,
+    "example_sentence": "They clawed their way to the top of the mountain.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "cheerfully",
+    "translation": "高高興興地",
+    "part_of_speech": "adv.",
+    "gsat_level": 5,
+    "gsat_frequency": 68,
+    "example_sentence": "He cheerfully agreed to do it.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "altitude",
+    "translation": "高度, 海拔, 高處；高度",
+    "part_of_speech": "n.",
+    "gsat_level": 5,
+    "gsat_frequency": 68,
+    "example_sentence": "The altitude gave her a headache.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "ecology",
+    "translation": "生態學, 社會生態學；生態學",
+    "part_of_speech": "n.",
+    "gsat_level": 5,
+    "gsat_frequency": 68,
+    "example_sentence": "It changed the ecology of the island.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "pronunciation",
+    "translation": "發音, 讀法",
+    "part_of_speech": "n.",
+    "gsat_level": 5,
+    "gsat_frequency": 68,
+    "example_sentence": "They are always correcting my pronunciation.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "telescope",
+    "translation": "望遠鏡；疊縮, 嵌進, 縮短",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 68,
+    "example_sentence": "My hiking sticks telescope and can be put into the backpack.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "impatiently",
+    "translation": "不耐煩, 忍受不了, 急躁, 急欲, 急切",
+    "part_of_speech": "adv.",
+    "gsat_level": 5,
+    "gsat_frequency": 67,
+    "example_sentence": "He answered her impatiently.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "catastrophe",
+    "translation": "大災難, 大禍；突變",
+    "part_of_speech": "n.",
+    "gsat_level": 5,
+    "gsat_frequency": 67,
+    "example_sentence": "Lack of funds has resulted in a catastrophe for our school system.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "sincere",
+    "translation": "誠實的, 正直的, 真摯的, 純淨的",
+    "part_of_speech": "adj.",
+    "gsat_level": 5,
+    "gsat_frequency": 67,
+    "example_sentence": "He was a good man, decent and sincere.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "accidentally",
+    "translation": "偶然地, 意外地",
+    "part_of_speech": "adv.",
+    "gsat_level": 5,
+    "gsat_frequency": 67,
+    "example_sentence": "They met accidentally.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "confidently",
+    "translation": "自信地；安心地",
+    "part_of_speech": "adv.",
+    "gsat_level": 5,
+    "gsat_frequency": 66,
+    "example_sentence": "We have to do what is right confidently.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "disapprove",
+    "translation": "不贊成",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 66,
+    "example_sentence": "I disapprove of her child rearing methods.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "alarmed",
+    "translation": "受驚的；焦慮的；驚恐的",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 66,
+    "example_sentence": "The empty house alarmed him.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "pointed",
+    "translation": "尖的, 有尖頂的, 銳利的, 率直的, 顯然的",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 66,
+    "example_sentence": "He pointed to the empty parking space.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "willingly",
+    "translation": "自動地, 欣然地",
+    "part_of_speech": "adv.",
+    "gsat_level": 5,
+    "gsat_frequency": 66,
+    "example_sentence": "I willingly accept.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "backward",
+    "translation": "向後地, 相反地；向後的, 相反的",
+    "part_of_speech": "adj.",
+    "gsat_level": 5,
+    "gsat_frequency": 66,
+    "example_sentence": "A backward view.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "downward",
+    "translation": "向下的",
+    "part_of_speech": "adj.",
+    "gsat_level": 5,
+    "gsat_frequency": 66,
+    "example_sentence": "The downward course of the stream.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "shaped",
+    "translation": "成某種形狀的, 製成一定形狀的, 有某種形狀的, 合適的, 計劃好的, 有目標的；具形的, 形似的",
+    "part_of_speech": "adj.",
+    "gsat_level": 5,
+    "gsat_frequency": 66,
+    "example_sentence": "A shaped handgrip.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "unlucky",
+    "translation": "不吉利的, 不祥的, 不幸的",
+    "part_of_speech": "adj.",
+    "gsat_level": 5,
+    "gsat_frequency": 66,
+    "example_sentence": "Friday the 13th is an unlucky date.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "admirable",
+    "translation": "可欽佩的, 極好的, 令人驚奇的",
+    "part_of_speech": "adj.",
+    "gsat_level": 5,
+    "gsat_frequency": 66,
+    "example_sentence": "Trains ran with admirable precision.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "abrupt",
+    "translation": "突然的, 唐突的, 陡峭的, 不連貫的",
+    "part_of_speech": "adj.",
+    "gsat_level": 5,
+    "gsat_frequency": 66,
+    "example_sentence": "Came to an abrupt stop.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "chant",
+    "translation": "聖歌, 讚美詩；吟唱, 誦揚",
+    "part_of_speech": "v.",
+    "gsat_level": 5,
+    "gsat_frequency": 66,
+    "example_sentence": "The rabbi chanted a prayer.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  },
+  {
+    "word": "cardboard",
+    "translation": "薄紙板；咭紙; 特等紙板; 卡紙板; 卡片紙板",
+    "part_of_speech": "adj.",
+    "gsat_level": 5,
+    "gsat_frequency": 66,
+    "example_sentence": "Cardboard caricatures of historical figures.",
+    "source": "ECDICT + WordNet frequency-filtered RC fallback"
+  }
+]
