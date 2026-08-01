@@ -23,7 +23,6 @@ from backend import main as backend_main
 from backend.main import PerformanceMetrics
 from backend.models import (
     BackgroundJob,
-    Base,
     DailyExpansionQuiz,
     GrammarErrorLedger,
     User,
@@ -350,10 +349,21 @@ def test_alembic_clean_existing_and_downgrade_paths(tmp_path: Path) -> None:
     with sqlite3.connect(clean_path) as connection:
         assert connection.execute(
             "SELECT version_num FROM alembic_version"
-        ).fetchone()[0] == "328de383cbc9"
-        assert connection.execute(
-            "SELECT COUNT(*) FROM sqlite_master WHERE type='table'"
-        ).fetchone()[0] == 17
+        ).fetchone()[0] == "9c52b7f79fd4"
+        tables = {
+            row[0]
+            for row in connection.execute(
+                "SELECT name FROM sqlite_master WHERE type='table'"
+            )
+        }
+        assert {
+            "users",
+            "daily_mission_tasks",
+            "learning_reward_states",
+            "learning_progress_events",
+            "user_learning_preferences",
+            "weekly_study_packs",
+        } <= tables
     alembic_command.downgrade(config, "base")
     with sqlite3.connect(clean_path) as connection:
         remaining = {
@@ -365,21 +375,21 @@ def test_alembic_clean_existing_and_downgrade_paths(tmp_path: Path) -> None:
         assert remaining <= {"alembic_version"}
 
     existing_path = tmp_path / "existing.sqlite3"
-    existing_engine = create_engine(f"sqlite:///{existing_path.as_posix()}")
-    Base.metadata.create_all(existing_engine)
-    with Session(existing_engine) as db:
-        db.add(User(email="migration@example.com", display_name="Preserve Me"))
-        db.commit()
     existing_config = AlembicConfig(str(config_path))
     existing_config.attributes["database_url"] = (
         f"sqlite:///{existing_path.as_posix()}"
     )
+    alembic_command.upgrade(existing_config, "328de383cbc9")
+    existing_engine = create_engine(f"sqlite:///{existing_path.as_posix()}")
+    with Session(existing_engine) as db:
+        db.add(User(email="migration@example.com", display_name="Preserve Me"))
+        db.commit()
     alembic_command.upgrade(existing_config, "head")
     with sqlite3.connect(existing_path) as connection:
         assert connection.execute("SELECT COUNT(*) FROM users").fetchone()[0] == 1
         assert connection.execute(
             "SELECT version_num FROM alembic_version"
-        ).fetchone()[0] == "328de383cbc9"
+        ).fetchone()[0] == "9c52b7f79fd4"
     existing_engine.dispose()
 
 

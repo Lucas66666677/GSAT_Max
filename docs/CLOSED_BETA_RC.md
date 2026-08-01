@@ -8,26 +8,27 @@
 
 ## 已驗證
 
-- Git 安全基準與初始 RC commit：`0545dfa`；最新已驗證 commit：`13d281c`。
+- Git 安全基準與初始 RC commit：`0545dfa`；本輪功能與驗收證據會以獨立 RC commit 收錄，尚不建立 release tag。
 - `flutter analyze`：PASS。
-- `flutter test`：20 tests PASS，涵蓋 Router、登入恢復、Refresh 成敗、離線 session、API host、任務持久化、離線 SyncQueue 重建、背景 job polling、Writing DTO、Paywall 三種結果、登出／刪帳確認、五分頁與小螢幕 overflow。
+- `flutter test`：23 tests PASS，新增短時段排程、正回饋與紙本包資料契約，並持續涵蓋 Router、登入恢復、Refresh 成敗、離線 session、API host、任務持久化、SyncQueue、背景 job、Writing、Paywall、五分頁與小螢幕 overflow。
 - `flutter build web`：PASS。
-- `pytest backend/tests -q`：23 tests PASS，涵蓋 Auth rotation/revoke、Email token、Password reset、SM-2、OCR 驗證、背景 job、Writing schema、Mock Exam 防答案外洩與後端評分、AI quota、RevenueCat webhook、Migration 與 Seed 冪等。
-- Alembic：空資料庫 upgrade/downgrade/re-upgrade PASS；完整既有 schema 保留資料 upgrade PASS；部分 schema 會安全拒絕。
-- Seed：實際 SQLite 達到 500 vocab／50 grammar；第二次執行新增 0／0。
+- `pytest backend/tests -q`：27 tests PASS，新增 3/10/20/45 分鐘預算、微型勝利、點數冪等、完成任務保留、五日 PDF 紙本包、完成碼、Gemini/Groq fallback 與 PII 遮蔽。PDF 使用內附 Noto Sans TC 字形嵌入，7 頁 A4 實際渲染與繁中版面檢查 PASS。
+- Alembic：新 head `9c52b7f79fd4`；空資料庫 upgrade/downgrade PASS，baseline 既有資料安全升級 PASS，真實專案 DB 已升級。
+- Seed：實際 SQLite 為 513 vocab／50 grammar；連續兩次執行皆新增 0／0。
 - Tesseract 5.5.3：使用 `backend/tests/fixtures/exam_sample.png` 真實辨識 PASS，必要英文行皆可取回。
 - FastAPI 真實 HTTP：Register、Onboarding、20 字初始化、Daily Schedule、Target Date、Vocab Review、SM-2、Refresh rotation、Logout revoke PASS。
 
 ## Android 待驗收
 
-- Android licenses：OWNER ACTION，必須由授權人閱讀並輸入 `y`。
-- SDK packages、Emulator、debug APK build/install、integration test、adb logcat：等待 licenses 後執行。
+- Project-local JDK 17 與官方 Android command-line tools 已完成，Flutter 已設定 SDK/JDK 路徑。
+- Android licenses：OWNER ACTION，必須由授權人閱讀並輸入 `y`；Platform 36、Build Tools 36、NDK 28.2 與 Platform Tools 會在授權後安裝。
+- Emulator、debug APK build/install、integration test、adb logcat：等待 licenses 與 SDK packages 後執行。
 - 實機相機：若 Emulator camera 不可用，列為 OWNER ACTION；相簿路徑仍須在 Emulator 驗證。
 - 正式 release keystore/AAB：不屬於 debug RC，且 keystore 不得提交。
 
 ## 外部服務待驗收
 
-- OpenAI-compatible API：OWNER ACTION。建立 `.env` 並填入 `OPENAI_API_KEY` 後執行：
+- AI provider：OWNER ACTION。Router 已支援 `Gemini -> Groq -> OpenAI -> Ollama` 自動 fallback；建立 `.env` 並至少填入 `GEMINI_API_KEY`、`GROQ_API_KEY` 或 `OPENAI_API_KEY` 後執行：
 
   ```powershell
   .\scripts\verify_real_ai.ps1

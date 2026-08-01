@@ -4,11 +4,21 @@ Do not paste secrets into chat or commit `.env`.
 
 ## 1. Install Android Tooling
 
-1. Install Android Studio from the official Android developer site.
-2. In SDK Manager install Android SDK Platform, Build Tools, Command-line Tools, and an Emulator image.
-3. Run `flutter config --android-sdk <SDK_PATH>` if Flutter does not discover it.
-4. Accept licenses with `flutter doctor --android-licenses`.
-5. Start an emulator and run the APK commands from `README.md`.
+Project-local JDK 17 and Android command-line tools are already installed. The owner must personally accept Google's SDK terms:
+
+```powershell
+$env:JAVA_HOME=(Resolve-Path '.\.tools\jdk17').Path
+$sdk=(Resolve-Path '.\.tools\android-sdk').Path
+.\.tools\android-sdk\cmdline-tools\latest\bin\sdkmanager.bat --sdk_root=$sdk --licenses
+```
+
+Enter `y` for each agreement you accept. Then install Platform 36, Build Tools, Platform Tools, NDK, and an Emulator image, start the Emulator, and run the Android commands from `docs/CLOSED_BETA_RC.md`.
+
+```powershell
+.\.tools\android-sdk\cmdline-tools\latest\bin\sdkmanager.bat --sdk_root=$sdk "platform-tools" "platforms;android-36" "build-tools;36.0.0" "ndk;28.2.13676358" "emulator" "system-images;android-35;google_apis;x86_64"
+"no" | .\.tools\android-sdk\cmdline-tools\latest\bin\avdmanager.bat create avd --force --name GSAT_Max_API_35 --package "system-images;android-35;google_apis;x86_64" --device "pixel_7"
+& "$sdk\emulator\emulator.exe" -avd GSAT_Max_API_35
+```
 
 ## 2. Install Tesseract OCR
 
@@ -20,8 +30,8 @@ Do not paste secrets into chat or commit `.env`.
 ## 3. Configure AI
 
 1. Copy `.env.example` to `.env`.
-2. In the selected OpenAI-compatible provider, create a server-side API key.
-3. Put it in `OPENAI_API_KEY`; set `OPENAI_BASE_URL` and `CODEX_MODEL` to a model with text and vision support.
+2. For the lowest-cost setup, create a Gemini API key and set `GEMINI_API_KEY`; optionally create a Groq key and set `GROQ_API_KEY` as the text fallback.
+3. The default router order is `gemini,groq,openai,ollama`. `OPENAI_API_KEY` is optional, and all keys must remain server-side.
 4. Alternatively install Ollama, pull `OLLAMA_MODEL`, and verify `OLLAMA_BASE_URL` from the backend host.
 5. Start FastAPI and manually verify Writing, OCR, Reading, Grammar, and full mock generation.
 
@@ -45,7 +55,7 @@ Do not paste secrets into chat or commit `.env`.
 1. Provision an HTTPS API domain, host, persistent database volume, backups, and monitoring.
 2. Set `APP_ENV=production`, a random `JWT_SECRET_KEY` of at least 32 characters, exact `API_CORS_ORIGINS`, and all provider secrets.
 3. Move rate-limit/job state to shared infrastructure before running more than one API process.
-4. Replace SQLite with managed PostgreSQL before broad public scale; introduce Alembic migrations.
+4. Replace SQLite with managed PostgreSQL before broad public scale; Alembic is already active and every deployment must run `alembic upgrade head`.
 
 ## 7. Device and Store Acceptance
 

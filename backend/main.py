@@ -2,7 +2,7 @@ import base64
 import asyncio
 from collections import defaultdict, deque
 from contextlib import asynccontextmanager
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta, timezone
 import hashlib
 import hmac
 import html
@@ -16,6 +16,7 @@ import time
 from threading import Lock
 from typing import Any, Generator
 from urllib.parse import quote
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 import httpx
 from alembic import command as alembic_command
@@ -47,8 +48,11 @@ try:
     from reportlab.lib.units import mm
     from reportlab.pdfbase import pdfmetrics
     from reportlab.pdfbase.cidfonts import UnicodeCIDFont
+    from reportlab.pdfbase.ttfonts import TTFont
     from reportlab.platypus import (
         Paragraph,
+        PageBreak,
+        KeepTogether,
         SimpleDocTemplate,
         Spacer,
         Table,
@@ -63,7 +67,10 @@ except ImportError:
     mm = 2.834645669291339
     pdfmetrics = None
     UnicodeCIDFont = None
+    TTFont = None
     Paragraph = None
+    PageBreak = None
+    KeepTogether = None
     SimpleDocTemplate = None
     Spacer = None
     Table = None
@@ -75,6 +82,8 @@ try:
         Base,
         DailyExpansionQuiz,
         DailyMissionTask,
+        LearningProgressEvent,
+        LearningRewardState,
         EmailActionToken,
         BackgroundJob,
         GrammarConceptBank,
@@ -85,8 +94,10 @@ try:
         RefreshToken,
         ReviewSyncReceipt,
         User,
+        UserLearningPreference,
         UserVocabProgress,
         Vocabulary,
+        WeeklyStudyPack,
         WritingEvaluationRecord,
     )
 except ImportError:
@@ -95,6 +106,8 @@ except ImportError:
         Base,
         DailyExpansionQuiz,
         DailyMissionTask,
+        LearningProgressEvent,
+        LearningRewardState,
         EmailActionToken,
         BackgroundJob,
         GrammarConceptBank,
@@ -105,8 +118,10 @@ except ImportError:
         RefreshToken,
         ReviewSyncReceipt,
         User,
+        UserLearningPreference,
         UserVocabProgress,
         Vocabulary,
+        WeeklyStudyPack,
         WritingEvaluationRecord,
     )
 
@@ -120,6 +135,14 @@ OPENAI_API_KEY = settings.openai_api_key
 CODEX_MODEL = settings.codex_model
 OPENAI_TIMEOUT_SECONDS = settings.openai_timeout_seconds
 OPENAI_MAX_RETRIES = settings.openai_max_retries
+AI_PROVIDER_ORDER = settings.ai_provider_order
+GEMINI_BASE_URL = settings.gemini_base_url
+GEMINI_API_KEY = settings.gemini_api_key
+GEMINI_MODEL = settings.gemini_model
+GROQ_BASE_URL = settings.groq_base_url
+GROQ_API_KEY = settings.groq_api_key
+GROQ_MODEL = settings.groq_model
+AI_REDACT_STUDENT_PII = settings.ai_redact_student_pii
 DEFAULT_USER_EMAIL = settings.default_user_email
 JWT_SECRET_KEY = settings.jwt_secret_key
 JWT_ALGORITHM = "HS256"
@@ -154,7 +177,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=list(settings.cors_origins),
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
+    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allow_headers=["Authorization", "Content-Type", "X-Request-ID"],
 )
 
@@ -168,6 +191,8 @@ class PerformanceMetrics(BaseModel):
     )
     total_tokens: int = Field(description="Total tokens reported by the AI provider.")
     cached: bool = Field(default=False, description="Whether this response came from cache.")
+    provider: str | None = Field(default=None, description="AI provider that served the request.")
+    model: str | None = Field(default=None, description="AI model that served the request.")
 
 
 class AuthRegisterRequest(BaseModel):
@@ -240,6 +265,66 @@ class UserStatsResponse(BaseModel):
     writing_skill: float = 0.0
 
 
+class LearningPreferencesResponse(BaseModel):
+    weekday_minutes: int
+    weekend_minutes: int
+    preferred_session_minutes: int
+    rescue_session_minutes: int
+    maximum_session_minutes: int
+    weekly_goal_days: int
+    timezone: str
+    gentle_streak_enabled: bool
+    paper_pack_enabled: bool
+
+
+class LearningPreferencesUpdateRequest(BaseModel):
+    weekday_minutes: int | None = Field(default=None, ge=3, le=60)
+    weekend_minutes: int | None = Field(default=None, ge=3, le=90)
+    preferred_session_minutes: int | None = Field(default=None, ge=3, le=60)
+    rescue_session_minutes: int | None = Field(default=None, ge=2, le=10)
+    maximum_session_minutes: int | None = Field(default=None, ge=10, le=90)
+    weekly_goal_days: int | None = Field(default=None, ge=1, le=7)
+    timezone: str | None = Field(default=None, min_length=3, max_length=80)
+    gentle_streak_enabled: bool | None = None
+    paper_pack_enabled: bool | None = None
+
+
+class RewardSummary(BaseModel):
+    total_points: int
+    level: int
+    level_progress: float
+    points_to_next_level: int
+    weekly_active_days: int
+    weekly_goal_days: int
+    weekly_goal_progress: float
+    comeback_count: int
+    streak_shields: int
+    current_streak: int
+    headline: str
+
+
+class RewardFeedback(BaseModel):
+    awarded: bool
+    points: int
+    message: str
+    total_points: int
+    level: int
+    level_up: bool = False
+
+
+class LearningEventRequest(BaseModel):
+    source_key: str = Field(min_length=6, max_length=120)
+    event_type: str = Field(min_length=3, max_length=80)
+    skill: str | None = Field(default=None, max_length=40)
+    outcome: str | None = Field(default=None, max_length=40)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class LearningEventResponse(BaseModel):
+    reward: RewardFeedback
+    summary: RewardSummary
+
+
 class DailyScheduleTask(BaseModel):
     id: int
     task_key: str
@@ -249,6 +334,10 @@ class DailyScheduleTask(BaseModel):
     topic: str | None = None
     minutes: int | None = None
     priority: str = "core"
+    difficulty: str = "foundation"
+    success_target: float = 0.85
+    reward_points: int = 10
+    reward: RewardFeedback | None = None
 
 
 class DailyScheduleResponse(BaseModel):
@@ -256,11 +345,21 @@ class DailyScheduleResponse(BaseModel):
     days_remaining: int
     upward_curve: float
     focus_skill: str
+    available_minutes: int
+    planned_minutes: int
+    session_mode: str
+    can_stop_when_complete: bool = True
+    encouragement: str
+    reward_summary: RewardSummary
     tasks: list[DailyScheduleTask]
 
 
 class DailyScheduleTaskUpdateRequest(BaseModel):
     completed: bool
+
+
+class DailyScheduleReplanRequest(BaseModel):
+    available_minutes: int = Field(ge=3, le=60)
 
 
 class TargetExamDateRequest(BaseModel):
@@ -633,6 +732,7 @@ class VocabUpdateProgressResponse(BaseModel):
     repetitions: int
     ease_factor: float
     next_review_date: datetime
+    reward: RewardFeedback | None = None
 
 
 class WeeklyReportRequest(BaseModel):
@@ -650,6 +750,35 @@ class WeeklyReportResponse(BaseModel):
     mission_tasks_total: int = 0
     top_error_concepts: list[str]
     performance_metrics: PerformanceMetrics
+
+
+class WeeklyStudyPackCreateRequest(BaseModel):
+    daily_minutes: int | None = Field(default=None, ge=5, le=30)
+    week_start: date | None = None
+    regenerate: bool = False
+
+
+class WeeklyStudyPackResponse(BaseModel):
+    id: str
+    week_start: date
+    pack_code: str
+    daily_minutes: int
+    status: str
+    completed_days: list[int]
+    day_count: int
+    generated_at: datetime
+    pdf_url: str
+
+
+class WeeklyStudyPackCompleteRequest(BaseModel):
+    pack_code: str = Field(min_length=6, max_length=12)
+    completed_days: list[int] = Field(min_length=1, max_length=5)
+
+
+class WeeklyStudyPackCompleteResponse(BaseModel):
+    pack: WeeklyStudyPackResponse
+    reward: RewardFeedback
+    summary: RewardSummary
 
 
 class GrammarLedgerSaveRequest(BaseModel):
@@ -781,6 +910,9 @@ def health_check(db: Session = Depends(get_db)) -> dict[str, Any]:
         "environment": settings.app_env,
         "database": "reachable",
         "openai_configured": bool(OPENAI_API_KEY),
+        "configured_ai_providers": [
+            provider["name"] for provider in configured_ai_providers()
+        ],
         "ollama_base_url": OLLAMA_BASE_URL,
     }
 
@@ -1231,18 +1363,27 @@ def auth_response_for_user(user: User, db: Session) -> AuthTokenResponse:
     )
 
 
-def update_login_streak(user: User) -> None:
-    today = datetime.utcnow().date()
+def update_login_streak(user: User, db: Session) -> None:
+    preference = get_or_create_learning_preference(db, user.id)
+    today = _local_today(preference)
     previous_login = user.last_login_date.date() if user.last_login_date else None
 
     if previous_login == today:
         user.current_streak = max(1, int(user.current_streak or 1))
     elif previous_login == today - timedelta(days=1):
         user.current_streak = int(user.current_streak or 0) + 1
+    elif previous_login == today - timedelta(days=2):
+        reward_state = get_or_create_reward_state(db, user.id, preference=preference)
+        if preference.gentle_streak_enabled and int(reward_state.streak_shields or 0) > 0:
+            reward_state.streak_shields -= 1
+            reward_state.comeback_count = int(reward_state.comeback_count or 0) + 1
+            user.current_streak = max(1, int(user.current_streak or 1))
+        else:
+            user.current_streak = 1
     else:
         user.current_streak = 1
 
-    user.last_login_date = datetime.utcnow()
+    user.last_login_date = datetime.combine(today, datetime.min.time())
 
 
 def create_email_action_token(
@@ -1323,7 +1464,7 @@ def register_user(
         display_name=(request.display_name or email.split("@")[0]).strip(),
         password_hash=hash_password(request.password),
         current_streak=1,
-        last_login_date=datetime.utcnow(),
+        last_login_date=datetime.combine(_local_today(), datetime.min.time()),
     )
     db.add(user)
     db.commit()
@@ -1343,7 +1484,7 @@ def login_user(
     user = db.scalar(select(User).where(User.email == email))
     if user is None or not verify_password(request.password, user.password_hash):
         raise HTTPException(status_code=401, detail="Invalid email or password.")
-    update_login_streak(user)
+    update_login_streak(user, db)
     db.commit()
     db.refresh(user)
     return auth_response_for_user(user, db)
@@ -2053,12 +2194,17 @@ def extract_ollama_performance_metrics(
         total_time_seconds=round(total_time_seconds, 3),
         tokens_per_second=round(tokens_per_second, 1),
         total_tokens=eval_count,
+        provider="ollama",
+        model=OLLAMA_MODEL,
     )
 
 
 def calculate_api_performance_metrics(
     elapsed_seconds: float,
     total_tokens: int,
+    *,
+    provider: str | None = None,
+    model: str | None = None,
 ) -> PerformanceMetrics:
     tokens_per_second = 0.0
     if elapsed_seconds > 0 and total_tokens > 0:
@@ -2068,6 +2214,8 @@ def calculate_api_performance_metrics(
         total_time_seconds=round(elapsed_seconds, 3),
         tokens_per_second=round(tokens_per_second, 1),
         total_tokens=total_tokens,
+        provider=provider,
+        model=model,
     )
 
 
@@ -2095,9 +2243,75 @@ def apply_app_mode_to_prompt(prompt: str, app_mode: str | None) -> str:
 
 
 def ai_runtime_signature() -> str:
-    if OPENAI_API_KEY:
-        return f"openai:{OPENAI_BASE_URL}:{CODEX_MODEL}"
-    return f"ollama:{OLLAMA_BASE_URL}:{OLLAMA_MODEL}"
+    configured = configured_ai_providers()
+    return "|".join(
+        f"{provider['name']}:{provider['model']}" for provider in configured
+    ) or "none"
+
+
+def redact_student_pii(value: str) -> str:
+    if not AI_REDACT_STUDENT_PII:
+        return value
+    redacted = re.sub(
+        r"(?i)\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b",
+        "[REDACTED_EMAIL]",
+        value,
+    )
+    redacted = re.sub(r"\b09\d{2}[-\s]?\d{3}[-\s]?\d{3}\b", "[REDACTED_PHONE]", redacted)
+    redacted = re.sub(r"\b[A-Z][12]\d{8}\b", "[REDACTED_ID]", redacted)
+    redacted = re.sub(
+        r"(?im)^(student\s+name|name|姓名)\s*[:：]\s*[^\n]+$",
+        r"\1: [REDACTED_NAME]",
+        redacted,
+    )
+    return redacted
+
+
+def configured_ai_providers(*, vision: bool = False) -> list[dict[str, str]]:
+    providers = {
+        "gemini": {
+            "name": "gemini",
+            "base_url": GEMINI_BASE_URL,
+            "api_key": GEMINI_API_KEY or "",
+            "model": GEMINI_MODEL,
+            "vision": "true",
+        },
+        "groq": {
+            "name": "groq",
+            "base_url": GROQ_BASE_URL,
+            "api_key": GROQ_API_KEY or "",
+            "model": GROQ_MODEL,
+            "vision": "false",
+        },
+        "openai": {
+            "name": "openai",
+            "base_url": OPENAI_BASE_URL,
+            "api_key": OPENAI_API_KEY or "",
+            "model": CODEX_MODEL,
+            "vision": "true",
+        },
+        "ollama": {
+            "name": "ollama",
+            "base_url": OLLAMA_BASE_URL,
+            "api_key": "local",
+            "model": OLLAMA_MODEL,
+            "vision": "false",
+        },
+    }
+    ordered: list[dict[str, str]] = []
+    seen: set[str] = set()
+    for raw_name in AI_PROVIDER_ORDER or ("ollama",):
+        name = raw_name.strip().lower()
+        provider = providers.get(name)
+        if provider is None or name in seen:
+            continue
+        seen.add(name)
+        if not provider["api_key"]:
+            continue
+        if vision and provider["vision"] != "true":
+            continue
+        ordered.append(provider)
+    return ordered
 
 
 async def call_ollama(prompt: str) -> tuple[str, PerformanceMetrics]:
@@ -2135,9 +2349,15 @@ async def _post_openai_payload(
     payload: dict[str, Any],
     *,
     operation_name: str,
+    base_url: str | None = None,
+    api_key: str | None = None,
 ) -> tuple[dict[str, Any], float]:
+    resolved_base_url = (base_url or OPENAI_BASE_URL).rstrip("/")
+    resolved_api_key = api_key or OPENAI_API_KEY
+    if not resolved_api_key:
+        raise HTTPException(status_code=500, detail=f"{operation_name} API key is not configured.")
     headers = {
-        "Authorization": f"Bearer {OPENAI_API_KEY}",
+        "Authorization": f"Bearer {resolved_api_key}",
         "Content-Type": "application/json",
     }
     started_at = time.perf_counter()
@@ -2145,7 +2365,7 @@ async def _post_openai_payload(
         try:
             async with httpx.AsyncClient(timeout=OPENAI_TIMEOUT_SECONDS) as client:
                 response = await client.post(
-                    f"{OPENAI_BASE_URL}/chat/completions",
+                    f"{resolved_base_url}/chat/completions",
                     headers=headers,
                     json=payload,
                 )
@@ -2190,18 +2410,39 @@ async def _post_openai_payload(
     raise HTTPException(status_code=502, detail=f"{operation_name} failed.")
 
 
-async def call_codex_api(
-    prompt: str,
-    app_mode: str | None = "engagement",
+def _openai_compatible_result(
+    data: dict[str, Any],
+    elapsed_seconds: float,
+    *,
+    provider: str,
+    model: str,
 ) -> tuple[str, PerformanceMetrics]:
-    if not OPENAI_API_KEY:
-        raise HTTPException(
-            status_code=500,
-            detail="OPENAI_API_KEY is not configured.",
-        )
+    choices = data.get("choices") or []
+    message = choices[0].get("message", {}) if choices else {}
+    generated_text = str(message.get("content", "")).strip()
+    if not generated_text:
+        raise HTTPException(status_code=502, detail=f"{provider} returned empty content.")
+    usage = data.get("usage") or {}
+    total_tokens = _safe_int(
+        usage.get("total_tokens"),
+        _safe_int(usage.get("completion_tokens")),
+    )
+    metrics = calculate_api_performance_metrics(
+        elapsed_seconds,
+        total_tokens,
+        provider=provider,
+        model=model,
+    )
+    return generated_text, metrics
 
+
+async def _call_openai_compatible_text(
+    provider: dict[str, str],
+    prompt: str,
+    app_mode: str | None,
+) -> tuple[str, PerformanceMetrics]:
     payload = {
-        "model": CODEX_MODEL,
+        "model": provider["model"],
         "messages": [
             {
                 "role": "system",
@@ -2211,26 +2452,48 @@ async def call_codex_api(
                     f"{app_mode_system_instruction(app_mode)}"
                 ),
             },
-            {"role": "user", "content": prompt},
+            {"role": "user", "content": redact_student_pii(prompt)},
         ],
         "temperature": 0.2,
     }
     data, elapsed_seconds = await _post_openai_payload(
         payload,
-        operation_name="Codex API request",
+        operation_name=f"{provider['name']} API request",
+        base_url=provider["base_url"],
+        api_key=provider["api_key"],
     )
-    choices = data.get("choices") or []
-    message = choices[0].get("message", {}) if choices else {}
-    generated_text = str(message.get("content", "")).strip()
-    if not generated_text:
-        raise HTTPException(status_code=502, detail="Codex API returned empty content.")
-    usage = data.get("usage") or {}
-    total_tokens = _safe_int(
-        usage.get("total_tokens"),
-        _safe_int(usage.get("completion_tokens")),
+    return _openai_compatible_result(
+        data,
+        elapsed_seconds,
+        provider=provider["name"],
+        model=provider["model"],
     )
-    metrics = calculate_api_performance_metrics(elapsed_seconds, total_tokens)
-    return generated_text, metrics
+
+
+async def call_codex_api(
+    prompt: str,
+    app_mode: str | None = "engagement",
+) -> tuple[str, PerformanceMetrics]:
+    failures: list[str] = []
+    for provider in configured_ai_providers():
+        try:
+            if provider["name"] == "ollama":
+                text_value, metrics = await call_ollama(
+                    apply_app_mode_to_prompt(redact_student_pii(prompt), app_mode)
+                )
+                metrics.provider = "ollama"
+                metrics.model = OLLAMA_MODEL
+                return text_value, metrics
+            return await _call_openai_compatible_text(provider, prompt, app_mode)
+        except HTTPException as exc:
+            failures.append(f"{provider['name']}:{exc.status_code}")
+    raise HTTPException(
+        status_code=503,
+        detail=(
+            "All configured AI providers are unavailable. "
+            f"Attempted: {', '.join(failures) or 'none'}."
+        ),
+    )
 
 
 async def call_codex_vision_api(
@@ -2239,13 +2502,9 @@ async def call_codex_vision_api(
     images: list[tuple[bytes, str]],
     app_mode: str | None = "engagement",
 ) -> tuple[str, PerformanceMetrics]:
-    if not OPENAI_API_KEY:
-        raise HTTPException(
-            status_code=500,
-            detail="OPENAI_API_KEY is not configured.",
-        )
-
-    content: list[dict[str, Any]] = [{"type": "text", "text": text_prompt}]
+    content: list[dict[str, Any]] = [
+        {"type": "text", "text": redact_student_pii(text_prompt)}
+    ]
     for image_bytes, content_type in images:
         if not content_type.startswith("image/"):
             raise HTTPException(status_code=415, detail="Prompt image must be an image file.")
@@ -2260,33 +2519,44 @@ async def call_codex_vision_api(
             }
         )
 
-    payload = {
-        "model": CODEX_MODEL,
-        "messages": [
-            {
-                "role": "system",
-                "content": f"{system_prompt}\n\n{app_mode_system_instruction(app_mode)}",
-            },
-            {"role": "user", "content": content},
-        ],
-        "temperature": 0.2,
-    }
-    data, elapsed_seconds = await _post_openai_payload(
-        payload,
-        operation_name="Codex Vision API request",
+    failures: list[str] = []
+    for provider in configured_ai_providers(vision=True):
+        payload = {
+            "model": provider["model"],
+            "messages": [
+                {
+                    "role": "system",
+                    "content": (
+                        f"{redact_student_pii(system_prompt)}\n\n"
+                        f"{app_mode_system_instruction(app_mode)}"
+                    ),
+                },
+                {"role": "user", "content": content},
+            ],
+            "temperature": 0.2,
+        }
+        try:
+            data, elapsed_seconds = await _post_openai_payload(
+                payload,
+                operation_name=f"{provider['name']} Vision API request",
+                base_url=provider["base_url"],
+                api_key=provider["api_key"],
+            )
+            return _openai_compatible_result(
+                data,
+                elapsed_seconds,
+                provider=provider["name"],
+                model=provider["model"],
+            )
+        except HTTPException as exc:
+            failures.append(f"{provider['name']}:{exc.status_code}")
+    raise HTTPException(
+        status_code=503,
+        detail=(
+            "No configured vision provider is available. "
+            f"Attempted: {', '.join(failures) or 'none'}."
+        ),
     )
-    choices = data.get("choices") or []
-    message = choices[0].get("message", {}) if choices else {}
-    generated_text = str(message.get("content", "")).strip()
-    if not generated_text:
-        raise HTTPException(status_code=502, detail="Codex Vision API returned empty content.")
-    usage = data.get("usage") or {}
-    total_tokens = _safe_int(
-        usage.get("total_tokens"),
-        _safe_int(usage.get("completion_tokens")),
-    )
-    metrics = calculate_api_performance_metrics(elapsed_seconds, total_tokens)
-    return generated_text, metrics
 
 
 async def call_preferred_text_ai(
@@ -2294,9 +2564,7 @@ async def call_preferred_text_ai(
     *,
     app_mode: str | None = "engagement",
 ) -> tuple[str, PerformanceMetrics]:
-    if OPENAI_API_KEY:
-        return await call_codex_api(prompt, app_mode=app_mode)
-    return await call_ollama(apply_app_mode_to_prompt(prompt, app_mode))
+    return await call_codex_api(prompt, app_mode=app_mode)
 
 
 async def generate_expansion_questions_for_mistake(
@@ -2684,6 +2952,489 @@ def add_vocab(
     )
 
 
+def _week_start(value: date) -> date:
+    return value - timedelta(days=value.weekday())
+
+
+def _local_today(preference: UserLearningPreference | None = None) -> date:
+    timezone_name = preference.timezone if preference is not None else "Asia/Taipei"
+    try:
+        return datetime.now(ZoneInfo(timezone_name or "Asia/Taipei")).date()
+    except ZoneInfoNotFoundError:
+        return datetime.now(timezone(timedelta(hours=8))).date()
+
+
+def get_or_create_learning_preference(db: Session, user_id: int) -> UserLearningPreference:
+    preference = db.scalar(
+        select(UserLearningPreference).where(UserLearningPreference.user_id == user_id)
+    )
+    if preference is None:
+        preference = UserLearningPreference(user_id=user_id)
+        db.add(preference)
+        db.flush()
+    return preference
+
+
+def get_or_create_reward_state(
+    db: Session,
+    user_id: int,
+    *,
+    preference: UserLearningPreference | None = None,
+) -> LearningRewardState:
+    state = db.scalar(
+        select(LearningRewardState).where(LearningRewardState.user_id == user_id)
+    )
+    if state is None:
+        state = LearningRewardState(user_id=user_id)
+        db.add(state)
+        db.flush()
+    preference = preference or get_or_create_learning_preference(db, user_id)
+    current_week = _week_start(_local_today(preference))
+    if state.last_shield_refill_week is None or state.last_shield_refill_week < current_week:
+        state.streak_shields = max(1, int(state.streak_shields or 0))
+        state.last_shield_refill_week = current_week
+    return state
+
+
+def learning_preferences_response(
+    preference: UserLearningPreference,
+) -> LearningPreferencesResponse:
+    return LearningPreferencesResponse(
+        weekday_minutes=int(preference.weekday_minutes or 10),
+        weekend_minutes=int(preference.weekend_minutes or 20),
+        preferred_session_minutes=int(preference.preferred_session_minutes or 10),
+        rescue_session_minutes=int(preference.rescue_session_minutes or 3),
+        maximum_session_minutes=int(preference.maximum_session_minutes or 60),
+        weekly_goal_days=int(preference.weekly_goal_days or 5),
+        timezone=preference.timezone or "Asia/Taipei",
+        gentle_streak_enabled=bool(preference.gentle_streak_enabled),
+        paper_pack_enabled=bool(preference.paper_pack_enabled),
+    )
+
+
+def build_reward_summary(
+    db: Session,
+    user: User,
+    *,
+    preference: UserLearningPreference | None = None,
+    state: LearningRewardState | None = None,
+) -> RewardSummary:
+    preference = preference or get_or_create_learning_preference(db, user.id)
+    state = state or get_or_create_reward_state(
+        db,
+        user.id,
+        preference=preference,
+    )
+    today = _local_today(preference)
+    start = _week_start(today)
+    weekly_active_days = db.scalar(
+        select(func.count(func.distinct(LearningProgressEvent.event_date))).where(
+            LearningProgressEvent.user_id == user.id,
+            LearningProgressEvent.event_date >= start,
+            LearningProgressEvent.event_date <= today,
+        )
+    ) or 0
+    total_points = max(0, int(state.total_points or 0))
+    level = max(1, int(state.level or 1))
+    points_in_level = total_points % 100
+    weekly_goal = max(1, min(7, int(preference.weekly_goal_days or 5)))
+    if total_points == 0:
+        headline = "先完成一個一分鐘暖身，你今天就已經開始進步。"
+    elif int(weekly_active_days) >= weekly_goal:
+        headline = f"本週目標已達成，你累積了 {int(weekly_active_days)} 個有效學習日。"
+    elif state.comeback_count:
+        headline = "回來繼續比完美更重要，你的進度沒有白費。"
+    else:
+        headline = f"你已累積 {total_points} 成長點，每一次訂正都算進步。"
+    return RewardSummary(
+        total_points=total_points,
+        level=level,
+        level_progress=round(points_in_level / 100, 3),
+        points_to_next_level=100 - points_in_level if points_in_level else 100,
+        weekly_active_days=int(weekly_active_days),
+        weekly_goal_days=weekly_goal,
+        weekly_goal_progress=round(min(1.0, int(weekly_active_days) / weekly_goal), 3),
+        comeback_count=int(state.comeback_count or 0),
+        streak_shields=int(state.streak_shields or 0),
+        current_streak=int(user.current_streak or 0),
+        headline=headline,
+    )
+
+
+def record_learning_event(
+    db: Session,
+    *,
+    user: User,
+    source_key: str,
+    event_type: str,
+    points: int,
+    message: str,
+    skill: str | None = None,
+    outcome: str | None = None,
+    metadata: dict[str, Any] | None = None,
+) -> RewardFeedback:
+    preference = get_or_create_learning_preference(db, user.id)
+    state = get_or_create_reward_state(db, user.id, preference=preference)
+    existing = db.scalar(
+        select(LearningProgressEvent).where(LearningProgressEvent.source_key == source_key)
+    )
+    if existing is not None:
+        return RewardFeedback(
+            awarded=False,
+            points=0,
+            message="這次進度已經記錄，不會重複計分。",
+            total_points=int(state.total_points or 0),
+            level=int(state.level or 1),
+            level_up=False,
+        )
+
+    today = _local_today(preference)
+    comeback = False
+    if state.last_active_date is None:
+        user.current_streak = max(1, int(user.current_streak or 1))
+    elif state.last_active_date == today:
+        pass
+    elif state.last_active_date == today - timedelta(days=1):
+        user.current_streak = max(1, int(user.current_streak or 0) + 1)
+    elif (
+        bool(preference.gentle_streak_enabled)
+        and state.last_active_date == today - timedelta(days=2)
+        and int(state.streak_shields or 0) > 0
+    ):
+        state.streak_shields = int(state.streak_shields or 0) - 1
+        user.current_streak = max(1, int(user.current_streak or 1))
+        state.comeback_count = int(state.comeback_count or 0) + 1
+        comeback = True
+    else:
+        if state.last_active_date < today - timedelta(days=1):
+            state.comeback_count = int(state.comeback_count or 0) + 1
+            comeback = True
+        user.current_streak = 1
+    state.last_active_date = today
+
+    previous_level = max(1, int(state.level or 1))
+    awarded_points = max(1, min(50, int(points)))
+    state.total_points = int(state.total_points or 0) + awarded_points
+    state.level = int(state.total_points // 100) + 1
+    final_message = (
+        "你願意回來就是一次勝利。" if comeback else message
+    )
+    event = LearningProgressEvent(
+        user_id=user.id,
+        source_key=source_key,
+        event_type=event_type,
+        skill=skill,
+        outcome=outcome,
+        points=awarded_points,
+        message=final_message,
+        metadata_json=json.dumps(metadata or {}, ensure_ascii=False),
+        event_date=today,
+    )
+    db.add(event)
+    db.flush()
+    return RewardFeedback(
+        awarded=True,
+        points=awarded_points,
+        message=final_message,
+        total_points=int(state.total_points),
+        level=int(state.level),
+        level_up=int(state.level) > previous_level,
+    )
+
+
+def _session_mode(minutes: int) -> str:
+    if minutes <= 3:
+        return "rescue"
+    if minutes <= 10:
+        return "quick"
+    if minutes <= 20:
+        return "sprint"
+    return "deep"
+
+
+def _difficulty_for_skill(value: float) -> tuple[str, float]:
+    if value < 0.35:
+        return "foundation", 0.90
+    if value < 0.65:
+        return "developing", 0.82
+    return "challenge", 0.72
+
+
+def build_minute_budget_task_specs(
+    *,
+    available_minutes: int,
+    focus_skill: str,
+    skills: dict[str, float],
+    days_remaining: int,
+) -> list[dict[str, Any]]:
+    budget = max(3, min(60, int(available_minutes)))
+    difficulty, success_target = _difficulty_for_skill(skills[focus_skill])
+    topics = {
+        "vocab": "先認得最常考的核心字義",
+        "grammar": "從最容易得分的句型判斷開始",
+        "reading": "先找轉折詞與主旨句",
+        "writing": "先寫出一個正確、清楚的主題句",
+    }
+    specs: list[dict[str, Any]] = [
+        {
+            "task_key": "micro_win",
+            "task_type": "micro_win",
+            "count": 3,
+            "topic": "一分鐘必勝暖身",
+            "minutes": 1,
+            "priority": "high",
+            "difficulty": "foundation",
+            "success_target": 0.95,
+            "reward_points": 8,
+        }
+    ]
+    candidates: list[dict[str, Any]] = []
+
+    focus_minutes = {
+        "vocab": 3,
+        "grammar": 3,
+        "reading": 5,
+        "writing": 8,
+    }[focus_skill]
+    focus_type = {
+        "vocab": "vocab",
+        "grammar": "grammar",
+        "reading": "reading_practice",
+        "writing": "writing_sprint",
+    }[focus_skill]
+    candidates.append(
+        {
+            "task_key": f"focus_{focus_skill}",
+            "task_type": focus_type,
+            "count": max(3, focus_minutes * 2) if focus_skill != "writing" else None,
+            "topic": topics[focus_skill],
+            "minutes": focus_minutes,
+            "priority": "high",
+            "difficulty": difficulty,
+            "success_target": success_target,
+            "reward_points": 12,
+        }
+    )
+    candidates.extend(
+        [
+            {
+                "task_key": "vocab",
+                "task_type": "vocab",
+                "count": 8,
+                "topic": "高頻單字快速回想",
+                "minutes": 3,
+                "priority": "core",
+                "difficulty": "foundation" if skills["vocab"] < 0.5 else "developing",
+                "success_target": 0.88,
+                "reward_points": 10,
+            },
+            {
+                "task_key": "grammar",
+                "task_type": "grammar",
+                "count": 3,
+                "topic": "一題一觀念，不一次塞滿規則",
+                "minutes": 3,
+                "priority": "core",
+                "difficulty": "foundation" if skills["grammar"] < 0.5 else "developing",
+                "success_target": 0.85,
+                "reward_points": 10,
+            },
+            {
+                "task_key": "reading_practice",
+                "task_type": "reading_practice",
+                "count": 1,
+                "topic": "短篇主旨與轉折定位",
+                "minutes": 5,
+                "priority": "core",
+                "difficulty": difficulty,
+                "success_target": 0.80,
+                "reward_points": 14,
+            },
+            {
+                "task_key": "mixed_questions",
+                "task_type": "mixed_questions",
+                "count": 1,
+                "topic": "學測混合題小組合",
+                "minutes": 6,
+                "priority": "core",
+                "difficulty": difficulty,
+                "success_target": 0.76,
+                "reward_points": 16,
+            },
+            {
+                "task_key": "writing_sprint",
+                "task_type": "writing_sprint",
+                "topic": "只完成一個可得分段落",
+                "minutes": 8,
+                "priority": "core",
+                "difficulty": difficulty,
+                "success_target": 0.75,
+                "reward_points": 18,
+            },
+        ]
+    )
+    if days_remaining <= 7:
+        candidates.insert(
+            1,
+            {
+                "task_key": "final_review",
+                "task_type": "final_review",
+                "topic": "只看尚未掌握的錯題與單字",
+                "minutes": 5,
+                "priority": "high",
+                "difficulty": "developing",
+                "success_target": 0.82,
+                "reward_points": 15,
+            },
+        )
+
+    used = 1
+    seen_types = {"micro_win"}
+    for candidate in candidates:
+        candidate_type = str(candidate["task_type"])
+        if candidate_type in seen_types:
+            continue
+        minutes = int(candidate["minutes"])
+        if used + minutes <= budget:
+            specs.append(candidate)
+            used += minutes
+            seen_types.add(candidate_type)
+
+    remaining = budget - used
+    if remaining >= 2:
+        specs.append(
+            {
+                "task_key": "confidence_recap",
+                "task_type": "confidence_recap",
+                "count": 1,
+                "topic": "寫下今天確定學會的一件事",
+                "minutes": min(3, remaining),
+                "priority": "core",
+                "difficulty": "foundation",
+                "success_target": 1.0,
+                "reward_points": 6,
+            }
+        )
+    if len(specs) == 1:
+        specs.append(
+            {
+                "task_key": "rescue_recall",
+                "task_type": "vocab",
+                "count": 4,
+                "topic": "救援模式：只回想四個看過的單字",
+                "minutes": budget - 1,
+                "priority": "core",
+                "difficulty": "foundation",
+                "success_target": 0.90,
+                "reward_points": 7,
+            }
+        )
+    return specs
+
+
+def daily_task_response(
+    task: DailyMissionTask,
+    *,
+    reward: RewardFeedback | None = None,
+) -> DailyScheduleTask:
+    return DailyScheduleTask(
+        id=task.id,
+        task_key=task.task_key,
+        type=task.task_type,
+        count=task.count,
+        topic=task.topic,
+        minutes=task.minutes,
+        priority=task.priority,
+        difficulty=task.difficulty or "foundation",
+        success_target=float(task.success_target or 0.85),
+        reward_points=int(task.reward_points or 10),
+        status=task.status,
+        reward=reward,
+    )
+
+
+@app.get("/user/learning-preferences", response_model=LearningPreferencesResponse)
+def get_learning_preferences(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> LearningPreferencesResponse:
+    preference = get_or_create_learning_preference(db, current_user.id)
+    db.commit()
+    return learning_preferences_response(preference)
+
+
+@app.put("/user/learning-preferences", response_model=LearningPreferencesResponse)
+def update_learning_preferences(
+    request: LearningPreferencesUpdateRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> LearningPreferencesResponse:
+    preference = get_or_create_learning_preference(db, current_user.id)
+    for field_name, value in request.model_dump(exclude_none=True).items():
+        setattr(preference, field_name, value.strip() if isinstance(value, str) else value)
+    if int(preference.rescue_session_minutes) > int(preference.preferred_session_minutes):
+        raise HTTPException(status_code=422, detail="Rescue session cannot exceed preferred session.")
+    if int(preference.preferred_session_minutes) > int(preference.maximum_session_minutes):
+        raise HTTPException(status_code=422, detail="Preferred session cannot exceed maximum session.")
+    db.commit()
+    db.refresh(preference)
+    return learning_preferences_response(preference)
+
+
+@app.get("/user/reward-summary", response_model=RewardSummary)
+def get_reward_summary(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> RewardSummary:
+    user = db.get(User, current_user.id)
+    if user is None:
+        raise HTTPException(status_code=401, detail="Token user no longer exists.")
+    summary = build_reward_summary(db, user)
+    db.commit()
+    return summary
+
+
+@app.post("/user/learning-events", response_model=LearningEventResponse)
+def add_learning_event(
+    request: LearningEventRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> LearningEventResponse:
+    user = db.get(User, current_user.id)
+    if user is None:
+        raise HTTPException(status_code=401, detail="Token user no longer exists.")
+    event_type = re.sub(r"[^a-z0-9_]+", "_", request.event_type.strip().lower())
+    outcome = re.sub(r"[^a-z0-9_]+", "_", (request.outcome or "").strip().lower())
+    points_map = {
+        "grammar_correct": 12,
+        "grammar_retry_mastered": 20,
+        "reading_completed": 12,
+        "writing_submitted": 18,
+        "effort_reviewed": 6,
+        "translation_completed": 12,
+        "paper_day_completed": 14,
+    }
+    points = points_map.get(event_type, 5)
+    message = (
+        "你把原本不會的題目救回來了，這種進步最有價值。"
+        if event_type == "grammar_retry_mastered"
+        else "這一步已經記進你的成長曲線。"
+    )
+    reward = record_learning_event(
+        db,
+        user=user,
+        source_key=f"user:{user.id}:event:{request.source_key}",
+        event_type=event_type,
+        skill=request.skill,
+        outcome=outcome or None,
+        points=points,
+        message=message,
+        metadata=request.metadata,
+    )
+    db.commit()
+    return LearningEventResponse(reward=reward, summary=build_reward_summary(db, user))
+
+
 @app.get("/user/stats", response_model=UserStatsResponse)
 def get_user_stats(
     db: Session = Depends(get_db),
@@ -2694,20 +3445,38 @@ def get_user_stats(
 
 @app.get("/user/daily-schedule", response_model=DailyScheduleResponse)
 def get_user_daily_schedule(
+    available_minutes: int | None = None,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ) -> DailyScheduleResponse:
     user = db.get(User, current_user.id)
     if user is None:
         raise HTTPException(status_code=401, detail="Token user no longer exists.")
+    if available_minutes is not None and not 3 <= available_minutes <= 60:
+        raise HTTPException(status_code=422, detail="Available minutes must be between 3 and 60.")
+    return compose_daily_schedule(
+        db,
+        user,
+        available_minutes=available_minutes,
+        force_replan=available_minutes is not None,
+    )
+
+
+def compose_daily_schedule(
+    db: Session,
+    user: User,
+    *,
+    available_minutes: int | None = None,
+    force_replan: bool = False,
+) -> DailyScheduleResponse:
+    preference = get_or_create_learning_preference(db, user.id)
 
     now = datetime.utcnow()
+    local_today = _local_today(preference)
     if user.target_exam_date is None or user.target_exam_date <= now:
         user.target_exam_date = now + timedelta(days=90)
-        db.commit()
-        db.refresh(user)
 
-    days_remaining = max(0, (user.target_exam_date.date() - now.date()).days)
+    days_remaining = max(0, (user.target_exam_date.date() - local_today).days)
     original_window = max(1, (user.target_exam_date - user.created_at).days)
     elapsed_window = max(0, (now - user.created_at).days)
     upward_curve = min(1.0, max(0.0, elapsed_window / original_window))
@@ -2719,65 +3488,14 @@ def get_user_daily_schedule(
         "writing": float(user.skill_writing or 0.0),
     }
     focus_skill = min(skills, key=skills.get)
-    urgency = 1.35 if days_remaining <= 14 else 1.15 if days_remaining <= 30 else 1.0
+    default_budget = (
+        int(preference.weekend_minutes or 20)
+        if local_today.weekday() >= 5
+        else int(preference.weekday_minutes or 10)
+    )
+    budget = max(3, min(60, int(available_minutes or default_budget)))
 
-    vocab_count = int(round((36 + (1 - skills["vocab"]) * 42) * urgency))
-    reading_count = max(1, int(round((1 + (1 - skills["reading"]) * 2) * urgency)))
-    writing_minutes = int(round((18 + (1 - skills["writing"]) * 22) * urgency))
-    grammar_topics = {
-        "vocab": "Collocation and word family traps",
-        "grammar": "Inversion",
-        "reading": "Inference and transition logic",
-        "writing": "Topic sentence and support",
-    }
-    mixed_count = 2 if days_remaining <= 30 or focus_skill in {"reading", "grammar"} else 1
-
-    task_specs = [
-        {
-            "task_key": "vocab",
-            "task_type": "vocab",
-            "count": max(30, min(90, vocab_count)),
-            "priority": "high" if focus_skill == "vocab" else "core",
-        },
-        {
-            "task_key": "grammar",
-            "task_type": "grammar",
-            "topic": grammar_topics[focus_skill],
-            "minutes": 18 if focus_skill == "grammar" else 12,
-            "priority": "high" if focus_skill == "grammar" else "core",
-        },
-        {
-            "task_key": "mixed_questions",
-            "task_type": "mixed_questions",
-            "count": mixed_count,
-            "priority": "high" if focus_skill in {"reading", "grammar"} else "core",
-        },
-        {
-            "task_key": "reading_practice",
-            "task_type": "reading_practice",
-            "count": reading_count,
-            "priority": "high" if focus_skill == "reading" else "core",
-        },
-        {
-            "task_key": "writing_sprint",
-            "task_type": "writing_sprint",
-            "minutes": max(15, min(45, writing_minutes)),
-            "priority": "high" if focus_skill == "writing" else "core",
-        },
-    ]
-
-    if days_remaining <= 7:
-        task_specs.append(
-            {
-                "task_key": "final_review",
-                "task_type": "final_review",
-                "topic": "Error Ledger and cheat sheet",
-                "minutes": 20,
-                "priority": "high",
-            }
-        )
-
-    mission_date = now.date()
+    mission_date = local_today
     persisted_tasks = list(
         db.scalars(
             select(DailyMissionTask)
@@ -2788,8 +3506,31 @@ def get_user_daily_schedule(
             .order_by(DailyMissionTask.id.asc())
         )
     )
-    if not persisted_tasks:
+    needs_new_plan = not persisted_tasks or not any(
+        task.task_key == "micro_win" for task in persisted_tasks
+    )
+    if force_replan or needs_new_plan:
+        completed_tasks = [task for task in persisted_tasks if task.status == "completed"]
+        for task in persisted_tasks:
+            if task.status != "completed":
+                db.delete(task)
+        db.flush()
+        completed_keys = {task.task_key for task in completed_tasks}
+        completed_minutes = sum(max(0, int(task.minutes or 0)) for task in completed_tasks)
+        remaining_budget = max(0, budget - completed_minutes)
+        task_specs = (
+            build_minute_budget_task_specs(
+                available_minutes=remaining_budget,
+                focus_skill=focus_skill,
+                skills=skills,
+                days_remaining=days_remaining,
+            )
+            if remaining_budget >= 3
+            else []
+        )
         for spec in task_specs:
+            if spec["task_key"] in completed_keys:
+                continue
             db.add(
                 DailyMissionTask(
                     user_id=user.id,
@@ -2810,26 +3551,45 @@ def get_user_daily_schedule(
             )
         )
 
-    tasks = [
-        DailyScheduleTask(
-            id=task.id,
-            task_key=task.task_key,
-            type=task.task_type,
-            count=task.count,
-            topic=task.topic,
-            minutes=task.minutes,
-            priority=task.priority,
-            status=task.status,
-        )
-        for task in persisted_tasks
-    ]
+    planned_minutes = sum(max(0, int(task.minutes or 0)) for task in persisted_tasks)
+    mode = _session_mode(budget)
+    encouragement = {
+        "rescue": "三分鐘不是偷懶，是讓學習不中斷。完成後今天就可以停。",
+        "quick": "十分鐘足以完成一次有效複習，不需要把自己耗盡。",
+        "sprint": "今天只處理最有機會加分的弱點，完成後安心收工。",
+        "deep": "你今天有較完整的時間，系統仍會把任務拆成短段落。",
+    }[mode]
+    reward_summary = build_reward_summary(db, user, preference=preference)
+    db.commit()
 
     return DailyScheduleResponse(
         target_exam_date=user.target_exam_date,
         days_remaining=days_remaining,
         upward_curve=round(upward_curve, 3),
         focus_skill=focus_skill,
-        tasks=tasks,
+        available_minutes=budget,
+        planned_minutes=planned_minutes,
+        session_mode=mode,
+        encouragement=encouragement,
+        reward_summary=reward_summary,
+        tasks=[daily_task_response(task) for task in persisted_tasks],
+    )
+
+
+@app.post("/user/daily-schedule/replan", response_model=DailyScheduleResponse)
+def replan_user_daily_schedule(
+    request: DailyScheduleReplanRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> DailyScheduleResponse:
+    user = db.get(User, current_user.id)
+    if user is None:
+        raise HTTPException(status_code=401, detail="Token user no longer exists.")
+    return compose_daily_schedule(
+        db,
+        user,
+        available_minutes=request.available_minutes,
+        force_replan=True,
     )
 
 
@@ -2848,11 +3608,14 @@ def update_daily_schedule_task(
     )
     if task is None:
         raise HTTPException(status_code=404, detail="Daily mission task not found.")
+    was_completed = task.status == "completed"
     task.status = "completed" if request.completed else "pending"
     task.completed_at = datetime.utcnow() if request.completed else None
     user = db.get(User, current_user.id)
-    if request.completed and user is not None:
+    reward: RewardFeedback | None = None
+    if request.completed and not was_completed and user is not None:
         skill_field = {
+            "micro_win": "skill_vocabulary",
             "vocab": "skill_vocabulary",
             "grammar": "skill_grammar",
             "mixed_questions": "skill_reading",
@@ -2862,18 +3625,35 @@ def update_daily_schedule_task(
         if skill_field:
             current_value = float(getattr(user, skill_field) or 0.0)
             setattr(user, skill_field, round(min(1.0, current_value + 0.01), 2))
+        reward = record_learning_event(
+            db,
+            user=user,
+            source_key=f"user:{user.id}:mission:{task.id}:completed",
+            event_type="mission_completed",
+            skill=task.task_type,
+            outcome="completed",
+            points=int(task.reward_points or 10),
+            message=(
+                "第一個小任務完成了，今天的進步已經成立。"
+                if task.task_type == "micro_win"
+                else "你完成了一個可量化的小進步。"
+            ),
+            metadata={"task_key": task.task_key, "minutes": task.minutes},
+        )
     db.commit()
     db.refresh(task)
-    return DailyScheduleTask(
-        id=task.id,
-        task_key=task.task_key,
-        type=task.task_type,
-        count=task.count,
-        topic=task.topic,
-        minutes=task.minutes,
-        priority=task.priority,
-        status=task.status,
-    )
+    if request.completed and was_completed and user is not None:
+        reward = record_learning_event(
+            db,
+            user=user,
+            source_key=f"user:{user.id}:mission:{task.id}:completed",
+            event_type="mission_completed",
+            skill=task.task_type,
+            outcome="completed",
+            points=int(task.reward_points or 10),
+            message="你完成了一個可量化的小進步。",
+        )
+    return daily_task_response(task, reward=reward)
 
 
 @app.patch("/user/target-exam-date", response_model=DailyScheduleResponse)
@@ -3023,6 +3803,348 @@ def build_user_stats(db: Session, current_user: User) -> UserStatsResponse:
     )
 
 
+def _study_pack_response(pack: WeeklyStudyPack) -> WeeklyStudyPackResponse:
+    try:
+        completed_days = sorted(
+            {
+                int(day)
+                for day in json.loads(pack.completed_days_json or "[]")
+                if 1 <= int(day) <= 5
+            }
+        )
+    except (TypeError, ValueError, json.JSONDecodeError):
+        completed_days = []
+    try:
+        payload = json.loads(pack.payload_json)
+        day_count = len(payload.get("days", [])) if isinstance(payload, dict) else 5
+    except (TypeError, ValueError, json.JSONDecodeError):
+        day_count = 5
+    return WeeklyStudyPackResponse(
+        id=pack.id,
+        week_start=pack.week_start,
+        pack_code=pack.pack_code,
+        daily_minutes=pack.daily_minutes,
+        status=pack.status,
+        completed_days=completed_days,
+        day_count=max(1, day_count),
+        generated_at=pack.generated_at,
+        pdf_url=f"/user/weekly-study-pack/{pack.id}/pdf",
+    )
+
+
+def _weekly_pack_code(db: Session) -> str:
+    alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
+    for _ in range(20):
+        candidate = "".join(secrets.choice(alphabet) for _ in range(8))
+        if db.scalar(
+            select(WeeklyStudyPack.id).where(WeeklyStudyPack.pack_code == candidate)
+        ) is None:
+            return candidate
+    raise HTTPException(status_code=500, detail="Unable to allocate a study pack code.")
+
+
+def _build_weekly_study_pack_payload(
+    db: Session,
+    user: User,
+    *,
+    week_start: date,
+    daily_minutes: int,
+) -> dict[str, Any]:
+    vocab_rows = db.execute(
+        select(Vocabulary, UserVocabProgress)
+        .join(UserVocabProgress, UserVocabProgress.vocab_id == Vocabulary.id)
+        .where(UserVocabProgress.user_id == user.id)
+        .order_by(
+            UserVocabProgress.ease_factor.asc(),
+            UserVocabProgress.repetitions.asc(),
+            UserVocabProgress.next_review_date.asc(),
+        )
+        .limit(30)
+    ).all()
+    vocabulary_items = [
+        {
+            "word": vocab.word,
+            "meaning": vocab.definition or "請寫下你記得的中文意思",
+            "example": vocab.source_context or f"Write one sentence using {vocab.word}.",
+        }
+        for vocab, _progress in vocab_rows
+    ]
+    if not vocabulary_items:
+        vocabulary_items = [
+            {"word": word, "meaning": meaning, "example": example}
+            for word, meaning, example in (
+                INITIAL_EASY_GSAT_WORDS + INITIAL_HARD_GSAT_WORDS
+            )
+        ]
+
+    grammar_rows = list(
+        db.scalars(
+            select(GrammarErrorLedger)
+            .where(
+                GrammarErrorLedger.user_id == user.id,
+                GrammarErrorLedger.is_mastered.is_(False),
+            )
+            .order_by(
+                GrammarErrorLedger.occurrence_count.desc(),
+                GrammarErrorLedger.updated_at.desc(),
+            )
+            .limit(10)
+        )
+    )
+    grammar_items = [
+        {
+            "concept": _titleize_concept(item.error_type),
+            "question": item.original_sentence,
+            "wrong_answer": item.user_answer or "",
+            "correct_answer": item.corrected_sentence or "Check the rule and rewrite the sentence.",
+            "explanation": item.explanation or "Identify the grammar signal and explain the correction.",
+        }
+        for item in grammar_rows
+    ]
+    if not grammar_items:
+        grammar_items = [
+            {
+                "concept": "Subject-Verb Agreement",
+                "question": "Each of the students have a different study plan.",
+                "wrong_answer": "have",
+                "correct_answer": "Each of the students has a different study plan.",
+                "explanation": "Each is singular, so the verb must be has.",
+            },
+            {
+                "concept": "Inversion",
+                "question": "I had never seen such a useful review sheet.",
+                "wrong_answer": "",
+                "correct_answer": "Never had I seen such a useful review sheet.",
+                "explanation": "A negative adverb at the beginning triggers auxiliary-subject inversion.",
+            },
+            {
+                "concept": "Participle Clause",
+                "question": "Because she felt tired, she took a short break.",
+                "wrong_answer": "",
+                "correct_answer": "Feeling tired, she took a short break.",
+                "explanation": "The subjects are the same, so the adverb clause can become a participle clause.",
+            },
+        ]
+
+    vocab_count = 2 if daily_minutes <= 5 else 4 if daily_minutes <= 10 else 6 if daily_minutes <= 20 else 8
+    days: list[dict[str, Any]] = []
+    for day_index in range(5):
+        selected_vocab = [
+            vocabulary_items[(day_index * vocab_count + offset) % len(vocabulary_items)]
+            for offset in range(vocab_count)
+        ]
+        grammar = grammar_items[day_index % len(grammar_items)]
+        words_in_context = ", ".join(item["word"] for item in selected_vocab[:4])
+        reading_text = (
+            "Small study sessions can produce meaningful progress. A learner who reviews "
+            "a few difficult words, checks one grammar pattern, and recalls the ideas without "
+            "looking at the answers is training long-term memory. The goal is not to study "
+            "until exhaustion. It is to return tomorrow with enough energy to continue. "
+            f"Today's focus words are {words_in_context}."
+        )
+        day_number = day_index + 1
+        days.append(
+            {
+                "day": day_number,
+                "date": (week_start + timedelta(days=day_index)).isoformat(),
+                "title": f"Day {day_number} - Small Win Sprint",
+                "minutes": daily_minutes,
+                "vocabulary": selected_vocab,
+                "grammar": grammar,
+                "reading": {
+                    "text": reading_text,
+                    "questions": [
+                        "In one English sentence, state the main idea.",
+                        f"Circle every occurrence of one focus word and explain {selected_vocab[0]['word']} in Chinese.",
+                    ],
+                    "answers": [
+                        "Short, repeatable study sessions build sustainable progress.",
+                        selected_vocab[0]["meaning"],
+                    ],
+                },
+                "reflection": "今天我確實記住的一件事：____________________________",
+            }
+        )
+
+    return {
+        "title": "GSAT_Max 五日紙本衝刺包",
+        "week_start": week_start.isoformat(),
+        "daily_minutes": daily_minutes,
+        "student": user.display_name or user.email.split("@")[0],
+        "instructions": [
+            "每天只做一頁，時間到即可停止。",
+            "先遮住答案回想，再用答案頁訂正。",
+            "回到 App 輸入完成碼，可同步成長點數與學習紀錄。",
+        ],
+        "days": days,
+    }
+
+
+@app.post("/user/weekly-study-pack", response_model=WeeklyStudyPackResponse)
+def create_weekly_study_pack(
+    request: WeeklyStudyPackCreateRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> WeeklyStudyPackResponse:
+    preference = get_or_create_learning_preference(db, current_user.id)
+    requested_week = request.week_start or _week_start(_local_today(preference))
+    requested_week = _week_start(requested_week)
+    if abs((requested_week - _local_today(preference)).days) > 370:
+        raise HTTPException(status_code=422, detail="Study pack week is outside the allowed range.")
+    daily_minutes = int(request.daily_minutes or preference.preferred_session_minutes or 10)
+    daily_minutes = max(5, min(30, daily_minutes))
+    pack = db.scalar(
+        select(WeeklyStudyPack).where(
+            WeeklyStudyPack.user_id == current_user.id,
+            WeeklyStudyPack.week_start == requested_week,
+        )
+    )
+    if pack is not None and not request.regenerate:
+        return _study_pack_response(pack)
+
+    payload = _build_weekly_study_pack_payload(
+        db,
+        current_user,
+        week_start=requested_week,
+        daily_minutes=daily_minutes,
+    )
+    if pack is None:
+        pack = WeeklyStudyPack(
+            id=secrets.token_hex(16),
+            user_id=current_user.id,
+            week_start=requested_week,
+            pack_code=_weekly_pack_code(db),
+            daily_minutes=daily_minutes,
+            status="ready",
+            payload_json=json.dumps(payload, ensure_ascii=False),
+            completed_days_json="[]",
+        )
+        db.add(pack)
+    else:
+        pack.daily_minutes = daily_minutes
+        pack.payload_json = json.dumps(payload, ensure_ascii=False)
+        pack.generated_at = datetime.utcnow()
+    db.commit()
+    db.refresh(pack)
+    return _study_pack_response(pack)
+
+
+@app.get("/user/weekly-study-pack/latest", response_model=WeeklyStudyPackResponse)
+def get_latest_weekly_study_pack(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> WeeklyStudyPackResponse:
+    pack = db.scalar(
+        select(WeeklyStudyPack)
+        .where(WeeklyStudyPack.user_id == current_user.id)
+        .order_by(WeeklyStudyPack.week_start.desc(), WeeklyStudyPack.generated_at.desc())
+        .limit(1)
+    )
+    if pack is None:
+        raise HTTPException(status_code=404, detail="No weekly study pack has been generated.")
+    return _study_pack_response(pack)
+
+
+@app.post("/user/weekly-study-pack/complete", response_model=WeeklyStudyPackCompleteResponse)
+def complete_weekly_study_pack(
+    request: WeeklyStudyPackCompleteRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> WeeklyStudyPackCompleteResponse:
+    normalized_code = request.pack_code.strip().upper()
+    pack = db.scalar(
+        select(WeeklyStudyPack).where(
+            WeeklyStudyPack.user_id == current_user.id,
+            WeeklyStudyPack.pack_code == normalized_code,
+        )
+    )
+    if pack is None:
+        raise HTTPException(status_code=404, detail="Study pack completion code is invalid.")
+    requested_days = sorted({int(day) for day in request.completed_days})
+    if not requested_days or any(day < 1 or day > 5 for day in requested_days):
+        raise HTTPException(status_code=422, detail="Completed days must be between 1 and 5.")
+    try:
+        prior_days = {int(day) for day in json.loads(pack.completed_days_json or "[]")}
+    except (TypeError, ValueError, json.JSONDecodeError):
+        prior_days = set()
+    newly_completed = [day for day in requested_days if day not in prior_days]
+    aggregate_points = 0
+    any_level_up = False
+    for day in newly_completed:
+        feedback = record_learning_event(
+            db,
+            user=current_user,
+            source_key=f"user:{current_user.id}:paper-pack:{pack.id}:day:{day}",
+            event_type="paper_day_completed",
+            skill="mixed",
+            outcome="completed",
+            points=14,
+            message="你在沒有手機的情況下也完成了學習，這份自律已經記錄下來。",
+            metadata={"pack_id": pack.id, "day": day},
+        )
+        if feedback.awarded:
+            aggregate_points += feedback.points
+            any_level_up = any_level_up or feedback.level_up
+    all_days = sorted(prior_days.union(requested_days))
+    pack.completed_days_json = json.dumps(all_days)
+    if len(all_days) >= 5:
+        pack.status = "completed"
+        pack.completed_at = datetime.utcnow()
+    state = get_or_create_reward_state(db, current_user.id)
+    db.commit()
+    db.refresh(pack)
+    reward = RewardFeedback(
+        awarded=bool(newly_completed),
+        points=aggregate_points,
+        message=(
+            f"已同步 {len(newly_completed)} 天紙本學習，手機不在身邊也沒有中斷進步。"
+            if newly_completed
+            else "這些紙本學習日已經同步過，不會重複計分。"
+        ),
+        total_points=int(state.total_points or 0),
+        level=int(state.level or 1),
+        level_up=any_level_up,
+    )
+    return WeeklyStudyPackCompleteResponse(
+        pack=_study_pack_response(pack),
+        reward=reward,
+        summary=build_reward_summary(db, current_user),
+    )
+
+
+@app.get("/user/weekly-study-pack/{pack_id}/pdf")
+def download_weekly_study_pack_pdf(
+    pack_id: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> StreamingResponse:
+    if SimpleDocTemplate is None:
+        raise HTTPException(status_code=500, detail="PDF export requires reportlab.")
+    pack = db.scalar(
+        select(WeeklyStudyPack).where(
+            WeeklyStudyPack.id == pack_id,
+            WeeklyStudyPack.user_id == current_user.id,
+        )
+    )
+    if pack is None:
+        raise HTTPException(status_code=404, detail="Weekly study pack not found.")
+    try:
+        payload = json.loads(pack.payload_json)
+    except (TypeError, ValueError, json.JSONDecodeError) as exc:
+        raise HTTPException(status_code=500, detail="Study pack data is corrupted.") from exc
+    pdf_buffer = BytesIO()
+    _build_weekly_study_pack_pdf(pdf_buffer, pack=pack, payload=payload)
+    pdf_buffer.seek(0)
+    pack.last_downloaded_at = datetime.utcnow()
+    db.commit()
+    filename = f"gsat-max-study-pack-{pack.week_start.isoformat()}.pdf"
+    return StreamingResponse(
+        pdf_buffer,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
+
+
 @app.post("/admin/seed-gsat", response_model=GSATSeedResponse)
 def seed_gsat_reference_papers(
     papers: list[GSATReferencePaperSeedItem],
@@ -3133,6 +4255,240 @@ def export_cheat_sheet(
         media_type="application/pdf",
         headers=headers,
     )
+
+
+def _build_weekly_study_pack_pdf(
+    pdf_buffer: BytesIO,
+    *,
+    pack: WeeklyStudyPack,
+    payload: dict[str, Any],
+) -> None:
+    body_font = _register_cheat_sheet_body_font()
+    doc = SimpleDocTemplate(
+        pdf_buffer,
+        pagesize=A4,
+        rightMargin=16 * mm,
+        leftMargin=16 * mm,
+        topMargin=15 * mm,
+        bottomMargin=15 * mm,
+        title="GSAT_Max Weekly Study Pack",
+    )
+    styles = getSampleStyleSheet()
+    styles.add(
+        ParagraphStyle(
+            name="PackTitle",
+            parent=styles["Title"],
+            fontName=body_font,
+            fontSize=20,
+            leading=26,
+            alignment=TA_CENTER,
+            textColor=colors.HexColor("#111111"),
+            spaceAfter=8,
+        )
+    )
+    styles.add(
+        ParagraphStyle(
+            name="PackHeading",
+            parent=styles["Heading2"],
+            fontName=body_font,
+            fontSize=13,
+            leading=18,
+            textColor=colors.HexColor("#111111"),
+            spaceBefore=8,
+            spaceAfter=6,
+        )
+    )
+    styles.add(
+        ParagraphStyle(
+            name="PackBody",
+            parent=styles["BodyText"],
+            fontName=body_font,
+            fontSize=9,
+            leading=14,
+            textColor=colors.HexColor("#222222"),
+            spaceAfter=5,
+        )
+    )
+    styles.add(
+        ParagraphStyle(
+            name="PackSmall",
+            parent=styles["BodyText"],
+            fontName=body_font,
+            fontSize=8,
+            leading=11,
+            textColor=colors.HexColor("#444444"),
+        )
+    )
+    story: list[Any] = [
+        Spacer(1, 20 * mm),
+        Paragraph(_pdf_escape(payload.get("title", "GSAT_Max 五日紙本衝刺包")), styles["PackTitle"]),
+        Paragraph(
+            _pdf_escape(
+                f"學生：{payload.get('student', '')}　週次：{pack.week_start.isoformat()}　"
+                f"每日約 {pack.daily_minutes} 分鐘"
+            ),
+            styles["PackBody"],
+        ),
+        Spacer(1, 8 * mm),
+    ]
+    instructions = payload.get("instructions", [])
+    for index, instruction in enumerate(instructions, start=1):
+        story.append(Paragraph(f"{index}. {_pdf_escape(instruction)}", styles["PackBody"]))
+    story.extend(
+        [
+            Spacer(1, 12 * mm),
+            Paragraph("完成方式", styles["PackHeading"]),
+            Paragraph(
+                "每天完成一頁後打勾。下次打開 App 時輸入下方完成碼，系統會同步紙本進度與成長點數。",
+                styles["PackBody"],
+            ),
+            Spacer(1, 5 * mm),
+            Table(
+                [[Paragraph("完成碼", styles["PackBody"]), Paragraph(f"<b>{pack.pack_code}</b>", styles["PackTitle"])]],
+                colWidths=[35 * mm, 110 * mm],
+                style=TableStyle(
+                    [
+                        ("BOX", (0, 0), (-1, -1), 1.2, colors.black),
+                        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+                        ("ALIGN", (1, 0), (1, 0), "CENTER"),
+                        ("TOPPADDING", (0, 0), (-1, -1), 9),
+                        ("BOTTOMPADDING", (0, 0), (-1, -1), 9),
+                    ]
+                ),
+            ),
+            Spacer(1, 18 * mm),
+            Paragraph("家長／老師簽名：____________________________", styles["PackBody"]),
+        ]
+    )
+
+    days = payload.get("days", [])
+    for day in days:
+        story.extend(
+            [
+                PageBreak(),
+                Paragraph(
+                    _pdf_escape(f"{day.get('title', 'Daily Sprint')}　{day.get('date', '')}"),
+                    styles["PackTitle"],
+                ),
+                Paragraph(
+                    f"□ 開始　□ 完成　建議時間：{int(day.get('minutes', pack.daily_minutes))} 分鐘",
+                    styles["PackBody"],
+                ),
+                Paragraph("A. 單字快速回想", styles["PackHeading"]),
+            ]
+        )
+        vocab_data = [
+            [
+                Paragraph("<b>Word</b>", styles["PackSmall"]),
+                Paragraph("<b>先遮住答案，寫下中文意思</b>", styles["PackSmall"]),
+                Paragraph("<b>用法提示</b>", styles["PackSmall"]),
+            ]
+        ]
+        for item in day.get("vocabulary", []):
+            vocab_data.append(
+                [
+                    Paragraph(f"<b>{_pdf_escape(item.get('word'))}</b>", styles["PackSmall"]),
+                    Paragraph("________________________________", styles["PackSmall"]),
+                    Paragraph(_pdf_escape(_clip_text(str(item.get("example", "")), 110)), styles["PackSmall"]),
+                ]
+            )
+        vocab_table = Table(vocab_data, colWidths=[34 * mm, 65 * mm, 79 * mm], repeatRows=1)
+        vocab_table.setStyle(_weekly_pack_table_style())
+        story.append(vocab_table)
+
+        grammar = day.get("grammar", {})
+        reading = day.get("reading", {})
+        story.extend(
+            [
+                Paragraph("B. 文法弱點修復", styles["PackHeading"]),
+                Paragraph(f"概念：<b>{_pdf_escape(grammar.get('concept', 'Grammar'))}</b>", styles["PackBody"]),
+                Paragraph(_pdf_escape(grammar.get("question", "")), styles["PackBody"]),
+                Paragraph("我的改寫：____________________________________________________________", styles["PackBody"]),
+                Paragraph("C. 短篇閱讀", styles["PackHeading"]),
+                Paragraph(_pdf_escape(reading.get("text", "")), styles["PackBody"]),
+            ]
+        )
+        for index, question in enumerate(reading.get("questions", []), start=1):
+            story.extend(
+                [
+                    Paragraph(f"{index}. {_pdf_escape(question)}", styles["PackBody"]),
+                    Paragraph("______________________________________________________________________", styles["PackSmall"]),
+                ]
+            )
+        story.extend(
+            [
+                Paragraph("D. 今天的勝利證據", styles["PackHeading"]),
+                Paragraph(_pdf_escape(day.get("reflection", "")), styles["PackBody"]),
+                Paragraph("難度感受：□ 比想像中容易　□ 剛剛好　□ 需要再練一次", styles["PackBody"]),
+            ]
+        )
+
+    story.extend([PageBreak(), Paragraph("答案與訂正頁", styles["PackTitle"])])
+    for day in days:
+        grammar = day.get("grammar", {})
+        reading = day.get("reading", {})
+        answer_parts = [
+            Paragraph(f"<b>Day {day.get('day')}</b>", styles["PackHeading"]),
+            Paragraph(
+                "單字：" + "；".join(
+                    f"{_pdf_escape(item.get('word'))} = {_pdf_escape(item.get('meaning'))}"
+                    for item in day.get("vocabulary", [])
+                ),
+                styles["PackSmall"],
+            ),
+            Paragraph(
+                "文法：" + _pdf_escape(grammar.get("correct_answer", "")),
+                styles["PackSmall"],
+            ),
+            Paragraph(
+                "解析：" + _pdf_escape(grammar.get("explanation", "")),
+                styles["PackSmall"],
+            ),
+        ]
+        for index, answer in enumerate(reading.get("answers", []), start=1):
+            answer_parts.append(
+                Paragraph(f"閱讀 {index}：{_pdf_escape(answer)}", styles["PackSmall"])
+            )
+        story.append(KeepTogether(answer_parts))
+        story.append(Spacer(1, 4 * mm))
+
+    doc.build(
+        story,
+        onFirstPage=_draw_weekly_pack_watermark,
+        onLaterPages=_draw_weekly_pack_watermark,
+    )
+
+
+def _weekly_pack_table_style() -> TableStyle:
+    return TableStyle(
+        [
+            ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#E5E7EB")),
+            ("TEXTCOLOR", (0, 0), (-1, 0), colors.black),
+            ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+            ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#777777")),
+            ("VALIGN", (0, 0), (-1, -1), "TOP"),
+            ("LEFTPADDING", (0, 0), (-1, -1), 5),
+            ("RIGHTPADDING", (0, 0), (-1, -1), 5),
+            ("TOPPADDING", (0, 0), (-1, -1), 6),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
+        ]
+    )
+
+
+def _draw_weekly_pack_watermark(canvas: Any, doc: SimpleDocTemplate) -> None:
+    canvas.saveState()
+    canvas.setFont("Helvetica-Bold", 28)
+    canvas.setFillColor(colors.Color(0.05, 0.05, 0.05, alpha=0.035))
+    canvas.translate(A4[0] / 2, A4[1] / 2)
+    canvas.rotate(32)
+    canvas.drawCentredString(0, 0, "GSAT_MAX WEEKLY SPRINT")
+    canvas.restoreState()
+    canvas.saveState()
+    canvas.setFont("Helvetica", 7)
+    canvas.setFillColor(colors.HexColor("#777777"))
+    canvas.drawString(16 * mm, 9 * mm, "Generated by GSAT_Max - GSAT English Master")
+    canvas.drawRightString(A4[0] - 16 * mm, 9 * mm, f"Page {doc.page}")
+    canvas.restoreState()
 
 
 def _build_cheat_sheet_pdf(
@@ -3325,13 +4681,26 @@ def _build_cheat_sheet_pdf(
 
 
 def _register_cheat_sheet_body_font() -> str:
-    if pdfmetrics is None or UnicodeCIDFont is None:
+    if pdfmetrics is None:
         return "Helvetica"
-    try:
-        pdfmetrics.registerFont(UnicodeCIDFont("STSong-Light"))
-        return "STSong-Light"
-    except Exception:
+    bundled_font = Path(__file__).resolve().parent / "assets" / "fonts" / "NotoSansTC-Regular.ttf"
+    if TTFont is not None and bundled_font.is_file():
+        font_name = "GSATMaxNotoSansTC"
+        try:
+            if font_name not in pdfmetrics.getRegisteredFontNames():
+                pdfmetrics.registerFont(TTFont(font_name, str(bundled_font)))
+            return font_name
+        except Exception:
+            pass
+    if UnicodeCIDFont is None:
         return "Helvetica"
+    for font_name in ("MSung-Light", "STSong-Light"):
+        try:
+            pdfmetrics.registerFont(UnicodeCIDFont(font_name))
+            return font_name
+        except Exception:
+            continue
+    return "Helvetica"
 
 
 def _cheat_sheet_table_style() -> TableStyle:
@@ -3852,6 +5221,27 @@ def update_vocab_progress(
     progress.ease_factor = updated["ease_factor"]
     progress.next_review_date = updated["next_review_date"]
     progress.last_reviewed_at = datetime.utcnow()
+    user = db.get(User, current_user.id)
+    reward = None
+    if user is not None:
+        source_suffix = request.action_id or (
+            f"progress:{progress.id}:{progress.last_reviewed_at.isoformat()}"
+        )
+        reward = record_learning_event(
+            db,
+            user=user,
+            source_key=f"user:{user.id}:vocab-review:{source_suffix}",
+            event_type="vocab_review",
+            skill="vocab",
+            outcome="recalled" if request.quality >= 3 else "effort_reviewed",
+            points=10 if request.quality >= 5 else 8 if request.quality >= 3 else 5,
+            message=(
+                "這個單字已經更穩了。"
+                if request.quality >= 3
+                else "覺得困難也算有效學習，系統會更快安排它回來。"
+            ),
+            metadata={"vocab_id": progress.vocab_id, "quality": request.quality},
+        )
 
     response = VocabUpdateProgressResponse(
         vocab_id=progress.vocab_id,
@@ -3860,6 +5250,7 @@ def update_vocab_progress(
         repetitions=progress.repetitions,
         ease_factor=progress.ease_factor,
         next_review_date=progress.next_review_date,
+        reward=reward,
     )
     if request.action_id:
         db.add(

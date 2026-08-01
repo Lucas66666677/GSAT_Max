@@ -73,6 +73,28 @@ class User(Base):
         back_populates="user",
         cascade="all, delete-orphan",
     )
+    learning_preference = relationship(
+        "UserLearningPreference",
+        back_populates="user",
+        cascade="all, delete-orphan",
+        uselist=False,
+    )
+    reward_state = relationship(
+        "LearningRewardState",
+        back_populates="user",
+        cascade="all, delete-orphan",
+        uselist=False,
+    )
+    learning_events = relationship(
+        "LearningProgressEvent",
+        back_populates="user",
+        cascade="all, delete-orphan",
+    )
+    weekly_study_packs = relationship(
+        "WeeklyStudyPack",
+        back_populates="user",
+        cascade="all, delete-orphan",
+    )
     review_sync_receipts = relationship(
         "ReviewSyncReceipt",
         back_populates="user",
@@ -261,6 +283,9 @@ class DailyMissionTask(Base):
     topic = Column(String(255), nullable=True)
     minutes = Column(Integer, nullable=True)
     priority = Column(String(20), default="core", nullable=False)
+    difficulty = Column(String(20), default="foundation", nullable=False)
+    success_target = Column(Float, default=0.85, nullable=False)
+    reward_points = Column(Integer, default=10, nullable=False)
     status = Column(String(20), default="pending", nullable=False, index=True)
     completed_at = Column(DateTime, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
@@ -272,6 +297,98 @@ class DailyMissionTask(Base):
     )
 
     user = relationship("User", back_populates="daily_mission_tasks")
+
+
+class UserLearningPreference(Base):
+    __tablename__ = "user_learning_preferences"
+    __table_args__ = (
+        UniqueConstraint("user_id", name="uq_user_learning_preference"),
+    )
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    weekday_minutes = Column(Integer, default=10, nullable=False)
+    weekend_minutes = Column(Integer, default=20, nullable=False)
+    preferred_session_minutes = Column(Integer, default=10, nullable=False)
+    rescue_session_minutes = Column(Integer, default=3, nullable=False)
+    maximum_session_minutes = Column(Integer, default=60, nullable=False)
+    weekly_goal_days = Column(Integer, default=5, nullable=False)
+    timezone = Column(String(80), default="Asia/Taipei", nullable=False)
+    gentle_streak_enabled = Column(Boolean, default=True, nullable=False)
+    paper_pack_enabled = Column(Boolean, default=True, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = Column(
+        DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
+        nullable=False,
+    )
+
+    user = relationship("User", back_populates="learning_preference")
+
+
+class LearningRewardState(Base):
+    __tablename__ = "learning_reward_states"
+    __table_args__ = (
+        UniqueConstraint("user_id", name="uq_learning_reward_state"),
+    )
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    total_points = Column(Integer, default=0, nullable=False)
+    level = Column(Integer, default=1, nullable=False)
+    comeback_count = Column(Integer, default=0, nullable=False)
+    streak_shields = Column(Integer, default=1, nullable=False)
+    last_active_date = Column(Date, nullable=True, index=True)
+    last_shield_refill_week = Column(Date, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = Column(
+        DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
+        nullable=False,
+    )
+
+    user = relationship("User", back_populates="reward_state")
+
+
+class LearningProgressEvent(Base):
+    __tablename__ = "learning_progress_events"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    source_key = Column(String(160), unique=True, nullable=False, index=True)
+    event_type = Column(String(80), nullable=False, index=True)
+    skill = Column(String(40), nullable=True, index=True)
+    outcome = Column(String(40), nullable=True, index=True)
+    points = Column(Integer, default=0, nullable=False)
+    message = Column(String(255), nullable=False)
+    metadata_json = Column(Text, nullable=True)
+    event_date = Column(Date, default=date.today, nullable=False, index=True)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False, index=True)
+
+    user = relationship("User", back_populates="learning_events")
+
+
+class WeeklyStudyPack(Base):
+    __tablename__ = "weekly_study_packs"
+    __table_args__ = (
+        UniqueConstraint("user_id", "week_start", name="uq_weekly_study_pack"),
+    )
+
+    id = Column(String(64), primary_key=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    week_start = Column(Date, nullable=False, index=True)
+    pack_code = Column(String(12), unique=True, nullable=False, index=True)
+    daily_minutes = Column(Integer, default=10, nullable=False)
+    status = Column(String(20), default="ready", nullable=False, index=True)
+    payload_json = Column(Text, nullable=False)
+    completed_days_json = Column(Text, default="[]", nullable=False)
+    generated_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    last_downloaded_at = Column(DateTime, nullable=True)
+    completed_at = Column(DateTime, nullable=True)
+
+    user = relationship("User", back_populates="weekly_study_packs")
 
 
 class BackgroundJob(Base):

@@ -17,6 +17,8 @@ __pycache__/
 .packages
 build/
 coverage/
+tmp/
+output/
 **/local.properties
 **/key.properties
 *.jks

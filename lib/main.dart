@@ -1087,6 +1087,9 @@ class StudyMissionTask {
     required this.type,
     required this.status,
     required this.priority,
+    this.difficulty = 'foundation',
+    this.successTarget = 0.85,
+    this.rewardPoints = 10,
     this.count,
     this.topic,
     this.minutes,
@@ -1097,6 +1100,9 @@ class StudyMissionTask {
   final String type;
   final String status;
   final String priority;
+  final String difficulty;
+  final double successTarget;
+  final int rewardPoints;
   final int? count;
   final String? topic;
   final int? minutes;
@@ -1108,6 +1114,13 @@ class StudyMissionTask {
       type: _stringFromAny(json['type'], fallback: 'study_task'),
       status: _stringFromAny(json['status'], fallback: 'pending'),
       priority: _stringFromAny(json['priority'], fallback: 'core'),
+      difficulty: _stringFromAny(json['difficulty'], fallback: 'foundation'),
+      successTarget: PerformanceMetrics._asDouble(json['success_target']) == 0
+          ? 0.85
+          : PerformanceMetrics._asDouble(json['success_target']),
+      rewardPoints: PerformanceMetrics._asInt(json['reward_points']) == 0
+          ? 10
+          : PerformanceMetrics._asInt(json['reward_points']),
       count: json['count'] == null
           ? null
           : PerformanceMetrics._asInt(json['count']),
@@ -1119,6 +1132,117 @@ class StudyMissionTask {
   }
 }
 
+class LearningRewardFeedback {
+  const LearningRewardFeedback({
+    required this.awarded,
+    required this.points,
+    required this.message,
+    required this.totalPoints,
+    required this.level,
+    required this.levelUp,
+  });
+
+  final bool awarded;
+  final int points;
+  final String message;
+  final int totalPoints;
+  final int level;
+  final bool levelUp;
+
+  factory LearningRewardFeedback.fromJson(Map<String, dynamic> json) {
+    return LearningRewardFeedback(
+      awarded: _boolFromJson(json['awarded']),
+      points: PerformanceMetrics._asInt(json['points']),
+      message: _stringFromAny(
+        json['message'],
+        fallback: '這一步已經記進你的成長曲線。',
+      ),
+      totalPoints: PerformanceMetrics._asInt(json['total_points']),
+      level: math.max(1, PerformanceMetrics._asInt(json['level'])),
+      levelUp: _boolFromJson(json['level_up']),
+    );
+  }
+
+  static LearningRewardFeedback? maybeFromJson(Map<String, dynamic> json) {
+    final raw = json['reward'];
+    if (raw is Map) {
+      return LearningRewardFeedback.fromJson(Map<String, dynamic>.from(raw));
+    }
+    return null;
+  }
+}
+
+class LearningRewardSummary {
+  const LearningRewardSummary({
+    required this.totalPoints,
+    required this.level,
+    required this.levelProgress,
+    required this.pointsToNextLevel,
+    required this.weeklyActiveDays,
+    required this.weeklyGoalDays,
+    required this.weeklyGoalProgress,
+    required this.comebackCount,
+    required this.streakShields,
+    required this.currentStreak,
+    required this.headline,
+  });
+
+  final int totalPoints;
+  final int level;
+  final double levelProgress;
+  final int pointsToNextLevel;
+  final int weeklyActiveDays;
+  final int weeklyGoalDays;
+  final double weeklyGoalProgress;
+  final int comebackCount;
+  final int streakShields;
+  final int currentStreak;
+  final String headline;
+
+  factory LearningRewardSummary.fromJson(Map<String, dynamic> json) {
+    return LearningRewardSummary(
+      totalPoints: PerformanceMetrics._asInt(json['total_points']),
+      level: math.max(1, PerformanceMetrics._asInt(json['level'])),
+      levelProgress: PerformanceMetrics._asDouble(json['level_progress'])
+          .clamp(0.0, 1.0)
+          .toDouble(),
+      pointsToNextLevel:
+          PerformanceMetrics._asInt(json['points_to_next_level']),
+      weeklyActiveDays: PerformanceMetrics._asInt(json['weekly_active_days']),
+      weeklyGoalDays:
+          math.max(1, PerformanceMetrics._asInt(json['weekly_goal_days'])),
+      weeklyGoalProgress:
+          PerformanceMetrics._asDouble(json['weekly_goal_progress'])
+              .clamp(0.0, 1.0)
+              .toDouble(),
+      comebackCount: PerformanceMetrics._asInt(json['comeback_count']),
+      streakShields: PerformanceMetrics._asInt(json['streak_shields']),
+      currentStreak: PerformanceMetrics._asInt(json['current_streak']),
+      headline: _stringFromAny(
+        json['headline'],
+        fallback: '完成一小步，今天的進步就成立。',
+      ),
+    );
+  }
+
+  LearningRewardSummary apply(LearningRewardFeedback feedback) {
+    final pointsIntoLevel = feedback.totalPoints % 100;
+    return LearningRewardSummary(
+      totalPoints: feedback.totalPoints,
+      level: feedback.level,
+      levelProgress: pointsIntoLevel / 100,
+      pointsToNextLevel: pointsIntoLevel == 0 ? 100 : 100 - pointsIntoLevel,
+      weeklyActiveDays: weeklyActiveDays,
+      weeklyGoalDays: weeklyGoalDays,
+      weeklyGoalProgress: weeklyGoalProgress,
+      comebackCount: comebackCount,
+      streakShields: streakShields,
+      currentStreak: currentStreak,
+      headline: feedback.message,
+    );
+  }
+}
+
 class StudyMissionSchedule {
   const StudyMissionSchedule({
     required this.targetExamDate,
@@ -1126,6 +1250,12 @@ class StudyMissionSchedule {
     required this.upwardCurve,
     required this.focusSkill,
     required this.tasks,
+    this.availableMinutes = 10,
+    this.plannedMinutes = 10,
+    this.sessionMode = 'quick',
+    this.canStopWhenComplete = true,
+    this.encouragement = '完成後今天就可以安心停止。',
+    this.rewardSummary,
   });
 
   final DateTime? targetExamDate;
@@ -1133,6 +1263,12 @@ class StudyMissionSchedule {
   final double upwardCurve;
   final String focusSkill;
   final List<StudyMissionTask> tasks;
+  final int availableMinutes;
+  final int plannedMinutes;
+  final String sessionMode;
+  final bool canStopWhenComplete;
+  final String encouragement;
+  final LearningRewardSummary? rewardSummary;
 
   factory StudyMissionSchedule.fromJson(Map<String, dynamic> json) {
     final rawTasks = json['tasks'];
@@ -1144,6 +1280,22 @@ class StudyMissionSchedule {
           .clamp(0.0, 1.0)
           .toDouble(),
       focusSkill: _stringFromAny(json['focus_skill'], fallback: 'vocab'),
+      availableMinutes:
+          math.max(3, PerformanceMetrics._asInt(json['available_minutes'])),
+      plannedMinutes: PerformanceMetrics._asInt(json['planned_minutes']),
+      sessionMode: _stringFromAny(json['session_mode'], fallback: 'quick'),
+      canStopWhenComplete: json['can_stop_when_complete'] == null
+          ? true
+          : _boolFromJson(json['can_stop_when_complete']),
+      encouragement: _stringFromAny(
+        json['encouragement'],
+        fallback: '完成後今天就可以安心停止。',
+      ),
+      rewardSummary: json['reward_summary'] is Map
+          ? LearningRewardSummary.fromJson(
+              Map<String, dynamic>.from(json['reward_summary'] as Map),
+            )
+          : null,
       tasks: rawTasks is List
           ? rawTasks
               .whereType<Map>()
@@ -1151,6 +1303,133 @@ class StudyMissionSchedule {
                   StudyMissionTask.fromJson(Map<String, dynamic>.from(item)))
               .toList()
           : const [],
+    );
+  }
+
+  StudyMissionSchedule withReward(LearningRewardFeedback feedback) {
+    return StudyMissionSchedule(
+      targetExamDate: targetExamDate,
+      daysRemaining: daysRemaining,
+      upwardCurve: upwardCurve,
+      focusSkill: focusSkill,
+      tasks: tasks,
+      availableMinutes: availableMinutes,
+      plannedMinutes: plannedMinutes,
+      sessionMode: sessionMode,
+      canStopWhenComplete: canStopWhenComplete,
+      encouragement: encouragement,
+      rewardSummary: rewardSummary?.apply(feedback),
+    );
+  }
+}
+
+class WeeklyStudyPackInfo {
+  const WeeklyStudyPackInfo({
+    required this.id,
+    required this.weekStart,
+    required this.packCode,
+    required this.dailyMinutes,
+    required this.status,
+    required this.completedDays,
+    required this.pdfUrl,
+  });
+
+  final String id;
+  final DateTime? weekStart;
+  final String packCode;
+  final int dailyMinutes;
+  final String status;
+  final List<int> completedDays;
+  final String pdfUrl;
+
+  factory WeeklyStudyPackInfo.fromJson(Map<String, dynamic> json) {
+    final rawDays = json['completed_days'];
+    return WeeklyStudyPackInfo(
+      id: _stringFromAny(json['id'], fallback: ''),
+      weekStart: DateTime.tryParse((json['week_start'] ?? '').toString()),
+      packCode: _stringFromAny(json['pack_code'], fallback: ''),
+      dailyMinutes: math.max(
+        5,
+        PerformanceMetrics._asInt(json['daily_minutes']),
+      ),
+      status: _stringFromAny(json['status'], fallback: 'ready'),
+      completedDays: rawDays is List
+          ? rawDays
+              .map(PerformanceMetrics._asInt)
+              .where((day) => day > 0)
+              .toList()
+          : const [],
+      pdfUrl: _stringFromAny(json['pdf_url'], fallback: ''),
+    );
+  }
+}
+
+class LearningPreferences {
+  const LearningPreferences({
+    this.weekdayMinutes = 10,
+    this.weekendMinutes = 20,
+    this.preferredSessionMinutes = 10,
+    this.rescueSessionMinutes = 3,
+    this.maximumSessionMinutes = 60,
+    this.weeklyGoalDays = 5,
+    this.gentleStreakEnabled = true,
+    this.paperPackEnabled = true,
+  });
+
+  final int weekdayMinutes;
+  final int weekendMinutes;
+  final int preferredSessionMinutes;
+  final int rescueSessionMinutes;
+  final int maximumSessionMinutes;
+  final int weeklyGoalDays;
+  final bool gentleStreakEnabled;
+  final bool paperPackEnabled;
+
+  factory LearningPreferences.fromJson(Map<String, dynamic> json) {
+    return LearningPreferences(
+      weekdayMinutes: PerformanceMetrics._asInt(json['weekday_minutes']),
+      weekendMinutes: PerformanceMetrics._asInt(json['weekend_minutes']),
+      preferredSessionMinutes:
+          PerformanceMetrics._asInt(json['preferred_session_minutes']),
+      rescueSessionMinutes:
+          PerformanceMetrics._asInt(json['rescue_session_minutes']),
+      maximumSessionMinutes:
+          PerformanceMetrics._asInt(json['maximum_session_minutes']),
+      weeklyGoalDays: PerformanceMetrics._asInt(json['weekly_goal_days']),
+      gentleStreakEnabled: _boolFromJson(json['gentle_streak_enabled']),
+      paperPackEnabled: _boolFromJson(json['paper_pack_enabled']),
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        'weekday_minutes': weekdayMinutes,
+        'weekend_minutes': weekendMinutes,
+        'preferred_session_minutes': preferredSessionMinutes,
+        'rescue_session_minutes': rescueSessionMinutes,
+        'maximum_session_minutes': maximumSessionMinutes,
+        'weekly_goal_days': weeklyGoalDays,
+        'gentle_streak_enabled': gentleStreakEnabled,
+        'paper_pack_enabled': paperPackEnabled,
+      };
+
+  LearningPreferences copyWith({
+    int? weekdayMinutes,
+    int? weekendMinutes,
+    int? preferredSessionMinutes,
+    int? weeklyGoalDays,
+    bool? gentleStreakEnabled,
+    bool? paperPackEnabled,
+  }) {
+    final preferred = preferredSessionMinutes ?? this.preferredSessionMinutes;
+    return LearningPreferences(
+      weekdayMinutes: weekdayMinutes ?? this.weekdayMinutes,
+      weekendMinutes: weekendMinutes ?? this.weekendMinutes,
+      preferredSessionMinutes: preferred,
+      rescueSessionMinutes: rescueSessionMinutes,
+      maximumSessionMinutes: math.max(maximumSessionMinutes, preferred).toInt(),
+      weeklyGoalDays: weeklyGoalDays ?? this.weeklyGoalDays,
+      gentleStreakEnabled: gentleStreakEnabled ?? this.gentleStreakEnabled,
+      paperPackEnabled: paperPackEnabled ?? this.paperPackEnabled,
     );
   }
 }
@@ -1387,6 +1666,25 @@ Future<http.Response> _authenticatedPatch(Uri uri, {Object? body}) async {
       await (_activeAuthController?.refreshAccessToken() ??
           Future.value(false))) {
     response = await http.patch(
+      uri,
+      headers: _authHeaders(jsonContent: true),
+      body: requestBody,
+    );
+  }
+  return response;
+}
+
+Future<http.Response> _authenticatedPut(Uri uri, {Object? body}) async {
+  final requestBody = _bodyWithAppMode(body);
+  var response = await http.put(
+    uri,
+    headers: _authHeaders(jsonContent: true),
+    body: requestBody,
+  );
+  if (response.statusCode == 401 &&
+      await (_activeAuthController?.refreshAccessToken() ??
+          Future.value(false))) {
+    response = await http.put(
       uri,
       headers: _authHeaders(jsonContent: true),
       body: requestBody,
@@ -4789,7 +5087,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   TimeOfDay _reminderTime = const TimeOfDay(hour: 20, minute: 0);
   DateTime? _targetExamDate;
   String _weeklyReportPersona = 'Encouraging';
+  LearningPreferences _learningPreferences = const LearningPreferences();
   bool _isLoading = true;
+  bool _isSavingPreferences = false;
   bool _isDeleting = false;
   int _developerTapCount = 0;
 
@@ -4877,6 +5177,164 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 ),
                 trailing: const Icon(Icons.schedule_rounded),
                 onTap: _pickReminderTime,
+              ),
+            ),
+            const SizedBox(height: 16),
+            CleanCard(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.schedule_send_rounded,
+                            color: kNeonGreen),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            '時間協同教練',
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    const Text(
+                      '告訴系統你真的有多少時間。任務會縮短，不會因為只有幾分鐘就判定失敗。',
+                      style: TextStyle(color: kTextTertiary, height: 1.4),
+                    ),
+                    const SizedBox(height: 14),
+                    _SettingsSliderLabel(
+                      label: '平日預算',
+                      value: '${_learningPreferences.weekdayMinutes} 分鐘',
+                    ),
+                    Slider(
+                      value: _learningPreferences.weekdayMinutes
+                          .clamp(3, 45)
+                          .toDouble(),
+                      min: 3,
+                      max: 45,
+                      divisions: 42,
+                      onChanged: (value) {
+                        setState(() {
+                          _learningPreferences = _learningPreferences.copyWith(
+                            weekdayMinutes: value.round(),
+                          );
+                        });
+                      },
+                    ),
+                    _SettingsSliderLabel(
+                      label: '週末預算',
+                      value: '${_learningPreferences.weekendMinutes} 分鐘',
+                    ),
+                    Slider(
+                      value: _learningPreferences.weekendMinutes
+                          .clamp(5, 60)
+                          .toDouble(),
+                      min: 5,
+                      max: 60,
+                      divisions: 55,
+                      onChanged: (value) {
+                        setState(() {
+                          _learningPreferences = _learningPreferences.copyWith(
+                            weekendMinutes: value.round(),
+                          );
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 4),
+                    const Text(
+                      '偏好的單次衝刺',
+                      style: TextStyle(fontWeight: FontWeight.w900),
+                    ),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        for (final minutes in const [3, 10, 20, 45])
+                          ChoiceChip(
+                            selected:
+                                _learningPreferences.preferredSessionMinutes ==
+                                    minutes,
+                            onSelected: (_) {
+                              setState(() {
+                                _learningPreferences =
+                                    _learningPreferences.copyWith(
+                                  preferredSessionMinutes: minutes,
+                                );
+                              });
+                            },
+                            label: Text('$minutes 分鐘'),
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: 14),
+                    _SettingsSliderLabel(
+                      label: '每週目標',
+                      value: '${_learningPreferences.weeklyGoalDays} 天',
+                    ),
+                    Slider(
+                      value: _learningPreferences.weeklyGoalDays
+                          .clamp(1, 7)
+                          .toDouble(),
+                      min: 1,
+                      max: 7,
+                      divisions: 6,
+                      onChanged: (value) {
+                        setState(() {
+                          _learningPreferences = _learningPreferences.copyWith(
+                            weeklyGoalDays: value.round(),
+                          );
+                        });
+                      },
+                    ),
+                    SwitchListTile.adaptive(
+                      contentPadding: EdgeInsets.zero,
+                      value: _learningPreferences.gentleStreakEnabled,
+                      onChanged: (value) {
+                        setState(() {
+                          _learningPreferences = _learningPreferences.copyWith(
+                            gentleStreakEnabled: value,
+                          );
+                        });
+                      },
+                      title: const Text('溫和連續學習'),
+                      subtitle: const Text('每週提供一次休息保護，不讓一次中斷抹掉全部努力。'),
+                    ),
+                    SwitchListTile.adaptive(
+                      contentPadding: EdgeInsets.zero,
+                      value: _learningPreferences.paperPackEnabled,
+                      onChanged: (value) {
+                        setState(() {
+                          _learningPreferences = _learningPreferences.copyWith(
+                            paperPackEnabled: value,
+                          );
+                        });
+                      },
+                      title: const Text('每週紙本學習包'),
+                      subtitle: const Text('為不方便使用手機的時段，自動排版五日列印內容。'),
+                    ),
+                    const SizedBox(height: 10),
+                    SizedBox(
+                      width: double.infinity,
+                      child: FilledButton.icon(
+                        onPressed: _isSavingPreferences
+                            ? null
+                            : _saveLearningPreferences,
+                        icon: Icon(
+                          _isSavingPreferences
+                              ? Icons.hourglass_top_rounded
+                              : Icons.save_rounded,
+                        ),
+                        label: Text(
+                          _isSavingPreferences ? '儲存中...' : '儲存學習節奏',
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
             const SizedBox(height: 16),
@@ -5119,6 +5577,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final minute = prefs.getInt(kReminderMinuteKey) ?? 0;
     final persona = prefs.getString(kWeeklyReportPersonaKey) ?? 'Encouraging';
     DateTime? targetExamDate;
+    var learningPreferences = const LearningPreferences();
     try {
       final response = await _authenticatedGet(
         AppConfig.apiUri('/user/daily-schedule'),
@@ -5134,6 +5593,18 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     } catch (_) {
       // Audio and notification settings remain usable while offline.
     }
+    try {
+      final response = await _authenticatedGet(
+        AppConfig.apiUri('/user/learning-preferences'),
+      ).timeout(const Duration(seconds: 8));
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        learningPreferences = LearningPreferences.fromJson(
+          _decodeJsonObject(response.body),
+        );
+      }
+    } catch (_) {
+      // Keep production defaults when learning preferences are unavailable.
+    }
     if (!mounted) return;
     setState(() {
       _speechRate = rate.clamp(0.1, 1.0).toDouble();
@@ -5143,8 +5614,49 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       );
       _weeklyReportPersona = persona == 'Spartan' ? 'Spartan' : 'Encouraging';
       _targetExamDate = targetExamDate;
+      _learningPreferences = learningPreferences;
       _isLoading = false;
     });
+  }
+
+  Future<void> _saveLearningPreferences() async {
+    if (_isSavingPreferences) return;
+    setState(() => _isSavingPreferences = true);
+    try {
+      final response = await _authenticatedPut(
+        AppConfig.apiUri('/user/learning-preferences'),
+        body: jsonEncode(_learningPreferences.toJson()),
+      ).timeout(const Duration(seconds: 8));
+      if (!mounted) return;
+      if (response.statusCode < 200 || response.statusCode >= 300) {
+        throw HttpException('Server returned ${response.statusCode}.');
+      }
+      setState(() {
+        _learningPreferences = LearningPreferences.fromJson(
+          _decodeJsonObject(response.body),
+        );
+      });
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          const SnackBar(
+            content: Text('學習節奏已儲存，之後的每日任務會照這個時間安排。'),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          const SnackBar(
+            content: Text('目前無法儲存學習節奏，請檢查網路後重試。'),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+    } finally {
+      if (mounted) setState(() => _isSavingPreferences = false);
+    }
   }
 
   Future<void> _pickTargetExamDate() async {
@@ -5520,6 +6032,34 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 }
 
+class _SettingsSliderLabel extends StatelessWidget {
+  const _SettingsSliderLabel({required this.label, required this.value});
+
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            label,
+            style: const TextStyle(fontWeight: FontWeight.w800),
+          ),
+        ),
+        Text(
+          value,
+          style: const TextStyle(
+            color: kNeonGreen,
+            fontWeight: FontWeight.w900,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
 
@@ -5531,17 +6071,37 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   static final Uri _statsEndpoint = AppConfig.apiUri('/user/stats');
   static final Uri _cheatSheetEndpoint =
       AppConfig.apiUri('/user/export-cheat-sheet');
+  static final Uri _weeklyStudyPackEndpoint =
+      AppConfig.apiUri('/user/weekly-study-pack');
+  static final Uri _latestWeeklyStudyPackEndpoint =
+      AppConfig.apiUri('/user/weekly-study-pack/latest');
+  static final Uri _completeWeeklyStudyPackEndpoint =
+      AppConfig.apiUri('/user/weekly-study-pack/complete');
   final GlobalKey _radarShareKey = GlobalKey();
+  final TextEditingController _paperPackCodeController =
+      TextEditingController();
 
   UserStats? _stats;
   bool _isLoading = true;
   bool _isDownloadingCheatSheet = false;
+  bool _isGeneratingStudyPack = false;
+  bool _isDownloadingStudyPack = false;
+  bool _isCompletingStudyPack = false;
+  int _studyPackDailyMinutes = 10;
+  WeeklyStudyPackInfo? _weeklyStudyPack;
   String? _errorMessage;
 
   @override
   void initState() {
     super.initState();
     _loadStats();
+    _loadLatestWeeklyStudyPack();
+  }
+
+  @override
+  void dispose() {
+    _paperPackCodeController.dispose();
+    super.dispose();
   }
 
   @override
@@ -5682,6 +6242,170 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     ),
                   ),
                 ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+        CleanCard(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      width: 42,
+                      height: 42,
+                      decoration: BoxDecoration(
+                        color: kElectricBlue.withOpacity(0.12),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: kElectricBlue.withOpacity(0.35),
+                        ),
+                      ),
+                      child: const Icon(
+                        Icons.print_rounded,
+                        color: kElectricBlue,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '五日紙本學習包',
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                          const SizedBox(height: 4),
+                          const Text(
+                            '自動排版單字、文法、短篇閱讀與答案頁；沒有手機也能照進度學。',
+                            style: TextStyle(
+                              color: kTextTertiary,
+                              height: 1.35,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 14),
+                const Text(
+                  '每天紙本時間',
+                  style: TextStyle(fontWeight: FontWeight.w900),
+                ),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    for (final minutes in const [5, 10, 20, 30])
+                      ChoiceChip(
+                        selected: _studyPackDailyMinutes == minutes,
+                        onSelected: _isGeneratingStudyPack
+                            ? null
+                            : (_) => setState(
+                                  () => _studyPackDailyMinutes = minutes,
+                                ),
+                        label: Text('$minutes 分鐘'),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    onPressed: _isGeneratingStudyPack
+                        ? null
+                        : _generateWeeklyStudyPack,
+                    icon: Icon(
+                      _isGeneratingStudyPack
+                          ? Icons.hourglass_top_rounded
+                          : Icons.auto_awesome_rounded,
+                    ),
+                    label: Text(
+                      _isGeneratingStudyPack
+                          ? '正在排版五日內容...'
+                          : _weeklyStudyPack == null
+                              ? '建立本週列印包'
+                              : '依新時間重新排版',
+                    ),
+                  ),
+                ),
+                if (_weeklyStudyPack != null) ...[
+                  const SizedBox(height: 14),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.035),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: kGlassBorder),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                '完成碼 ${_weeklyStudyPack!.packCode}',
+                                style: const TextStyle(
+                                  color: kNeonGreen,
+                                  fontWeight: FontWeight.w900,
+                                  letterSpacing: 1.2,
+                                ),
+                              ),
+                            ),
+                            Text(
+                              '${_weeklyStudyPack!.completedDays.length}/5 天',
+                              style: const TextStyle(
+                                color: kTextSecondary,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        LinearProgressIndicator(
+                          value: _weeklyStudyPack!.completedDays.length / 5,
+                          minHeight: 6,
+                          borderRadius: BorderRadius.circular(999),
+                          backgroundColor: Colors.white.withOpacity(0.06),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      OutlinedButton.icon(
+                        onPressed: _isDownloadingStudyPack
+                            ? null
+                            : _downloadWeeklyStudyPack,
+                        icon: Icon(
+                          _isDownloadingStudyPack
+                              ? Icons.hourglass_top_rounded
+                              : Icons.download_rounded,
+                        ),
+                        label: Text(
+                          _isDownloadingStudyPack ? '下載中...' : '下載並列印 PDF',
+                        ),
+                      ),
+                      OutlinedButton.icon(
+                        onPressed: _isCompletingStudyPack
+                            ? null
+                            : _openPaperCompletionDialog,
+                        icon: const Icon(Icons.fact_check_rounded),
+                        label: const Text('回填紙本進度'),
+                      ),
+                    ],
+                  ),
+                ],
               ],
             ),
           ),
@@ -5829,6 +6553,226 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         _errorMessage = 'Unable to load profile stats right now.';
         _isLoading = false;
       });
+    }
+  }
+
+  Future<void> _loadLatestWeeklyStudyPack() async {
+    try {
+      final response = await _authenticatedGet(_latestWeeklyStudyPackEndpoint)
+          .timeout(const Duration(seconds: 8));
+      if (!mounted || response.statusCode == 404) return;
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        final pack = WeeklyStudyPackInfo.fromJson(
+          _decodeJsonObject(response.body),
+        );
+        setState(() {
+          _weeklyStudyPack = pack;
+          _studyPackDailyMinutes = pack.dailyMinutes;
+        });
+      }
+    } catch (_) {
+      // The profile remains usable when no printable pack is cached yet.
+    }
+  }
+
+  Future<void> _generateWeeklyStudyPack() async {
+    if (_isGeneratingStudyPack) return;
+    setState(() => _isGeneratingStudyPack = true);
+    try {
+      final response = await _authenticatedPost(
+        _weeklyStudyPackEndpoint,
+        body: jsonEncode({
+          'daily_minutes': _studyPackDailyMinutes,
+          'regenerate': _weeklyStudyPack != null,
+        }),
+      ).timeout(const Duration(seconds: 15));
+      if (!mounted) return;
+      if (response.statusCode < 200 || response.statusCode >= 300) {
+        throw HttpException('Server returned ${response.statusCode}.');
+      }
+      final pack = WeeklyStudyPackInfo.fromJson(
+        _decodeJsonObject(response.body),
+      );
+      setState(() => _weeklyStudyPack = pack);
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Text('五日紙本包已完成排版，完成碼是 ${pack.packCode}。'),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+    } on TimeoutException {
+      if (mounted) _showCheatSheetError('紙本包排版超時，請再試一次。');
+    } catch (_) {
+      if (mounted) _showCheatSheetError('目前無法建立紙本包，請確認後端連線。');
+    } finally {
+      if (mounted) setState(() => _isGeneratingStudyPack = false);
+    }
+  }
+
+  Future<void> _downloadWeeklyStudyPack() async {
+    final pack = _weeklyStudyPack;
+    if (pack == null || _isDownloadingStudyPack) return;
+    setState(() => _isDownloadingStudyPack = true);
+    try {
+      final response = await _authenticatedGet(
+        AppConfig.apiUri('/user/weekly-study-pack/${pack.id}/pdf'),
+      ).timeout(const Duration(seconds: 20));
+      if (response.statusCode < 200 || response.statusCode >= 300) {
+        throw HttpException('Server returned ${response.statusCode}.');
+      }
+      if (kIsWeb) {
+        throw UnsupportedError('請在 Android 或 iOS 版下載並開啟 PDF。');
+      }
+      final directory = await getApplicationDocumentsDirectory();
+      final week = pack.weekStart?.toIso8601String().split('T').first ??
+          DateTime.now().millisecondsSinceEpoch.toString();
+      final file = File(
+        '${directory.path}${Platform.pathSeparator}gsat-max-weekly-pack-$week.pdf',
+      );
+      await file.writeAsBytes(response.bodyBytes, flush: true);
+      final openResult = await OpenFile.open(file.path);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Text(
+              openResult.type == ResultType.done
+                  ? '紙本學習包已開啟，可以直接列印。'
+                  : 'PDF 已儲存到 ${file.path}',
+            ),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+    } catch (error) {
+      if (mounted) {
+        _showCheatSheetError(
+          error is UnsupportedError
+              ? error.message?.toString() ?? '此平台暫時無法開啟 PDF。'
+              : '紙本 PDF 下載失敗，請確認網路後重試。',
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isDownloadingStudyPack = false);
+    }
+  }
+
+  Future<void> _openPaperCompletionDialog() async {
+    final pack = _weeklyStudyPack;
+    if (pack == null) return;
+    _paperPackCodeController.clear();
+    final selectedDays = <int>{};
+    final result = await showDialog<Set<int>>(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: const Text('回填紙本進度'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('輸入列印頁首頁的完成碼，再勾選這次完成的天數。'),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: _paperPackCodeController,
+                  textCapitalization: TextCapitalization.characters,
+                  decoration: const InputDecoration(
+                    labelText: '8 位完成碼',
+                    prefixIcon: Icon(Icons.password_rounded),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                for (var day = 1; day <= 5; day++)
+                  CheckboxListTile(
+                    contentPadding: EdgeInsets.zero,
+                    value: pack.completedDays.contains(day) ||
+                        selectedDays.contains(day),
+                    onChanged: pack.completedDays.contains(day)
+                        ? null
+                        : (selected) {
+                            setDialogState(() {
+                              if (selected == true) {
+                                selectedDays.add(day);
+                              } else {
+                                selectedDays.remove(day);
+                              }
+                            });
+                          },
+                    title: Text(
+                      pack.completedDays.contains(day)
+                          ? 'Day $day（已同步）'
+                          : 'Day $day',
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: const Text('取消'),
+            ),
+            FilledButton(
+              onPressed: () {
+                if (_paperPackCodeController.text.trim().length < 6 ||
+                    selectedDays.isEmpty) {
+                  return;
+                }
+                Navigator.of(dialogContext).pop(Set<int>.from(selectedDays));
+              },
+              child: const Text('同步完成紀錄'),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (result == null || result.isEmpty) return;
+    await _completePaperDays(result);
+  }
+
+  Future<void> _completePaperDays(Set<int> days) async {
+    setState(() => _isCompletingStudyPack = true);
+    try {
+      final response = await _authenticatedPost(
+        _completeWeeklyStudyPackEndpoint,
+        body: jsonEncode({
+          'pack_code': _paperPackCodeController.text.trim().toUpperCase(),
+          'completed_days': days.toList()..sort(),
+        }),
+      ).timeout(const Duration(seconds: 10));
+      if (!mounted) return;
+      final data = _decodeJsonObject(response.body);
+      if (response.statusCode < 200 || response.statusCode >= 300) {
+        throw StateError(_stringFromAny(
+          data['detail'],
+          fallback: '完成碼或天數無法驗證。',
+        ));
+      }
+      final rawPack = data['pack'];
+      final reward = LearningRewardFeedback.maybeFromJson(data);
+      if (rawPack is Map) {
+        setState(() {
+          _weeklyStudyPack = WeeklyStudyPackInfo.fromJson(
+            Map<String, dynamic>.from(rawPack),
+          );
+        });
+      }
+      if (reward != null && reward.awarded) {
+        await showModalBottomSheet<void>(
+          context: context,
+          backgroundColor: Colors.transparent,
+          builder: (context) => _LearningWinSheet(reward: reward),
+        );
+      }
+    } catch (error) {
+      if (mounted) {
+        _showCheatSheetError(error.toString().replaceFirst('Bad state: ', ''));
+      }
+    } finally {
+      if (mounted) setState(() => _isCompletingStudyPack = false);
     }
   }
 
@@ -6087,6 +7031,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       AppConfig.apiUri('/daily-expansion-quiz/submit');
   static final Uri _dailyScheduleEndpoint =
       AppConfig.apiUri('/user/daily-schedule');
+  static final Uri _dailyScheduleReplanEndpoint =
+      AppConfig.apiUri('/user/daily-schedule/replan');
   static final Uri _weeklyReportEndpoint =
       AppConfig.apiUri('/user/weekly-report');
   final MissionProgressStore _missionProgressStore = MissionProgressStore();
@@ -6102,6 +7048,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   bool _isMissionLoading = true;
   bool _isSubmittingExpansion = false;
   bool _isLoadingWeeklyReport = false;
+  bool _isReplanningMission = false;
   bool _isRating = false;
   bool _isFlipped = false;
   bool _isDismissing = false;
@@ -6143,7 +7090,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               completedIndexes: _completedMissionIndexes,
               isWeeklyReportDay: DateTime.now().weekday == DateTime.sunday,
               isLoadingWeeklyReport: _isLoadingWeeklyReport,
+              isReplanning: _isReplanningMission,
               onToggle: _toggleMissionTask,
+              onSelectMinutes: _replanDailySchedule,
               onOpenWeeklyReport: _openWeeklyReport,
               onStartReview: () {
                 Scrollable.ensureVisible(
@@ -6436,12 +7385,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         body: jsonEncode({'completed': shouldComplete}),
       ).timeout(const Duration(seconds: 8));
       if (response.statusCode >= 200 && response.statusCode < 300) {
+        final responseData = _decodeJsonObject(response.body);
+        final reward = LearningRewardFeedback.maybeFromJson(responseData);
         if (userId > 0) {
           await _missionProgressStore.clearOverride(
             userId: userId,
             day: DateTime.now(),
             taskId: task.id,
           );
+        }
+        if (reward != null && reward.awarded && mounted) {
+          setState(() {
+            final schedule = _missionSchedule;
+            if (schedule != null) {
+              _missionSchedule = schedule.withReward(reward);
+            }
+          });
+          await _showMissionReward(reward);
         }
         return;
       }
@@ -6452,6 +7412,64 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         'Task saved on this device. It will sync when the backend is reachable.',
       );
     }
+  }
+
+  Future<void> _replanDailySchedule(int minutes) async {
+    if (_isReplanningMission || _missionSchedule?.availableMinutes == minutes) {
+      return;
+    }
+    setState(() {
+      _isReplanningMission = true;
+      _missionError = null;
+    });
+    unawaited(HapticFeedback.selectionClick());
+    try {
+      final response = await _authenticatedPost(
+        _dailyScheduleReplanEndpoint,
+        body: jsonEncode({'available_minutes': minutes}),
+      ).timeout(const Duration(seconds: 8));
+      if (!mounted) return;
+      if (response.statusCode < 200 || response.statusCode >= 300) {
+        throw HttpException('Planner returned ${response.statusCode}.');
+      }
+      final schedule =
+          StudyMissionSchedule.fromJson(_decodeJsonObject(response.body));
+      setState(() {
+        _missionSchedule = schedule;
+        _completedMissionIndexes
+          ..clear()
+          ..addAll(
+            schedule.tasks
+                .asMap()
+                .entries
+                .where((entry) => entry.value.status == 'completed')
+                .map((entry) => entry.key),
+          );
+      });
+      _showHomeSnack('${schedule.availableMinutes} 分鐘計畫已排好；做完就可以停。');
+    } on TimeoutException {
+      if (mounted) _showHomeSnack('重新安排超時，原本的任務仍然保留。');
+    } catch (_) {
+      if (mounted) _showHomeSnack('目前無法重新安排，原本的任務仍然保留。');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isReplanningMission = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _showMissionReward(LearningRewardFeedback reward) async {
+    unawaited(reward.levelUp
+        ? HapticFeedback.heavyImpact()
+        : HapticFeedback.mediumImpact());
+    await showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      showDragHandle: false,
+      builder: (context) => _LearningWinSheet(reward: reward),
+    );
   }
 
   Future<void> _replayMissionOverrides({
@@ -6734,6 +7752,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     });
     unawaited(_cacheReviewCards(_queue));
 
+    _showHomeSnack(
+      switch (rating) {
+        _MemoryRating.hard => '誠實標記「還不熟」也算進步：系統會更快帶你再見一次。',
+        _MemoryRating.good => '這個字已經比剛才更穩，明天再加固一次。',
+        _MemoryRating.easy => '掌握得很漂亮，間隔已延長到 4 天。',
+      },
+    );
+
     if (_queue.isEmpty) {
       unawaited(NotificationService.instance.cancelTodaysReviewReminder());
     }
@@ -6746,7 +7772,9 @@ class _TodayMissionDashboard extends StatelessWidget {
     required this.completedIndexes,
     required this.isWeeklyReportDay,
     required this.isLoadingWeeklyReport,
+    required this.isReplanning,
     required this.onToggle,
+    required this.onSelectMinutes,
     required this.onOpenWeeklyReport,
     required this.onStartReview,
   });
@@ -6755,7 +7783,9 @@ class _TodayMissionDashboard extends StatelessWidget {
   final Set<int> completedIndexes;
   final bool isWeeklyReportDay;
   final bool isLoadingWeeklyReport;
+  final bool isReplanning;
   final ValueChanged<int> onToggle;
+  final ValueChanged<int> onSelectMinutes;
   final VoidCallback onOpenWeeklyReport;
   final VoidCallback onStartReview;
 
@@ -6816,6 +7846,56 @@ class _TodayMissionDashboard extends StatelessWidget {
                 _CountdownChip(daysRemaining: schedule.daysRemaining),
               ],
             ),
+            const SizedBox(height: 14),
+            _RewardMomentumPanel(summary: schedule.rewardSummary),
+            const SizedBox(height: 16),
+            Text(
+              '今天能留多少時間給英文？',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w900,
+                  ),
+            ),
+            const SizedBox(height: 5),
+            Text(
+              schedule.encouragement,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: kTextTertiary,
+                    height: 1.35,
+                  ),
+            ),
+            const SizedBox(height: 10),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                for (final minutes in const [3, 10, 20, 45])
+                  ChoiceChip(
+                    selected: schedule.availableMinutes == minutes,
+                    onSelected:
+                        isReplanning ? null : (_) => onSelectMinutes(minutes),
+                    avatar: Icon(
+                      minutes == 3
+                          ? Icons.battery_1_bar_rounded
+                          : minutes == 10
+                              ? Icons.bolt_rounded
+                              : minutes == 20
+                                  ? Icons.timer_rounded
+                                  : Icons.school_rounded,
+                      size: 18,
+                    ),
+                    label: Text('$minutes 分鐘'),
+                  ),
+                if (isReplanning)
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                    child: Icon(
+                      Icons.auto_awesome_rounded,
+                      color: kElectricBlue,
+                      size: 18,
+                    ),
+                  ),
+              ],
+            ),
             if (isWeeklyReportDay) ...[
               const SizedBox(height: 14),
               SizedBox(
@@ -6838,7 +7918,7 @@ class _TodayMissionDashboard extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(
-                    '已完成 $completed / $total 項任務',
+                    '已完成 $completed / $total 項 · ${schedule.plannedMinutes} 分鐘',
                     style: Theme.of(context).textTheme.labelLarge?.copyWith(
                           color: kTextSecondary,
                           fontWeight: FontWeight.w900,
@@ -6936,10 +8016,175 @@ class _TodayMissionDashboard extends StatelessWidget {
               child: FilledButton.icon(
                 onPressed: onStartReview,
                 icon: const Icon(Icons.style_rounded),
-                label: const Text('開始單字複習'),
+                label: Text(
+                  schedule.canStopWhenComplete ? '開始單字複習 · 做完就收工' : '開始單字複習',
+                ),
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _RewardMomentumPanel extends StatelessWidget {
+  const _RewardMomentumPanel({required this.summary});
+
+  final LearningRewardSummary? summary;
+
+  @override
+  Widget build(BuildContext context) {
+    final value = summary;
+    if (value == null) {
+      return Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: kNeonGreen.withOpacity(0.07),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: kNeonGreen.withOpacity(0.22)),
+        ),
+        child: const Row(
+          children: [
+            Icon(Icons.auto_awesome_rounded, color: kNeonGreen),
+            SizedBox(width: 10),
+            Expanded(child: Text('先完成第一個小任務，今天的進步就成立。')),
+          ],
+        ),
+      );
+    }
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: kNeonGreen.withOpacity(0.07),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: kNeonGreen.withOpacity(0.28)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.auto_awesome_rounded, color: kNeonGreen),
+              const SizedBox(width: 8),
+              Text(
+                'Lv.${value.level}',
+                style: const TextStyle(
+                  color: kNeonGreen,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  '${value.totalPoints} 成長點',
+                  style: const TextStyle(fontWeight: FontWeight.w900),
+                ),
+              ),
+              Text(
+                '本週 ${value.weeklyActiveDays}/${value.weeklyGoalDays} 天',
+                style: const TextStyle(
+                  color: kTextSecondary,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          LinearProgressIndicator(
+            value: value.levelProgress,
+            minHeight: 6,
+            borderRadius: BorderRadius.circular(999),
+            backgroundColor: Colors.white.withOpacity(0.06),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            value.headline,
+            style: const TextStyle(color: kTextSecondary, height: 1.35),
+          ),
+          if (value.streakShields > 0) ...[
+            const SizedBox(height: 5),
+            Text(
+              '本週保護卡 ${value.streakShields} 張：偶爾休息一天，不會把努力全部歸零。',
+              style: const TextStyle(color: kTextTertiary, fontSize: 11),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _LearningWinSheet extends StatelessWidget {
+  const _LearningWinSheet({required this.reward});
+
+  final LearningRewardFeedback reward;
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      top: false,
+      child: CleanCard(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 22, 20, 18),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TweenAnimationBuilder<double>(
+                tween: Tween(begin: 0.75, end: 1),
+                duration: const Duration(milliseconds: 420),
+                curve: Curves.elasticOut,
+                builder: (context, scale, child) =>
+                    Transform.scale(scale: scale, child: child),
+                child: Container(
+                  width: 64,
+                  height: 64,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: kNeonGreen.withOpacity(0.14),
+                    border: Border.all(color: kNeonGreen, width: 2),
+                  ),
+                  child: Icon(
+                    reward.levelUp
+                        ? Icons.workspace_premium_rounded
+                        : Icons.check_rounded,
+                    color: kNeonGreen,
+                    size: 34,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 14),
+              Text(
+                reward.levelUp
+                    ? '升級到 Lv.${reward.level}'
+                    : '+${reward.points} 成長點',
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      color: kNeonGreen,
+                      fontWeight: FontWeight.w900,
+                    ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                reward.message,
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: kTextSecondary, height: 1.45),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                '累積 ${reward.totalPoints} 點',
+                style: const TextStyle(color: kTextTertiary),
+              ),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('繼續下一小步'),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -7013,23 +8258,22 @@ class _MissionTaskRow extends StatelessWidget {
                 ],
               ),
             ),
-            if (task.priority == 'high')
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
-                decoration: BoxDecoration(
-                  color: kElectricBlue.withOpacity(0.12),
-                  borderRadius: BorderRadius.circular(999),
-                  border: Border.all(color: kElectricBlue.withOpacity(0.38)),
-                ),
-                child: const Text(
-                  'HIGH',
-                  style: TextStyle(
-                    color: kElectricBlue,
-                    fontWeight: FontWeight.w900,
-                    fontSize: 11,
-                  ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+              decoration: BoxDecoration(
+                color: kElectricBlue.withOpacity(0.12),
+                borderRadius: BorderRadius.circular(999),
+                border: Border.all(color: kElectricBlue.withOpacity(0.38)),
+              ),
+              child: Text(
+                '+${task.rewardPoints}',
+                style: const TextStyle(
+                  color: kElectricBlue,
+                  fontWeight: FontWeight.w900,
+                  fontSize: 11,
                 ),
               ),
+            ),
           ],
         ),
       ),
@@ -7193,12 +8437,14 @@ class _CountdownChip extends StatelessWidget {
 
 String _missionTaskLabel(StudyMissionTask task) {
   return switch (task.type) {
+    'micro_win' => '一分鐘開場勝利',
     'vocab' => '單字衝刺',
     'grammar' || 'grammar_concept' => '文法觀念訓練',
     'mixed_questions' => '混合題訓練',
     'reading_practice' => '閱讀練習',
     'writing_sprint' => '寫作衝刺',
     'final_review' => '考前總複習',
+    'confidence_recap' => '信心收尾回想',
     _ => _conceptLabel(task.type),
   };
 }
@@ -7208,6 +8454,7 @@ String _missionTaskMeta(StudyMissionTask task) {
   if (task.count != null) parts.add('${task.count} 題');
   if (task.minutes != null) parts.add('${task.minutes} 分鐘');
   if (task.topic != null) parts.add(task.topic!);
+  if (task.rewardPoints > 0) parts.add('+${task.rewardPoints} 成長點');
   return parts.join(' · ');
 }
 

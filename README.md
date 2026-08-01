@@ -41,6 +41,11 @@ JWT_SECRET_KEY=replace-with-at-least-32-random-characters
 OPENAI_API_KEY=
 OPENAI_BASE_URL=https://api.openai.com/v1
 CODEX_MODEL=gpt-4o-mini
+AI_PROVIDER_ORDER=gemini,groq,openai,ollama
+GEMINI_API_KEY=
+GEMINI_MODEL=gemini-2.5-flash
+GROQ_API_KEY=
+GROQ_MODEL=openai/gpt-oss-20b
 OLLAMA_BASE_URL=http://localhost:11434
 OLLAMA_MODEL=llama3.1
 REVENUECAT_WEBHOOK_AUTH=
@@ -53,6 +58,24 @@ OCR 還需要在後端主機安裝 Tesseract；Windows 可執行：
 ```powershell
 winget install --id tesseract-ocr.tesseract --exact
 ```
+
+### 免費 AI 路由
+
+後端所有文字生成共用同一個 provider router，預設順序是 `Gemini -> Groq -> OpenAI -> Ollama`。前一個服務遇到 timeout、429 或 5xx 時會自動嘗試下一個，回傳的 `performance_metrics` 也會標記實際使用的 provider 與 model。
+
+- `GEMINI_API_KEY`：預設 `gemini-2.5-flash`，支援文字與圖片，適合作為免費層主力。
+- `GROQ_API_KEY`：預設 `openai/gpt-oss-20b`，適合低延遲文字生成與 Gemini 限額後的 fallback。
+- `OPENAI_API_KEY`：付費備援；未填寫就自動略過。
+- `OLLAMA_BASE_URL`：本機最終備援，不需 API Key，但主機必須已啟動 Ollama 並下載指定模型。
+
+API Key 只放在後端 `.env`，Flutter App 不保存第三方 AI Secret。`AI_REDACT_STUDENT_PII=true` 會在送出文字前遮蔽常見 Email、手機、身分證字號與姓名欄位。免費雲端方案的資料使用條款與速率限制可能變動，Closed Beta 前仍需在各供應商後台確認未成年學生資料政策。
+
+### 短時段與紙本學習
+
+- Home 可依當下可用的 `3 / 10 / 20 / 45` 分鐘即時重排，第一個任務固定是高成功率的微型勝利。
+- 完成任務、單字複習與紙本日會累積成長點、等級、本週活躍天數與溫和連續學習保護卡；所有計分事件皆使用 idempotency key，離線重送不會重複加分。
+- Settings 可保存平日／週末預算、偏好衝刺時間、每週目標與溫和 streak。
+- Profile 可生成五日 A4 紙本學習包，含單字、文法、短篇閱讀、答案頁、完成碼及家長／老師簽名區；回到 App 後可回填完成天數並同步點數。
 
 ## Flutter 啟動
 

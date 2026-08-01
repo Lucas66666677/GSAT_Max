@@ -49,3 +49,12 @@
 - [ ] Build an Android APK locally (blocked by missing Android SDK on this workstation).
 - [ ] Perform real AI, OCR, notification, RevenueCat sandbox, and store-device acceptance.
 - [ ] Continue incremental `lib/main.dart` and backend router/service decomposition after beta stabilization.
+
+## Phase 8 - Learning Momentum and Low-Screen Access
+
+- [x] Add learner-owned weekday/weekend budgets and instant 3/10/20/45-minute replanning.
+- [x] Add high-success micro wins, effort-based points, levels, weekly goals, comeback tracking, and one-day streak shields.
+- [x] Add an idempotent learning event ledger so offline retries cannot duplicate rewards.
+- [x] Generate five-day A4 paper packs with vocabulary, grammar, reading, answer keys, completion codes, and progress sync.
+- [x] Add Gemini/Groq/OpenAI/Ollama provider routing, fallback metrics, and basic student-text PII redaction.
+- [x] Add migration and behavior tests for all new persistence and document workflows.

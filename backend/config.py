@@ -20,6 +20,13 @@ def _csv_environment(name: str, default: str = "") -> tuple[str, ...]:
     )
 
 
+def _bool_environment(name: str, default: bool) -> bool:
+    value = os.getenv(name)
+    if value is None:
+        return default
+    return value.strip().lower() in {"1", "true", "yes", "on"}
+
+
 def _tesseract_command() -> str | None:
     configured = os.getenv("TESSERACT_CMD")
     if configured:
@@ -56,6 +63,14 @@ class Settings:
     codex_model: str
     openai_timeout_seconds: float
     openai_max_retries: int
+    ai_provider_order: tuple[str, ...]
+    gemini_base_url: str
+    gemini_api_key: str | None
+    gemini_model: str
+    groq_base_url: str
+    groq_api_key: str | None
+    groq_model: str
+    ai_redact_student_pii: bool
     default_user_email: str
     jwt_secret_key: str
     jwt_expire_minutes: int
@@ -112,6 +127,23 @@ def load_settings() -> Settings:
         codex_model=os.getenv("CODEX_MODEL", os.getenv("OPENAI_MODEL", "gpt-4o-mini")),
         openai_timeout_seconds=float(os.getenv("OPENAI_TIMEOUT_SECONDS", "90")),
         openai_max_retries=max(1, int(os.getenv("OPENAI_MAX_RETRIES", "3"))),
+        ai_provider_order=_csv_environment(
+            "AI_PROVIDER_ORDER",
+            "gemini,groq,openai,ollama",
+        ),
+        gemini_base_url=os.getenv(
+            "GEMINI_BASE_URL",
+            "https://generativelanguage.googleapis.com/v1beta/openai",
+        ).rstrip("/"),
+        gemini_api_key=os.getenv("GEMINI_API_KEY") or None,
+        gemini_model=os.getenv("GEMINI_MODEL", "gemini-2.5-flash"),
+        groq_base_url=os.getenv(
+            "GROQ_BASE_URL",
+            "https://api.groq.com/openai/v1",
+        ).rstrip("/"),
+        groq_api_key=os.getenv("GROQ_API_KEY") or None,
+        groq_model=os.getenv("GROQ_MODEL", "openai/gpt-oss-20b"),
+        ai_redact_student_pii=_bool_environment("AI_REDACT_STUDENT_PII", True),
         default_user_email=os.getenv("DEFAULT_USER_EMAIL", "demo@student.local"),
         jwt_secret_key=os.getenv("JWT_SECRET_KEY", "change-this-dev-secret"),
         jwt_expire_minutes=int(os.getenv("JWT_EXPIRE_MINUTES", "30")),
