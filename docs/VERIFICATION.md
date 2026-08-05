@@ -6,9 +6,12 @@ Verified on Windows 11, Python 3.11.9, Flutter 3.44.7, Dart 3.12.2.
 | --- | --- |
 | `flutter pub get` | PASS |
 | `flutter analyze` | PASS, no issues found; executed through `C:\gsat_max_workspace` ASCII junction to avoid the Flutter analysis-server JSON bug on a Chinese workspace path |
-| `flutter test` | PASS, 23 tests |
+| `flutter test` | PASS, 26 tests |
 | `flutter build web --release` | PASS, output `build/web` |
-| Browser UI smoke test | PASS; `/#/login` rendered correctly and browser console had no errors |
+| Responsive Browser UI smoke test | PASS; release build completed register -> five-question onboarding -> Home -> Diagnostic -> Profile on 1440x1000 desktop, 820x1180 iPad, and 390x844 phone; no horizontal overflow and no new release-console errors |
+| Web PDF download | PASS; Profile download action displayed success and the authenticated backend response was verified as a valid `%PDF` file |
+| PWA/SEO metadata | PASS; Traditional Chinese manifest, install metadata, shortcuts, robots, theme and social metadata are included |
+| Production Web API routing | PASS; `/api` same-origin URL resolution and non-HTTPS production rejection are covered by Flutter tests |
 | Python `compileall` | PASS |
 | Backend `pytest` | PASS, 27 tests |
 | Clean FastAPI startup | PASS |
@@ -27,7 +30,8 @@ Verified on Windows 11, Python 3.11.9, Flutter 3.44.7, Dart 3.12.2.
 | Tesseract OCR executable | PASS; Tesseract 5.5.3 recognized `backend/tests/fixtures/exam_sample.png` and the OCR/error-expansion persistence test passes |
 | Real AI inference | BLOCKED: no Owner API key / Ollama runtime |
 | RevenueCat sandbox | BLOCKED: no Owner store products or account configuration |
+| Docker Compose image build | OWNER ACTION: production Dockerfiles, Nginx proxy and Compose stack are present; Docker is not installed on this workstation, so image build was not executable locally |
 
 Backend coverage includes protected route boundaries, registration/session refresh rotation, email verification, password reset, direct Pro upgrade rejection, time-budget mission persistence, reward idempotency, printable study packs, target date, vocabulary review, SM-2, sync idempotency, MIME rejection, OCR persistence, writing schema validation, mock answer-key sanitization, authoritative mock grading, AI provider fallback, PII redaction, and background job status.
 
-The Web release build reports Wasm dry-run incompatibilities in third-party secure-storage/timezone/TTS packages. The normal JavaScript Web release build succeeds. Package update notices are informational; dependencies remain locked by `pubspec.lock` for the RC.
+The Web release build reports Wasm dry-run incompatibilities in third-party secure-storage/timezone/TTS packages. The normal JavaScript Web release build succeeds and is the supported Web target for this RC. Package update notices are informational; dependencies remain locked by `pubspec.lock`.

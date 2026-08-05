@@ -21,8 +21,6 @@ import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
-import 'package:open_file/open_file.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
@@ -31,6 +29,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import 'core/config/app_config.dart';
 import 'core/services/background_job_poller.dart';
+import 'core/services/file_download_service.dart';
 import 'core/services/purchase_service.dart';
 import 'core/services/target_exam_date_service.dart';
 import 'core/storage/mission_progress_store.dart';
@@ -53,6 +52,9 @@ const String kTelemetryCrashLogsKey = 'telemetry_crash_logs_v1';
 const String kAppModeKey = 'settings_app_mode_v1';
 const String kWeeklyReportPersonaKey = 'settings_weekly_report_persona_v1';
 const double kTabletBreakpoint = 600;
+const double kNavigationRailBreakpoint = 900;
+const double kDesktopBreakpoint = 1200;
+const double kMaxContentWidth = 1120;
 
 enum AppMode { focus, engagement }
 
@@ -2803,7 +2805,7 @@ class _GsatEnglishAppState extends ConsumerState<GsatEnglishApp> {
       theme: ThemeData(
         useMaterial3: true,
         brightness: Brightness.dark,
-        fontFamily: 'Roboto',
+        fontFamily: 'NotoSansTC',
         colorScheme: ColorScheme.fromSeed(
           seedColor: primaryColor,
           brightness: Brightness.dark,
@@ -3131,12 +3133,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                   if (_isRegisterMode) ...[
                     const SizedBox(height: 14),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: kSurfaceGlass,
+                    Material(
+                      color: kSurfaceGlass,
+                      shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: kGlassBorder),
+                        side: const BorderSide(color: kGlassBorder),
                       ),
+                      clipBehavior: Clip.antiAlias,
                       child: Column(
                         children: [
                           CheckboxListTile(
@@ -4012,15 +4015,48 @@ class MainScreen extends ConsumerWidget {
     final streak = ref.watch(authControllerProvider).currentStreak;
     final syncController = ref.watch(reviewSyncControllerProvider);
     final isFocusMode = ref.watch(appModeControllerProvider).isFocus;
+    final width = MediaQuery.sizeOf(context).width;
+    final compactAppBar = width < 520;
+    final useNavigationRail = width >= kNavigationRailBreakpoint;
+    final extendNavigationRail = width >= kDesktopBreakpoint;
+    final animatedPage = TweenAnimationBuilder<double>(
+      key: ValueKey(navigationShell.currentIndex),
+      tween: Tween(begin: 0, end: 1),
+      duration: const Duration(milliseconds: 260),
+      curve: Curves.easeOutCubic,
+      builder: (context, value, child) {
+        return Opacity(
+          opacity: value,
+          child: Transform.translate(
+            offset: Offset((1 - value) * 10, 0),
+            child: child,
+          ),
+        );
+      },
+      child: navigationShell,
+    );
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('GSAT_Max'),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('GSAT_Max'),
+            if (kIsWeb && !compactAppBar) ...[
+              const SizedBox(width: 10),
+              const _WebAppBadge(),
+            ],
+          ],
+        ),
         actions: [
           if (navigationShell.currentIndex == 0 ||
               navigationShell.currentIndex == 1) ...[
-            const _AppModeToggle(),
-            const SizedBox(width: 8),
+            if (compactAppBar)
+              const _CompactAppModeButton()
+            else ...[
+              const _AppModeToggle(),
+              const SizedBox(width: 8),
+            ],
           ],
           if (syncController.hasPendingActions || syncController.isSyncing) ...[
             _SyncStatusBadge(
@@ -4038,67 +4074,131 @@ class MainScreen extends ConsumerWidget {
             tooltip: '登出',
             onPressed: () => _confirmLogout(context, ref),
             icon: const Icon(Icons.logout_rounded),
+            visualDensity:
+                compactAppBar ? VisualDensity.compact : VisualDensity.standard,
+            constraints:
+                compactAppBar ? const BoxConstraints.tightFor(width: 40) : null,
           ),
-          const SizedBox(width: 8),
+          if (!compactAppBar) const SizedBox(width: 8),
         ],
       ),
-      body: TweenAnimationBuilder<double>(
-        key: ValueKey(navigationShell.currentIndex),
-        tween: Tween(begin: 0, end: 1),
-        duration: const Duration(milliseconds: 260),
-        curve: Curves.easeOutCubic,
-        builder: (context, value, child) {
-          return Opacity(
-            opacity: value,
-            child: Transform.translate(
-              offset: Offset((1 - value) * 10, 0),
-              child: child,
-            ),
-          );
-        },
-        child: navigationShell,
-      ),
+      body: useNavigationRail
+          ? Row(
+              children: [
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: isFocusMode
+                        ? const Color(0xFF101010)
+                        : const Color(0xF0141922),
+                    border: const Border(
+                      right: BorderSide(color: kGlassBorder),
+                    ),
+                  ),
+                  child: NavigationRail(
+                    extended: extendNavigationRail,
+                    minWidth: 76,
+                    minExtendedWidth: 220,
+                    groupAlignment: -0.85,
+                    backgroundColor: Colors.transparent,
+                    selectedIndex: navigationShell.currentIndex,
+                    onDestinationSelected: _goBranch,
+                    labelType: extendNavigationRail
+                        ? NavigationRailLabelType.none
+                        : NavigationRailLabelType.selected,
+                    indicatorColor:
+                        Theme.of(context).colorScheme.primary.withOpacity(0.16),
+                    selectedIconTheme: IconThemeData(
+                      color: Theme.of(context).colorScheme.primary,
+                      size: 25,
+                    ),
+                    unselectedIconTheme: const IconThemeData(
+                      color: kTextTertiary,
+                      size: 23,
+                    ),
+                    selectedLabelTextStyle: TextStyle(
+                      color: Theme.of(context).colorScheme.primary,
+                      fontWeight: FontWeight.w900,
+                    ),
+                    unselectedLabelTextStyle: const TextStyle(
+                      color: kTextSecondary,
+                      fontWeight: FontWeight.w700,
+                    ),
+                    destinations: const [
+                      NavigationRailDestination(
+                        icon: Icon(Icons.home_outlined),
+                        selectedIcon: Icon(Icons.home_rounded),
+                        label: Text('首頁'),
+                      ),
+                      NavigationRailDestination(
+                        icon: Icon(Icons.quiz_outlined),
+                        selectedIcon: Icon(Icons.quiz_rounded),
+                        label: Text('診斷'),
+                      ),
+                      NavigationRailDestination(
+                        icon: Icon(Icons.menu_book_outlined),
+                        selectedIcon: Icon(Icons.menu_book_rounded),
+                        label: Text('閱讀'),
+                      ),
+                      NavigationRailDestination(
+                        icon: Icon(Icons.edit_note_outlined),
+                        selectedIcon: Icon(Icons.edit_note_rounded),
+                        label: Text('寫作'),
+                      ),
+                      NavigationRailDestination(
+                        icon: Icon(Icons.person_outline_rounded),
+                        selectedIcon: Icon(Icons.person_rounded),
+                        label: Text('個人'),
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(child: animatedPage),
+              ],
+            )
+          : animatedPage,
       floatingActionButton: FloatingActionButton.extended(
         heroTag: 'zen-mode-fab',
         onPressed: () => context.push('/zen'),
         icon: const Icon(Icons.self_improvement_rounded),
         label: const Text('專注'),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: navigationShell.currentIndex,
-        onTap: _goBranch,
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: Theme.of(context).colorScheme.primary,
-        unselectedItemColor: kTextTertiary,
-        showUnselectedLabels: true,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined),
-            activeIcon: Icon(Icons.home_rounded),
-            label: '首頁',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.quiz_outlined),
-            activeIcon: Icon(Icons.quiz_rounded),
-            label: '診斷',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.menu_book_outlined),
-            activeIcon: Icon(Icons.menu_book_rounded),
-            label: '閱讀',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.edit_note_outlined),
-            activeIcon: Icon(Icons.edit_note_rounded),
-            label: '寫作',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline_rounded),
-            activeIcon: Icon(Icons.person_rounded),
-            label: '個人',
-          ),
-        ],
-      ),
+      bottomNavigationBar: useNavigationRail
+          ? null
+          : BottomNavigationBar(
+              currentIndex: navigationShell.currentIndex,
+              onTap: _goBranch,
+              type: BottomNavigationBarType.fixed,
+              selectedItemColor: Theme.of(context).colorScheme.primary,
+              unselectedItemColor: kTextTertiary,
+              showUnselectedLabels: true,
+              items: const [
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.home_outlined),
+                  activeIcon: Icon(Icons.home_rounded),
+                  label: '首頁',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.quiz_outlined),
+                  activeIcon: Icon(Icons.quiz_rounded),
+                  label: '診斷',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.menu_book_outlined),
+                  activeIcon: Icon(Icons.menu_book_rounded),
+                  label: '閱讀',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.edit_note_outlined),
+                  activeIcon: Icon(Icons.edit_note_rounded),
+                  label: '寫作',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.person_outline_rounded),
+                  activeIcon: Icon(Icons.person_rounded),
+                  label: '個人',
+                ),
+              ],
+            ),
     );
   }
 
@@ -4123,6 +4223,49 @@ class MainScreen extends ConsumerWidget {
     if (shouldLogout == true) {
       await ref.read(authControllerProvider).logout();
     }
+  }
+}
+
+class _WebAppBadge extends StatelessWidget {
+  const _WebAppBadge();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: kElectricBlue.withOpacity(0.12),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: kElectricBlue.withOpacity(0.38)),
+      ),
+      child: const Text(
+        'WEB',
+        style: TextStyle(
+          color: Color(0xFF72AFFF),
+          fontSize: 10,
+          fontWeight: FontWeight.w900,
+        ),
+      ),
+    );
+  }
+}
+
+class _CompactAppModeButton extends ConsumerWidget {
+  const _CompactAppModeButton();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isFocus = ref.watch(appModeControllerProvider).isFocus;
+    return IconButton(
+      tooltip: isFocus ? '切換為互動模式' : '切換為專注模式',
+      onPressed: () => ref.read(appModeControllerProvider).toggle(),
+      visualDensity: VisualDensity.compact,
+      constraints: const BoxConstraints.tightFor(width: 40),
+      icon: Icon(
+        isFocus ? Icons.contrast_rounded : Icons.bolt_rounded,
+        color: isFocus ? Colors.white : kNeonGreen,
+      ),
+    );
   }
 }
 
@@ -6485,7 +6628,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'GSAT Skill Radar',
+                      '學測英文能力雷達',
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
                             fontWeight: FontWeight.w900,
                           ),
@@ -6495,12 +6638,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       height: 260,
                       child: CustomPaint(
                         painter: _SkillRadarPainter(
-                          labels: const [
-                            'Vocabulary',
-                            'Grammar',
-                            'Reading',
-                            'Writing'
-                          ],
+                          labels: const ['單字', '文法', '閱讀', '寫作'],
                           values: radarValues
                               .map((value) => value.toDouble())
                               .toList(),
@@ -6622,27 +6760,19 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       if (response.statusCode < 200 || response.statusCode >= 300) {
         throw HttpException('Server returned ${response.statusCode}.');
       }
-      if (kIsWeb) {
-        throw UnsupportedError('請在 Android 或 iOS 版下載並開啟 PDF。');
-      }
-      final directory = await getApplicationDocumentsDirectory();
       final week = pack.weekStart?.toIso8601String().split('T').first ??
           DateTime.now().millisecondsSinceEpoch.toString();
-      final file = File(
-        '${directory.path}${Platform.pathSeparator}gsat-max-weekly-pack-$week.pdf',
+      final downloadResult = await saveDownloadedFile(
+        response.bodyBytes,
+        fileName: 'gsat-max-weekly-pack-$week.pdf',
+        mimeType: 'application/pdf',
       );
-      await file.writeAsBytes(response.bodyBytes, flush: true);
-      final openResult = await OpenFile.open(file.path);
       if (!mounted) return;
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
         ..showSnackBar(
           SnackBar(
-            content: Text(
-              openResult.type == ResultType.done
-                  ? '紙本學習包已開啟，可以直接列印。'
-                  : 'PDF 已儲存到 ${file.path}',
-            ),
+            content: Text(downloadResult.message),
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -6797,30 +6927,19 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         );
       }
 
-      if (kIsWeb) {
-        throw UnsupportedError(
-          'PDF opening is available in the Android and iOS beta builds.',
-        );
-      }
-
-      final directory = await getApplicationDocumentsDirectory();
       final timestamp = DateTime.now().millisecondsSinceEpoch;
-      final file = File(
-        '${directory.path}${Platform.pathSeparator}gsat-final-week-cheat-sheet-$timestamp.pdf',
+      final downloadResult = await saveDownloadedFile(
+        response.bodyBytes,
+        fileName: 'gsat-final-week-cheat-sheet-$timestamp.pdf',
+        mimeType: 'application/pdf',
       );
-      await file.writeAsBytes(response.bodyBytes, flush: true);
-      final openResult = await OpenFile.open(file.path);
 
       if (!mounted) return;
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
         ..showSnackBar(
           SnackBar(
-            content: Text(
-              openResult.type == ResultType.done
-                  ? 'Cheat sheet downloaded and opened.'
-                  : 'Cheat sheet saved: ${file.path}',
-            ),
+            content: Text(downloadResult.message),
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -7968,7 +8087,7 @@ class _TodayMissionDashboard extends StatelessWidget {
             ),
             const SizedBox(height: 14),
             Text(
-              'Countdown Curve',
+              '學測倒數成長曲線',
               style: Theme.of(context).textTheme.labelLarge?.copyWith(
                     color: kTextSecondary,
                     fontWeight: FontWeight.w900,
@@ -16194,76 +16313,73 @@ class _DiagnosticScreenState extends State<DiagnosticScreen> {
           subtitle: '上傳考卷、找出弱點，讓 AI 建立個人化複習計畫。',
         ),
         const SizedBox(height: 18),
-        ActionPanel(
-          icon: Icons.timer_outlined,
-          title: '完整學測模擬考',
-          description: '以 100 分鐘限時完成閱讀、文法與寫作，練習正式考試節奏。',
-          buttonLabel: '開始模擬考',
-          heroTag: 'time-attack-simulator-flow',
-          onPressed: () => context.push('/exam-simulator'),
-        ),
-        const SizedBox(height: 16),
-        ActionPanel(
-          icon: Icons.quiz_outlined,
-          title: '文法測驗',
-          description: '產生符合學測難度的適性文法題，作答後立即查看解析。',
-          buttonLabel: '開始測驗',
-          heroTag: 'grammar-quiz-flow',
-          onPressed: () => context.push('/grammar-quiz'),
-        ),
-        const SizedBox(height: 16),
-        ActionPanel(
-          icon: Icons.fact_check_outlined,
-          title: '錯題本',
-          description: '集中複習曾答錯的文法觀念，並用 AI 救贖挑戰重新攻克。',
-          buttonLabel: '開啟錯題本',
-          heroTag: 'error-ledger-flow',
-          onPressed: () => context.push('/error-ledger'),
-        ),
-        const SizedBox(height: 16),
-        ActionPanel(
-          icon: Icons.account_tree_outlined,
-          title: '篇章結構訓練',
-          description: '拖曳關鍵句回正確段落，練習判斷文章脈絡與銜接。',
-          buttonLabel: '開始篇章結構',
-          heroTag: 'discourse-training-flow',
-          onPressed: () => context.push('/discourse'),
-        ),
-        const SizedBox(height: 16),
-        ActionPanel(
-          icon: Icons.dashboard_customize_outlined,
-          title: '混合題訓練',
-          description: '練習雙文本、選擇題與可獲部分分數的簡答題。',
-          buttonLabel: '開始混合題',
-          heroTag: 'mixed-questions-flow',
-          onPressed: () => context.push('/mixed-questions'),
-        ),
-        const SizedBox(height: 16),
-        ActionPanel(
-          icon: Icons.translate_rounded,
-          title: '中翻英練習',
-          description: '依學測標準嚴格扣分，並標示需要修正的字詞。',
-          buttonLabel: '開始中翻英',
-          heroTag: 'translation-practice-flow',
-          onPressed: () => context.push('/translation-practice'),
-        ),
-        const SizedBox(height: 16),
-        ActionPanel(
-          icon: Icons.extension_rounded,
-          title: '動態文意選填',
-          description: '將學測高頻片語與搭配詞拖入正確空格。',
-          buttonLabel: '開始文意選填',
-          heroTag: 'cloze-practice-flow',
-          onPressed: () => context.push('/cloze-practice'),
-        ),
-        const SizedBox(height: 16),
-        ActionPanel(
-          icon: Icons.upgrade_rounded,
-          title: '句子升級',
-          description: '使用進階句型改寫基礎句，提升學測英文寫作表現。',
-          buttonLabel: '開始句子升級',
-          heroTag: 'sentence-level-up-flow',
-          onPressed: () => context.push('/sentence-level-up'),
+        _ResponsiveActionGrid(
+          children: [
+            ActionPanel(
+              icon: Icons.timer_outlined,
+              title: '完整學測模擬考',
+              description: '以 100 分鐘限時完成閱讀、文法與寫作，練習正式考試節奏。',
+              buttonLabel: '開始模擬考',
+              heroTag: 'time-attack-simulator-flow',
+              onPressed: () => context.push('/exam-simulator'),
+            ),
+            ActionPanel(
+              icon: Icons.quiz_outlined,
+              title: '文法測驗',
+              description: '產生符合學測難度的適性文法題，作答後立即查看解析。',
+              buttonLabel: '開始測驗',
+              heroTag: 'grammar-quiz-flow',
+              onPressed: () => context.push('/grammar-quiz'),
+            ),
+            ActionPanel(
+              icon: Icons.fact_check_outlined,
+              title: '錯題本',
+              description: '集中複習曾答錯的文法觀念，並用 AI 救贖挑戰重新攻克。',
+              buttonLabel: '開啟錯題本',
+              heroTag: 'error-ledger-flow',
+              onPressed: () => context.push('/error-ledger'),
+            ),
+            ActionPanel(
+              icon: Icons.account_tree_outlined,
+              title: '篇章結構訓練',
+              description: '拖曳關鍵句回正確段落，練習判斷文章脈絡與銜接。',
+              buttonLabel: '開始篇章結構',
+              heroTag: 'discourse-training-flow',
+              onPressed: () => context.push('/discourse'),
+            ),
+            ActionPanel(
+              icon: Icons.dashboard_customize_outlined,
+              title: '混合題訓練',
+              description: '練習雙文本、選擇題與可獲部分分數的簡答題。',
+              buttonLabel: '開始混合題',
+              heroTag: 'mixed-questions-flow',
+              onPressed: () => context.push('/mixed-questions'),
+            ),
+            ActionPanel(
+              icon: Icons.translate_rounded,
+              title: '中翻英練習',
+              description: '依學測標準嚴格扣分，並標示需要修正的字詞。',
+              buttonLabel: '開始中翻英',
+              heroTag: 'translation-practice-flow',
+              onPressed: () => context.push('/translation-practice'),
+            ),
+            ActionPanel(
+              icon: Icons.extension_rounded,
+              title: '動態文意選填',
+              description: '將學測高頻片語與搭配詞拖入正確空格。',
+              buttonLabel: '開始文意選填',
+              heroTag: 'cloze-practice-flow',
+              onPressed: () => context.push('/cloze-practice'),
+            ),
+            ActionPanel(
+              icon: Icons.upgrade_rounded,
+              title: '句子升級',
+              description: '使用進階句型改寫基礎句，提升學測英文寫作表現。',
+              buttonLabel: '開始句子升級',
+              heroTag: 'sentence-level-up-flow',
+              onPressed: () => context.push('/sentence-level-up'),
+            ),
+          ],
         ),
         const SizedBox(height: 16),
         CleanCard(
@@ -18485,9 +18601,26 @@ class AppPage extends StatelessWidget {
             ],
           ),
         ),
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(18, 8, 18, 24),
-          children: children,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final width = constraints.maxWidth;
+            final horizontalPadding = width >= kDesktopBreakpoint
+                ? math.max(28.0, (width - kMaxContentWidth) / 2)
+                : width >= kTabletBreakpoint
+                    ? 28.0
+                    : 18.0;
+            return Scrollbar(
+              child: ListView(
+                padding: EdgeInsets.fromLTRB(
+                  horizontalPadding,
+                  8,
+                  horizontalPadding,
+                  28,
+                ),
+                children: children,
+              ),
+            );
+          },
         ),
       ),
     );
@@ -18747,6 +18880,36 @@ class CleanCard extends StatelessWidget {
                   filter: ui.ImageFilter.blur(sigmaX: 18, sigmaY: 18),
                   child: card,
                 ),
+        );
+      },
+    );
+  }
+}
+
+class _ResponsiveActionGrid extends StatelessWidget {
+  const _ResponsiveActionGrid({required this.children});
+
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final columns = constraints.maxWidth >= 1040
+            ? 3
+            : constraints.maxWidth >= 680
+                ? 2
+                : 1;
+        const spacing = 16.0;
+        final itemWidth =
+            (constraints.maxWidth - spacing * (columns - 1)) / columns;
+        return Wrap(
+          spacing: spacing,
+          runSpacing: spacing,
+          children: [
+            for (final child in children)
+              SizedBox(width: itemWidth, child: child),
+          ],
         );
       },
     );

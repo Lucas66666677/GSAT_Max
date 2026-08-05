@@ -36,12 +36,39 @@ class AppConfig {
   static bool get hasRevenueCatKey => revenueCatApiKey.trim().isNotEmpty;
 
   static Uri apiUri(String path) {
-    final base = apiBaseUrl.endsWith('/')
-        ? apiBaseUrl.substring(0, apiBaseUrl.length - 1)
-        : apiBaseUrl;
+    return resolveApiUri(
+      baseUrl: apiBaseUrl,
+      path: path,
+      web: kIsWeb,
+      pageUri: Uri.base,
+      production: isProduction,
+    );
+  }
+
+  static Uri resolveApiUri({
+    required String baseUrl,
+    required String path,
+    required bool web,
+    required Uri pageUri,
+    required bool production,
+  }) {
+    final trimmedBase = baseUrl.trim();
+    if (trimmedBase.isEmpty) {
+      throw StateError('API_BASE_URL cannot be empty.');
+    }
+    final base = trimmedBase.endsWith('/')
+        ? trimmedBase.substring(0, trimmedBase.length - 1)
+        : trimmedBase;
     final normalizedPath = path.startsWith('/') ? path : '/$path';
-    final uri = Uri.parse('$base$normalizedPath');
-    if (isProduction && uri.scheme != 'https') {
+    final isSameOriginWebPath = web && base.startsWith('/');
+    final uri = isSameOriginWebPath
+        ? pageUri.resolve('$base$normalizedPath')
+        : Uri.parse('$base$normalizedPath');
+    if (!uri.hasScheme || uri.host.isEmpty) {
+      throw StateError('API_BASE_URL must be absolute outside Flutter Web.');
+    }
+    final isLocalHost = uri.host == 'localhost' || uri.host == '127.0.0.1';
+    if (production && uri.scheme != 'https' && !isLocalHost) {
       throw StateError('Production API_BASE_URL must use HTTPS.');
     }
     return uri;

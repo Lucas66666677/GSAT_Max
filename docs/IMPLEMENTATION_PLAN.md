@@ -58,3 +58,12 @@
 - [x] Generate five-day A4 paper packs with vocabulary, grammar, reading, answer keys, completion codes, and progress sync.
 - [x] Add Gemini/Groq/OpenAI/Ollama provider routing, fallback metrics, and basic student-text PII redaction.
 - [x] Add migration and behavior tests for all new persistence and document workflows.
+
+## Phase 9 - Responsive Website and PWA Delivery
+
+- [x] Reuse the authenticated Flutter application as a responsive Web/PWA instead of a separate marketing shell.
+- [x] Add phone, iPad and desktop breakpoints, max content widths, adaptive navigation rail, and one/two/three-column feature grids.
+- [x] Add Web-native PDF downloads, same-origin `/api` resolution, production HTTPS guards, and expanded local CORS origins.
+- [x] Add Traditional Chinese PWA/SEO metadata, robots, caching/security headers, and bundled Noto Sans TC typography.
+- [x] Add Nginx/FastAPI Dockerfiles, a persistent SQLite Compose stack, Web build/start scripts, and CI Web artifacts.
+- [x] Verify the release UI through register, onboarding, Home, Diagnostic, Profile and PDF download at desktop, iPad and phone viewports.

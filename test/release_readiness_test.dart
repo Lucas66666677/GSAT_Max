@@ -40,6 +40,28 @@ void main() {
     expect(AppConfig.apiBaseUrl, 'http://localhost:8000');
   });
 
+  test('AppConfig resolves production Web API paths against the same origin',
+      () {
+    final uri = AppConfig.resolveApiUri(
+      baseUrl: '/api',
+      path: '/user/stats',
+      web: true,
+      pageUri: Uri.parse('https://learn.gsat-max.tw/#/home'),
+      production: true,
+    );
+    expect(uri, Uri.parse('https://learn.gsat-max.tw/api/user/stats'));
+    expect(
+      () => AppConfig.resolveApiUri(
+        baseUrl: 'http://api.gsat-max.tw',
+        path: '/health',
+        web: true,
+        pageUri: Uri.parse('https://learn.gsat-max.tw'),
+        production: true,
+      ),
+      throwsStateError,
+    );
+  });
+
   test('daily mission overrides persist locally and expire by day', () async {
     final preferences = await SharedPreferences.getInstance();
     final store = MissionProgressStore(preferences: preferences);
@@ -343,6 +365,53 @@ void main() {
       await _openTab(tester, label);
       expect(tester.takeException(), isNull, reason: '$label overflowed');
     }
+  });
+
+  testWidgets('iPad portrait keeps the touch-friendly bottom navigation',
+      (tester) async {
+    tester.view.physicalSize = const Size(820, 1180);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final auth = _StaticAuthController(signedIn: true);
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [authControllerProvider.overrideWith((ref) => auth)],
+        child: const GsatEnglishApp(),
+      ),
+    );
+    await tester.pump(const Duration(milliseconds: 600));
+
+    expect(find.byType(BottomNavigationBar), findsOneWidget);
+    expect(find.byType(NavigationRail), findsNothing);
+    await _openTab(tester, '閱讀');
+    expect(find.byType(ReadingVocabScreen), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('desktop uses a navigation rail and multi-column diagnostics',
+      (tester) async {
+    tester.view.physicalSize = const Size(1440, 1000);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final auth = _StaticAuthController(signedIn: true);
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [authControllerProvider.overrideWith((ref) => auth)],
+        child: const GsatEnglishApp(),
+      ),
+    );
+    await tester.pump(const Duration(milliseconds: 600));
+
+    expect(find.byType(NavigationRail), findsOneWidget);
+    expect(find.byType(BottomNavigationBar), findsNothing);
+    await _openTab(tester, '診斷');
+    final firstCard = tester.getTopLeft(find.text('開始模擬考'));
+    final secondCard = tester.getTopLeft(find.text('開始測驗'));
+    expect((firstCard.dy - secondCard.dy).abs(), lessThan(4));
+    expect(secondCard.dx, greaterThan(firstCard.dx + 200));
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('delete account requires destructive confirmation',

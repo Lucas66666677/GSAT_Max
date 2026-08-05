@@ -38,4 +38,5 @@ android/app/google-services.json
 ios/Runner/GoogleService-Info.plist
 artifacts/*.apk
 artifacts/*.aab
+artifacts/*.zip
 artifacts/verification/

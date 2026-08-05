@@ -43,3 +43,7 @@ flutter:
   uses-material-design: true
   assets:
     - assets/
+  fonts:
+    - family: NotoSansTC
+      fonts:
+        - asset: backend/assets/fonts/NotoSansTC-Regular.ttf

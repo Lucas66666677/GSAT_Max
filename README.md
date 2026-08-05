@@ -1,12 +1,13 @@
 # GSAT_Max
 
-GSAT_Max 是面向台灣高中生的學測英文訓練 App。前端使用 Flutter、Riverpod、GoRouter 與 Material 3；後端使用 FastAPI、SQLAlchemy 與 SQLite。
+GSAT_Max 是面向台灣高中生的學測英文訓練系統。同一套 Flutter 前端同時交付 Android、iOS 與可安裝的 Web/PWA；後端使用 FastAPI、SQLAlchemy 與 SQLite。手機、iPad 與桌機網頁共用帳號、學習進度與 AI 功能。
 
 ## 已驗證環境
 
 - Python 3.11
 - Flutter 3.44.7 / Dart 3.12.2
 - Chrome Web release build
+- Responsive Web release：手機單欄、iPad 雙欄、桌機側邊導覽與三欄功能區
 - Android 為 Closed Beta 第一目標；本機建置仍需 Android Studio、Android SDK 與 Emulator
 
 > Windows 注意：目前工作區路徑含中文。若 Flutter 工具出現路徑解析或 analyzer crash，請先建立 ASCII junction，再從該目錄執行 Flutter 指令：
@@ -94,6 +95,30 @@ Chrome：
   --dart-define=API_BASE_URL=http://localhost:8000
 ```
 
+## Web 網站開發與佈署
+
+開發時可用上方 `flutter run -d chrome`。產出可佈署網站：
+
+```powershell
+.\scripts\build_web.ps1 -ApiBaseUrl /api -Environment production
+```
+
+產物在 `build/web`，內含 PWA manifest、SEO metadata、robots 與靜態安全 header。Web 版 PDF 直接使用瀏覽器原生下載，不會呼叫行動平台的檔案 API。
+
+本機同時啟動前後端：
+
+```powershell
+.\scripts\start_full_stack.ps1
+```
+
+生產環境可使用根目錄 `compose.yaml`，Nginx 提供 SPA/PWA 並將同源 `/api` 反向代理到 FastAPI，避免 CORS 與 mixed-content 問題：
+
+```powershell
+docker compose up --build -d
+```
+
+完整 HTTPS、domain、reverse proxy 與環境變數說明見 `docs/WEB_DEPLOYMENT.md`。
+
 Android Emulator：
 
 ```powershell
@@ -127,11 +152,13 @@ App Icon 與 Splash 已生成。替換 `assets/icon.png`、`assets/splash.png` �
 - `lib/main.dart`：現有功能 UI 與主要流程
 - `lib/core/config/app_config.dart`：跨平台 API／RevenueCat build 設定
 - `lib/core/services/purchase_service.dart`：RevenueCat 購買與恢復介面
+- `lib/core/services/file_download_service*.dart`：Web/行動平台 PDF 下載與開啟
 - `backend/main.py`：API、認證、AI、背景工作與資料流程
 - `backend/models.py`：SQLAlchemy 模型
 - `backend/seed_data.py`：可重複執行的 GSAT Seed CLI
 - `backend/tests/`、`test/`：後端與 Flutter 自動化測試
 - `docs/`：執行計畫、驗證紀錄與 Owner Actions
+- `deploy/`、`compose.yaml`：Web Nginx + FastAPI 的生產容器化佈署
 
 ## 外部服務
 

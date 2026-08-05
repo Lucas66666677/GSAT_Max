@@ -1,13 +1,32 @@
 {
-    "name": "gsat_max",
-    "short_name": "gsat_max",
+    "name": "GSAT_Max 學測英文訓練系統",
+    "short_name": "GSAT_Max",
+    "id": "/",
     "start_url": ".",
+    "scope": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
-    "orientation": "portrait-primary",
+    "background_color": "#121212",
+    "theme_color": "#121212",
+    "description": "為台灣高中生打造的學測英文訓練系統。",
+    "lang": "zh-TW",
+    "dir": "ltr",
+    "orientation": "any",
+    "categories": ["education", "productivity"],
     "prefer_related_applications": false,
+    "shortcuts": [
+        {
+            "name": "今日任務",
+            "short_name": "首頁",
+            "url": "./#/home",
+            "icons": [{"src": "icons/Icon-192.png", "sizes": "192x192"}]
+        },
+        {
+            "name": "AI 診斷中心",
+            "short_name": "診斷",
+            "url": "./#/diagnostic",
+            "icons": [{"src": "icons/Icon-192.png", "sizes": "192x192"}]
+        }
+    ],
     "icons": [
         {
             "src": "icons/Icon-192.png",

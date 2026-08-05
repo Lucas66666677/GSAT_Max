@@ -10,8 +10,9 @@
 
 - Git 安全基準與初始 RC commit：`0545dfa`；本輪功能與驗收證據會以獨立 RC commit 收錄，尚不建立 release tag。
 - `flutter analyze`：PASS。
-- `flutter test`：23 tests PASS，新增短時段排程、正回饋與紙本包資料契約，並持續涵蓋 Router、登入恢復、Refresh 成敗、離線 session、API host、任務持久化、SyncQueue、背景 job、Writing、Paywall、五分頁與小螢幕 overflow。
-- `flutter build web`：PASS。
+- `flutter test`：26 tests PASS，新增同源 Web API、production HTTPS guard、iPad 導覽與桌機多欄佈局，並持續涵蓋 Router、登入恢復、Refresh 成敗、離線 session、任務持久化、SyncQueue、背景 job、Writing、Paywall、五分頁與小螢幕 overflow。
+- `flutter build web --release`：PASS；同一站點支援手機、iPad 與桌機，PWA/SEO metadata、Noto Sans TC、Web PDF 下載與 `/api` 同源代理均已就緒。
+- 真實瀏覽器：桌機 1440x1000、iPad 820x1180、手機 390x844 的 register -> onboarding -> Home -> Diagnostic -> Profile 與 PDF 下載 PASS，無水平 overflow。
 - `pytest backend/tests -q`：27 tests PASS，新增 3/10/20/45 分鐘預算、微型勝利、點數冪等、完成任務保留、五日 PDF 紙本包、完成碼、Gemini/Groq fallback 與 PII 遮蔽。PDF 使用內附 Noto Sans TC 字形嵌入，7 頁 A4 實際渲染與繁中版面檢查 PASS。
 - Alembic：新 head `9c52b7f79fd4`；空資料庫 upgrade/downgrade PASS，baseline 既有資料安全升級 PASS，真實專案 DB 已升級。
 - Seed：實際 SQLite 為 513 vocab／50 grammar；連續兩次執行皆新增 0／0。
@@ -39,6 +40,7 @@
 - RevenueCat：OWNER ACTION。需要正式 public SDK key、產品 Offering、商店 sandbox 帳號與 webhook Secret。
 - Email provider：OWNER ACTION。development provider 已驗證 token 流程，正式寄信供應商尚未設定。
 - 正式 HTTPS API host：OWNER ACTION。實機 Closed Beta 不可使用 Emulator 專用 `10.0.2.2`。
+- 公開網站 domain/TLS：OWNER ACTION。Docker/Nginx/Compose 與佈署文件已完成；本機無 Docker，未實際 build image 或上線到公開網址。
 
 ## 可重跑命令
 

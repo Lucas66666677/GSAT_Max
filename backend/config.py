@@ -117,7 +117,8 @@ def load_settings() -> Settings:
         database_url=os.getenv("DATABASE_URL", default_db),
         cors_origins=_csv_environment(
             "API_CORS_ORIGINS",
-            "http://localhost:3000,http://localhost:5173,http://localhost:8080",
+            "http://localhost:3000,http://localhost:5173,http://localhost:8080,"
+            "http://127.0.0.1:3000,http://127.0.0.1:5173,http://127.0.0.1:8080",
         ),
         ollama_base_url=os.getenv("OLLAMA_BASE_URL", "http://localhost:11434").rstrip("/"),
         ollama_model=os.getenv("OLLAMA_MODEL", "llama3.1"),
