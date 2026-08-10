@@ -198,7 +198,7 @@ class NotificationService {
     tz.initializeTimeZones();
     try {
       final localTimeZone = await FlutterTimezone.getLocalTimezone();
-      tz.setLocalLocation(tz.getLocation(localTimeZone));
+      tz.setLocalLocation(tz.getLocation(localTimeZone.identifier));
     } catch (_) {
       // Fall back to the timezone package default if the platform timezone is unavailable.
     }

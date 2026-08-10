@@ -18,7 +18,7 @@ dependencies:
   flutter_riverpod: ^2.5.1
   go_router: ^14.2.7
   flutter_local_notifications: ^17.2.4
-  flutter_timezone: ^1.0.8
+  flutter_timezone: 5.1.0
   audioplayers: ^6.1.0
   confetti: ^0.8.0
   http: ^1.6.0
