@@ -3,6 +3,12 @@ name: GSAT_Max CI
 on:
   push:
   pull_request:
+  workflow_dispatch:
+      inputs:
+        api_base_url:
+          description: "Backend API base URL for the Flutter web build"
+          required: true
+          default: "/api"
 
 jobs:
   backend:
@@ -31,7 +37,7 @@ jobs:
       - run: dart format --output=none --set-exit-if-changed lib test integration_test
       - run: flutter analyze
       - run: flutter test
-      - run: flutter build web --release --dart-define=APP_ENV=production --dart-define=API_BASE_URL=/api
+      - run: flutter build web --release --dart-define=APP_ENV=production --dart-define=API_BASE_URL=${{ github.event_name == 'workflow_dispatch' && inputs.api_base_url || '/api' }}
       - run: flutter build apk --debug --dart-define=API_BASE_URL=http://10.0.2.2:8000
       - uses: actions/upload-artifact@v4
         with:
