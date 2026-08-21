@@ -1,5 +1,5 @@
 name: gsat_max
-description: GSAT_Max - A Flutter app for Taiwanese high school students preparing for the English GSAT.
+description: GSAT Max by Lucirel - A Flutter app for Taiwanese high school students preparing for the English GSAT.
 publish_to: "none"
 version: 0.1.0+1
 
@@ -43,6 +43,7 @@ flutter:
   uses-material-design: true
   assets:
     - assets/
+    - assets/brand/
   fonts:
     - family: NotoSansTC
       fonts:

@@ -296,7 +296,7 @@ void main() {
     await tester.pump(const Duration(milliseconds: 350));
 
     expect(find.byType(LoginScreen), findsOneWidget);
-    expect(find.text('GSAT_Max'), findsOneWidget);
+    expect(find.text('GSAT Max'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
