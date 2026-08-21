@@ -1,6 +1,6 @@
-# GSAT_Max
+# GSAT Max by Lucirel
 
-GSAT_Max 是面向台灣高中生的學測英文訓練系統。同一套 Flutter 前端同時交付 Android、iOS 與可安裝的 Web/PWA；後端使用 FastAPI、SQLAlchemy 與 SQLite。手機、iPad 與桌機網頁共用帳號、學習進度與 AI 功能。
+GSAT Max 是 Lucirel 面向台灣高中生打造的學測英文訓練系統。同一套 Flutter 前端同時交付 Android、iOS 與可安裝的 Web/PWA；後端使用 FastAPI、SQLAlchemy 與 SQLite。手機、iPad 與桌機網頁共用帳號、學習進度與 AI 功能。
 
 ## 已驗證環境
 

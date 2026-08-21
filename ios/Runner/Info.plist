@@ -7,7 +7,7 @@
 		<key>CFBundleDevelopmentRegion</key>
 		<string>$(DEVELOPMENT_LANGUAGE)</string>
 		<key>CFBundleDisplayName</key>
-		<string>GSAT_Max</string>
+		<string>GSAT Max</string>
 		<key>CFBundleExecutable</key>
 		<string>$(EXECUTABLE_NAME)</string>
 		<key>CFBundleIdentifier</key>
@@ -27,11 +27,11 @@
 		<key>LSRequiresIPhoneOS</key>
 		<true/>
 		<key>NSCameraUsageDescription</key>
-		<string>GSAT_Max uses the camera to scan exam papers and handwritten essays.</string>
+		<string>GSAT Max uses the camera to scan exam papers and handwritten essays.</string>
 		<key>NSPhotoLibraryUsageDescription</key>
-		<string>GSAT_Max uses selected photos to analyze exam papers, writing prompts, and essays.</string>
+		<string>GSAT Max uses selected photos to analyze exam papers, writing prompts, and essays.</string>
 		<key>NSLocalNetworkUsageDescription</key>
-		<string>GSAT_Max connects to your local development server while testing.</string>
+		<string>GSAT Max connects to your local development server while testing.</string>
 		<key>NSAppTransportSecurity</key>
 		<dict>
 			<key>NSAllowsLocalNetworking</key>
