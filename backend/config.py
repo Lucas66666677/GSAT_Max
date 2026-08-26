@@ -12,6 +12,15 @@ BACKEND_ROOT = Path(__file__).resolve().parent
 load_dotenv(PROJECT_ROOT / ".env", override=False)
 
 
+def normalize_database_url(url: str) -> str:
+    """Select the installed psycopg 3 driver for provider-style URLs."""
+    if url.startswith("postgres://"):
+        return url.replace("postgres://", "postgresql+psycopg://", 1)
+    if url.startswith("postgresql://"):
+        return url.replace("postgresql://", "postgresql+psycopg://", 1)
+    return url
+
+
 def _csv_environment(name: str, default: str = "") -> tuple[str, ...]:
     return tuple(
         item.strip().rstrip("/")
@@ -114,7 +123,7 @@ def load_settings() -> Settings:
     default_db = f"sqlite:///{(BACKEND_ROOT / 'gsat_english.db').as_posix()}"
     settings = Settings(
         app_env=os.getenv("APP_ENV", "development"),
-        database_url=os.getenv("DATABASE_URL", default_db),
+        database_url=normalize_database_url(os.getenv("DATABASE_URL", default_db)),
         cors_origins=_csv_environment(
             "API_CORS_ORIGINS",
             "http://localhost:3000,http://localhost:5173,http://localhost:8080,"
