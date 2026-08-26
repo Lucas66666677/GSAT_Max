@@ -23,6 +23,7 @@ from alembic import command as alembic_command
 from alembic.config import Config as AlembicConfig
 from fastapi import BackgroundTasks, Depends, FastAPI, File, Form, Header, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.responses import StreamingResponse
 from PIL import Image
 from pydantic import BaseModel, Field, ValidationError
@@ -180,6 +181,12 @@ app.add_middleware(
     allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allow_headers=["Authorization", "Content-Type", "X-Request-ID"],
 )
+trusted_hosts = [
+    item.strip()
+    for item in os.getenv("TRUSTED_HOSTS", "localhost,127.0.0.1,testserver").split(",")
+    if item.strip()
+]
+app.add_middleware(TrustedHostMiddleware, allowed_hosts=trusted_hosts)
 
 
 class PerformanceMetrics(BaseModel):

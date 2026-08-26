@@ -41,6 +41,14 @@ def _metrics() -> PerformanceMetrics:
     )
 
 
+def test_trusted_host_middleware_rejects_unknown_host(client: TestClient) -> None:
+    response = client.get("/health", headers={"host": "evil.example.com"})
+    assert response.status_code == 400
+
+    allowed = client.get("/health", headers={"host": "testserver"})
+    assert allowed.status_code == 200
+
+
 def test_logout_revokes_refresh_token(client: TestClient) -> None:
     email = f"logout-{uuid.uuid4().hex}@example.com"
     registered = client.post(
