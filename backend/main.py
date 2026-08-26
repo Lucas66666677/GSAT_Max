@@ -148,7 +148,18 @@ DEFAULT_USER_EMAIL = settings.default_user_email
 JWT_SECRET_KEY = settings.jwt_secret_key
 JWT_ALGORITHM = "HS256"
 JWT_EXPIRE_MINUTES = settings.jwt_expire_minutes
-PASSWORD_HASH_ITERATIONS = 120_000
+# OWASP's headline figure for PBKDF2-HMAC-SHA256 is 600k, but its actual advice
+# is to tune the cost to roughly one second on the hardware you run on. Measured
+# on this deployment's Render free tier (0.1 CPU): 120k already costs ~1s per
+# login, and 600k would cost ~5s -- unusable, and a DoS amplifier against a
+# single shared tenth of a core. So the default stays 120k *for this hardware*
+# and the cost is env-tunable instead: raise PASSWORD_HASH_ITERATIONS as soon as
+# the service moves to paid compute. Existing users are upgraded automatically
+# on their next successful login (see maybe_upgrade_password_hash), because the
+# iteration count is stored per-hash rather than assumed.
+PASSWORD_HASH_ITERATIONS = max(
+    120_000, int(os.getenv("PASSWORD_HASH_ITERATIONS", "120000"))
+)
 _RATE_LIMIT_BUCKETS: dict[str, deque[float]] = defaultdict(deque)
 _RATE_LIMIT_LOCK = Lock()
 
@@ -1187,6 +1198,32 @@ def verify_password(password: str, stored_hash: str | None) -> bool:
         return False
 
 
+def password_hash_is_outdated(stored_hash: str | None) -> bool:
+    """True when a verified hash was made with a weaker cost than we now use."""
+    if not stored_hash:
+        return False
+    try:
+        algorithm, iterations_text, _salt, _expected = stored_hash.split("$", 3)
+    except ValueError:
+        return False
+    if algorithm != "pbkdf2_sha256":
+        return True
+    try:
+        return int(iterations_text) < PASSWORD_HASH_ITERATIONS
+    except ValueError:
+        return True
+
+
+def maybe_upgrade_password_hash(user: User, password: str) -> None:
+    """Re-hash at the current cost, once, right after a successful login.
+
+    The plaintext is only available here, so this is the sole moment an
+    already-stored hash can be strengthened without forcing a password reset.
+    """
+    if password_hash_is_outdated(user.password_hash):
+        user.password_hash = hash_password(password)
+
+
 def _b64url_encode(data: bytes) -> str:
     return base64.urlsafe_b64encode(data).rstrip(b"=").decode("ascii")
 
@@ -1499,6 +1536,7 @@ def login_user(
     user = db.scalar(select(User).where(User.email == email))
     if user is None or not verify_password(request.password, user.password_hash):
         raise HTTPException(status_code=401, detail="Invalid email or password.")
+    maybe_upgrade_password_hash(user, request.password)
     update_login_streak(user, db)
     db.commit()
     db.refresh(user)

@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import replace
 from datetime import datetime, timedelta
 import asyncio
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -506,3 +507,60 @@ def test_openai_adapter_retries_transient_failures_and_reports_metrics(
     assert text == "verified output"
     assert metrics.total_tokens == 18
     assert metrics.total_time_seconds >= 0
+
+
+def test_login_upgrades_outdated_password_hash(
+    client: TestClient,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A stored hash made at a weaker cost is re-hashed on next login."""
+    email = f"rehash-{uuid.uuid4().hex}@example.com"
+    password = "rehash-password-123"
+    registered = client.post(
+        "/auth/register",
+        json={"email": email, "password": password},
+    )
+    assert registered.status_code == 200, registered.text
+
+    # Simulate an account created before the cost was raised.
+    salt = "a" * 32
+    weak_digest = hashlib.pbkdf2_hmac(
+        "sha256", password.encode("utf-8"), salt.encode("utf-8"), 1000
+    ).hex()
+    weak_hash = f"pbkdf2_sha256$1000${salt}${weak_digest}"
+    with backend_main.SessionLocal() as db:
+        user = db.scalar(select(User).where(User.email == email))
+        assert user is not None
+        user.password_hash = weak_hash
+        db.commit()
+
+    assert backend_main.password_hash_is_outdated(weak_hash) is True
+
+    logged_in = client.post(
+        "/auth/login",
+        json={"email": email, "password": password},
+    )
+    assert logged_in.status_code == 200, logged_in.text
+
+    with backend_main.SessionLocal() as db:
+        user = db.scalar(select(User).where(User.email == email))
+        assert user is not None
+        assert user.password_hash != weak_hash
+        assert user.password_hash.startswith(
+            f"pbkdf2_sha256${backend_main.PASSWORD_HASH_ITERATIONS}$"
+        )
+        assert backend_main.password_hash_is_outdated(user.password_hash) is False
+        # The upgraded hash must still authenticate the same password.
+        assert backend_main.verify_password(password, user.password_hash) is True
+
+
+def test_current_password_hash_is_not_flagged_outdated() -> None:
+    assert (
+        backend_main.password_hash_is_outdated(
+            backend_main.hash_password("some-strong-password")
+        )
+        is False
+    )
+    assert backend_main.password_hash_is_outdated(None) is False
+    assert backend_main.password_hash_is_outdated("garbage") is False
+    assert backend_main.password_hash_is_outdated("bcrypt$12$x$y") is True
