@@ -9,7 +9,3 @@ psycopg[binary]>=3.2.0,<4.0.0
 reportlab>=4.2.0,<5.0.0
 SQLAlchemy>=2.0.30,<3.0.0
 uvicorn[standard]>=0.30.0,<1.0.0
-
-# Development and release verification
-pytest>=9.0.3,<10.0.0
-pytest-asyncio>=1.4.0,<2.0.0

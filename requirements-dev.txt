@@ -1,0 +1,10 @@
+# Test and release-verification tooling.
+#
+# Kept out of requirements.txt because deploy/backend/Dockerfile installs that
+# file directly into the production image -- pytest and its transitive deps have
+# no business shipping to production. CI installs this file instead, so it gets
+# the runtime set plus the test tooling.
+-r requirements.txt
+
+pytest>=9.0.3,<10.0.0
+pytest-asyncio>=1.4.0,<2.0.0
