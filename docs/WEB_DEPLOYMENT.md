@@ -70,6 +70,18 @@ key set untouched and publishes the database password -- so the field names are
 checked and so is what produces each value. Reducing a secret to presence or
 length, as `bool(OPENAI_API_KEY)` does, stays allowed.
 
+The deployment health gate probes `GET /livez`, not `GET /health`. `/health`
+executes a query, so a gate pointed at it reports the backend process as dead
+whenever the database is briefly unreachable and holds back everything gated on
+it. `/livez` consults nothing and returns a literal, which is the question a
+gate asks. `deployment_health_gate_probes_liveness` reads the probe out of
+`compose.yaml` and fails when it drifts onto a dependency-sensitive route or
+becomes unreadable; `liveness_route_consults_no_dependency` fails if `/livez`
+ever grows an injected dependency; `liveness_payload_reads_nothing` fails if it
+grows a field built from anything but a literal; and `/livez` is in
+`REQUIRED_ROUTES`, so deleting it fails the release rather than leaving the gate
+probing a 404.
+
 ## Production checklist
 
 1. Terminate TLS at the hosting platform or an outer reverse proxy.

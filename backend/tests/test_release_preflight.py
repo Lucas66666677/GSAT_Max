@@ -13,11 +13,15 @@ import json
 from pathlib import Path
 import subprocess
 import sys
+from types import SimpleNamespace
 
 import pytest
 
+from backend import main as backend_main
 from backend import release_preflight
 from backend.release_preflight import (
+    LIVENESS_ROUTE,
+    READINESS_ROUTE,
     DatabaseUrlShape,
     ProductionEnvironment,
     check_configuration_shape,
@@ -461,6 +465,143 @@ def test_a_payload_assembled_by_spread_is_not_read_as_clean(tmp_path: Path) -> N
         release_preflight.UNREADABLE_HEALTH_FIELD
         in results["health_contract_matches_the_served_payload"].detail
     )
+
+
+def _stub_liveness_checkout(tmp_path: Path, fields: str) -> Path:
+    """A checkout whose ``backend/main.py`` serves `fields` from the gate route."""
+    backend = tmp_path / "backend"
+    backend.mkdir(exist_ok=True)
+    (backend / "main.py").write_text(
+        f"@app.get('{LIVENESS_ROUTE}', tags=['system'])\n"
+        "def liveness_probe():\n"
+        "    return {\n" + fields + "    }\n",
+        encoding="utf-8",
+    )
+    return tmp_path
+
+
+def _stub_compose(tmp_path: Path, healthcheck: str) -> Path:
+    """A checkout whose ``compose.yaml`` gates the backend on `healthcheck`."""
+    _stub_liveness_checkout(tmp_path, '        "status": "alive",\n')
+    (tmp_path / "compose.yaml").write_text(
+        "services:\n  backend:\n" + healthcheck, encoding="utf-8"
+    )
+    return tmp_path
+
+
+def _urlopen_probe(path: str) -> str:
+    return (
+        "    healthcheck:\n"
+        "      test:\n"
+        "        - CMD\n"
+        "        - python\n"
+        "        - -c\n"
+        "        - \"import urllib.request; urllib.request.urlopen("
+        f"'http://127.0.0.1:8000{path}', timeout=4)\"\n"
+    )
+
+
+def _routes_without(path: str) -> list[object]:
+    return [
+        route
+        for route in backend_main.app.routes
+        if getattr(route, "path", "") != path
+    ]
+
+
+def test_the_health_gate_probes_the_route_the_service_actually_serves(client) -> None:
+    """The gate's path, the declared liveness route, and the live app agree.
+
+    The gate is configuration in a file nothing else reads, so it is the piece
+    most able to drift: a rename here leaves the probe on a 404 and the
+    container permanently unhealthy, with every other check still green.
+    """
+    probe = release_preflight.deployment_health_gate_probe(PROJECT_ROOT)
+    assert probe == LIVENESS_ROUTE
+
+    response = client.get(LIVENESS_ROUTE)
+    assert response.status_code == 200
+    assert response.json() == {"status": "alive"}
+
+
+def test_liveness_answers_from_the_process_and_readiness_does_not() -> None:
+    """The distinction the gate depends on: one route injects, the other cannot.
+
+    If `/livez` ever grows a dependency it stops being a liveness probe, and the
+    gate starts reporting a database blip as a dead process.
+    """
+    dependencies = {
+        route.path: [dependency.name for dependency in route.dependant.dependencies]
+        for route in backend_main.app.routes
+        if getattr(route, "path", "") in {LIVENESS_ROUTE, READINESS_ROUTE}
+    }
+    assert dependencies[LIVENESS_ROUTE] == []
+    assert dependencies[READINESS_ROUTE] != []
+
+
+def test_a_gate_pointed_at_the_readiness_route_is_reported(tmp_path: Path) -> None:
+    root = _stub_compose(tmp_path, _urlopen_probe(READINESS_ROUTE))
+    results = {
+        result.name: result for result in check_health_contract(project_root=root)
+    }
+    gate = results["deployment_health_gate_probes_liveness"]
+    assert gate.passed is False
+    assert READINESS_ROUTE in gate.detail
+
+
+def test_an_unreadable_gate_fails_closed(tmp_path: Path) -> None:
+    """No probe to read is not the same as a correct probe."""
+    root = _stub_compose(tmp_path, "    restart: unless-stopped\n")
+    results = {
+        result.name: result for result in check_health_contract(project_root=root)
+    }
+    assert results["deployment_health_gate_probes_liveness"].passed is False
+
+
+def test_a_liveness_route_that_injects_a_dependency_is_reported(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    injected = SimpleNamespace(
+        path=LIVENESS_ROUTE,
+        methods={"GET"},
+        dependant=SimpleNamespace(dependencies=[SimpleNamespace(name="db")]),
+    )
+    monkeypatch.setattr(
+        backend_main.app.router,
+        "routes",
+        _routes_without(LIVENESS_ROUTE) + [injected],
+    )
+    results = {result.name: result for result in check_health_contract()}
+    assert results["liveness_route_consults_no_dependency"].passed is False
+    assert "db" in results["liveness_route_consults_no_dependency"].detail
+
+
+def test_a_computed_liveness_field_is_reported(tmp_path: Path) -> None:
+    """The gate route is unauthenticated, so a field it computes is public."""
+    root = _stub_liveness_checkout(
+        tmp_path,
+        '        "status": "alive",\n        "dsn": DATABASE_URL,\n',
+    )
+    results = {
+        result.name: result for result in check_health_contract(project_root=root)
+    }
+    payload = results["liveness_payload_reads_nothing"]
+    assert payload.passed is False
+    assert "dsn=DATABASE_URL" in payload.detail
+
+
+def test_dropping_the_liveness_route_is_reported(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The gate probes it, so the route has to stay declared."""
+    assert ("GET", LIVENESS_ROUTE) in release_preflight.REQUIRED_ROUTES
+
+    monkeypatch.setattr(
+        backend_main.app.router, "routes", _routes_without(LIVENESS_ROUTE)
+    )
+    results = {result.name: result for result in check_health_contract()}
+    assert results["required_routes_are_registered"].passed is False
+    assert LIVENESS_ROUTE in results["required_routes_are_registered"].detail
 
 
 # --------------------------------------------------------------------------- #

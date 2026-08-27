@@ -12,8 +12,10 @@ the development defaults rather than the production ones:
    unbroken chain, reversible revisions, and a table set that matches the ORM
    models. A drifting head only surfaces at boot, once the old container is
    already gone.
-3. **Backend health contracts** -- ``/health`` and the auth surface are
-   registered, ``/health`` stays unauthenticated, the Host allowlist runs
+3. **Backend health contracts** -- ``/health``, the ``/livez`` route the
+   deployment health gate probes, and the auth surface are registered, the
+   gate probes liveness rather than the dependency-sensitive readiness
+   route, ``/health`` stays unauthenticated, the Host allowlist runs
    ahead of CORS, and the health payload -- the fields the handler actually
    returns, not just the ones declared here -- exposes neither a secret-shaped
    field name nor a field whose value is built out of a secret.
@@ -119,9 +121,20 @@ SECRET_REDUCING_CALLS: frozenset[str] = frozenset({"bool", "len"})
 #: is no longer readable from the source, so the checks fail rather than guess.
 UNREADABLE_HEALTH_FIELD = "<unreadable>"
 
-#: Routes the mobile and web clients call by these exact paths.
+#: Liveness. Consults nothing, so it reports the process and only the
+#: process -- the question a deployment health gate asks.
+LIVENESS_ROUTE = "/livez"
+
+#: Readiness. Executes a query, so it reports the database too. A gate
+#: pointed here fails on a dependency blip rather than on the process.
+READINESS_ROUTE = "/health"
+
+#: Routes the mobile and web clients call by these exact paths, plus the
+#: liveness route the deployment health gate probes: dropping it would leave
+#: the gate probing a 404 and the service permanently unhealthy.
 REQUIRED_ROUTES: tuple[tuple[str, str], ...] = (
-    ("GET", "/health"),
+    ("GET", LIVENESS_ROUTE),
+    ("GET", READINESS_ROUTE),
     ("POST", "/auth/register"),
     ("POST", "/auth/login"),
     ("POST", "/auth/refresh"),
@@ -131,6 +144,7 @@ REQUIRED_ROUTES: tuple[tuple[str, str], ...] = (
 MINIMUM_JWT_SECRET_LENGTH = 32
 MINIMUM_UPLOAD_BYTES = 1_048_576
 
+_PROBE_URL = re.compile(r"https?://[^\s'\"]+")
 _ENV_LINE = re.compile(r"^\s*(?:export\s+)?([A-Z][A-Z0-9_]*)\s*=(.*)$")
 _DART_DEFINE = re.compile(r"--dart-define=\"?([A-Z][A-Z0-9_]*)=")
 _DART_FROM_ENVIRONMENT = re.compile(
@@ -690,8 +704,10 @@ def check_migration_readiness(
 # --------------------------------------------------------------------------- #
 
 
-def health_payload_sources(project_root: Path = PROJECT_ROOT) -> dict[str, str]:
-    """Map each ``GET /health`` field to the source of the expression behind it.
+def health_payload_sources(
+    project_root: Path = PROJECT_ROOT, *, route: str = READINESS_ROUTE
+) -> dict[str, str]:
+    """Map each field `route` serves to the source of the expression behind it.
 
     Read statically out of ``backend/main.py``: ``/health`` executes a query, and
     the preflight opens no database connection. The parser follows the route
@@ -711,7 +727,7 @@ def health_payload_sources(project_root: Path = PROJECT_ROOT) -> dict[str, str]:
                 isinstance(decorator, ast.Call)
                 and decorator.args
                 and isinstance(decorator.args[0], ast.Constant)
-                and decorator.args[0].value == "/health"
+                and decorator.args[0].value == route
                 for decorator in node.decorator_list
             )
         ),
@@ -771,6 +787,34 @@ def _is_secret_reducing(expression: str) -> bool:
     if isinstance(node, ast.UnaryOp):
         return isinstance(node.op, ast.Not)
     return isinstance(node, ast.Compare)
+
+
+def _is_constant(expression: str) -> bool:
+    """True when the expression is a literal, so producing it reads nothing."""
+    return isinstance(ast.parse(expression, mode="eval").body, ast.Constant)
+
+
+def deployment_health_gate_probe(project_root: Path = PROJECT_ROOT) -> str | None:
+    """The URL path the backend container health gate in ``compose.yaml`` probes.
+
+    ``None`` when no probe can be read at all -- a missing file, a service
+    with no healthcheck, a command with no URL in it. The caller fails closed
+    on ``None`` rather than reading an unreadable gate as a correct one.
+    """
+    # PyYAML ships with `uvicorn[standard]`, so parsing the compose file
+    # properly costs the preflight no dependency of its own.
+    import yaml
+
+    compose = project_root / "compose.yaml"
+    if not compose.is_file():
+        return None
+    document = yaml.safe_load(compose.read_text(encoding="utf-8")) or {}
+    service = (document.get("services") or {}).get("backend") or {}
+    probe = (service.get("healthcheck") or {}).get("test") or []
+    if isinstance(probe, str):
+        probe = [probe]
+    urls = _PROBE_URL.findall(" ".join(str(part) for part in probe))
+    return urlsplit(urls[0]).path or "/" if urls else None
 
 
 def check_health_contract(*, project_root: Path = PROJECT_ROOT) -> list[CheckResult]:
@@ -850,6 +894,67 @@ def check_health_contract(*, project_root: Path = PROJECT_ROOT) -> list[CheckRes
         "every /health field that reads a secret reduces it to presence"
         if not unreduced
         else "unauthenticated /health fields carry secret values: " + "; ".join(unreduced),
+    )
+
+    # A gate is only a liveness gate if the route it probes stays free of
+    # dependencies. Read that off the live route rather than the handler body:
+    # a `Depends(get_db)` anywhere in the signature is what breaks it.
+    live = next(
+        (
+            route
+            for route in backend_main.app.routes
+            if getattr(route, "path", "") == LIVENESS_ROUTE
+        ),
+        None,
+    )
+    injected = [
+        dependency.name
+        for dependency in getattr(
+            getattr(live, "dependant", None), "dependencies", ()
+        )
+    ]
+    checks.add(
+        "liveness_route_consults_no_dependency",
+        live is not None and not injected,
+        f"{LIVENESS_ROUTE} answers from the process alone"
+        if live is not None and not injected
+        else f"{LIVENESS_ROUTE} is not registered"
+        if live is None
+        else f"{LIVENESS_ROUTE} injects {injected}, so the health gate would "
+        "report the process as dead whenever a dependency is unreachable",
+    )
+
+    # The liveness route is unauthenticated too, and a gate probes it more
+    # often than anything else. Requiring literals keeps it from growing a
+    # field that reads configuration at all, secret-shaped or not.
+    live_served = health_payload_sources(project_root, route=LIVENESS_ROUTE)
+    computed = sorted(
+        f"{field}={expression}"
+        for field, expression in live_served.items()
+        if not _is_constant(expression)
+    )
+    checks.add(
+        "liveness_payload_reads_nothing",
+        bool(live_served) and not computed,
+        f"{LIVENESS_ROUTE} serves {len(live_served)} field(s), all literal"
+        if live_served and not computed
+        else f"{LIVENESS_ROUTE} payload could not be read from backend/main.py"
+        if not live_served
+        else f"unauthenticated {LIVENESS_ROUTE} fields are computed: "
+        + "; ".join(computed),
+    )
+
+    probed = deployment_health_gate_probe(project_root)
+    checks.add(
+        "deployment_health_gate_probes_liveness",
+        probed == LIVENESS_ROUTE,
+        f"the backend container health gate probes {LIVENESS_ROUTE}"
+        if probed == LIVENESS_ROUTE
+        else "no health gate probe could be read from compose.yaml"
+        if probed is None
+        else f"the health gate probes {probed}, which is dependency-sensitive: "
+        "a database blip would mark the backend unhealthy and hold back "
+        "everything gated on it",
     )
 
     stack = [middleware.cls for middleware in backend_main.app.user_middleware]
