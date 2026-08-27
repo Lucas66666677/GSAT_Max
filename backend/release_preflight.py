@@ -14,7 +14,9 @@ the development defaults rather than the production ones:
    already gone.
 3. **Backend health contracts** -- ``/health`` and the auth surface are
    registered, ``/health`` stays unauthenticated, the Host allowlist runs
-   ahead of CORS, and the health payload exposes no secret-shaped field.
+   ahead of CORS, and the health payload -- the fields the handler actually
+   returns, not just the ones declared here -- exposes neither a secret-shaped
+   field name nor a field whose value is built out of a secret.
 4. **Frontend-to-backend URL wiring** -- the backend host the web build is
    compiled against is one the backend's own ``TrustedHostMiddleware`` will
    accept, the ``--dart-define`` names the build scripts pass are the ones the
@@ -104,6 +106,18 @@ SECRET_SHAPED_FIELD_MARKERS: tuple[str, ...] = (
     "database_url",
     "dsn",
 )
+
+#: Calls that reduce a value to presence or to a length. A ``/health`` field
+#: whose expression mentions a secret is safe only when it is reduced this way:
+#: ``bool(OPENAI_API_KEY)`` publishes one bit, ``OPENAI_API_KEY`` publishes the
+#: key. This is the same presence-and-length boundary :class:`SecretShape` draws
+#: for the environment, applied to the payload the service serves.
+SECRET_REDUCING_CALLS: frozenset[str] = frozenset({"bool", "len"})
+
+#: Placeholder recorded by :func:`health_payload_sources` for a field it cannot
+#: attribute to a literal key -- a ``**spread`` or a computed key. The contract
+#: is no longer readable from the source, so the checks fail rather than guess.
+UNREADABLE_HEALTH_FIELD = "<unreadable>"
 
 #: Routes the mobile and web clients call by these exact paths.
 REQUIRED_ROUTES: tuple[tuple[str, str], ...] = (
@@ -676,7 +690,90 @@ def check_migration_readiness(
 # --------------------------------------------------------------------------- #
 
 
-def check_health_contract() -> list[CheckResult]:
+def health_payload_sources(project_root: Path = PROJECT_ROOT) -> dict[str, str]:
+    """Map each ``GET /health`` field to the source of the expression behind it.
+
+    Read statically out of ``backend/main.py``: ``/health`` executes a query, and
+    the preflight opens no database connection. The parser follows the route
+    decorator rather than a function name so renaming the handler cannot silently
+    empty the result.
+
+    Expressions are returned as source text, not values, so nothing a field would
+    resolve to at runtime is read here.
+    """
+    module = ast.parse((project_root / "backend" / "main.py").read_text(encoding="utf-8"))
+    handler = next(
+        (
+            node
+            for node in ast.walk(module)
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+            and any(
+                isinstance(decorator, ast.Call)
+                and decorator.args
+                and isinstance(decorator.args[0], ast.Constant)
+                and decorator.args[0].value == "/health"
+                for decorator in node.decorator_list
+            )
+        ),
+        None,
+    )
+    if handler is None:
+        return {}
+
+    returned = next(
+        (
+            node.value
+            for node in ast.walk(handler)
+            if isinstance(node, ast.Return) and isinstance(node.value, ast.Dict)
+        ),
+        None,
+    )
+    if returned is None:
+        return {}
+
+    sources: dict[str, str] = {}
+    for key, value in zip(returned.keys, returned.values):
+        if isinstance(key, ast.Constant) and isinstance(key.value, str):
+            sources[key.value] = ast.unparse(value)
+        else:
+            sources[UNREADABLE_HEALTH_FIELD] = ast.unparse(value)
+    return sources
+
+
+def _secret_names_in(expression: str) -> list[str]:
+    """Secret-shaped identifiers an expression reads, e.g. ``OPENAI_API_KEY``."""
+    tree = ast.parse(expression, mode="eval")
+    mentioned = {
+        name
+        for node in ast.walk(tree)
+        for name in (
+            (node.id,)
+            if isinstance(node, ast.Name)
+            else (node.attr,)
+            if isinstance(node, ast.Attribute)
+            else ()
+        )
+        if any(marker in name.lower() for marker in SECRET_SHAPED_FIELD_MARKERS)
+    }
+    return sorted(mentioned)
+
+
+def _is_secret_reducing(expression: str) -> bool:
+    """True when the expression publishes a fact about a secret, not the secret.
+
+    ``bool(x)`` and ``len(x)``, a comparison such as ``x is not None``, and a
+    ``not x`` all collapse to presence or length. Anything else -- an f-string, a
+    slice, a bare read -- carries the value itself into the response.
+    """
+    node = ast.parse(expression, mode="eval").body
+    if isinstance(node, ast.Call) and isinstance(node.func, ast.Name):
+        return node.func.id in SECRET_REDUCING_CALLS
+    if isinstance(node, ast.UnaryOp):
+        return isinstance(node.op, ast.Not)
+    return isinstance(node, ast.Compare)
+
+
+def check_health_contract(*, project_root: Path = PROJECT_ROOT) -> list[CheckResult]:
     from starlette.middleware.cors import CORSMiddleware
     from starlette.middleware.trustedhost import TrustedHostMiddleware
 
@@ -710,9 +807,13 @@ def check_health_contract() -> list[CheckResult]:
         else "/health demands credentials, so uptime probes would only ever see 401",
     )
 
+    served = health_payload_sources(project_root)
+    # Scan what the handler actually returns as well as what the contract
+    # declares: checking the declared set alone only ever proves that a literal
+    # in this file is clean, which it is by construction.
     leaky = sorted(
         key
-        for key in HEALTH_CONTRACT_KEYS
+        for key in set(HEALTH_CONTRACT_KEYS) | set(served)
         if any(marker in key.lower() for marker in SECRET_SHAPED_FIELD_MARKERS)
     )
     checks.add(
@@ -721,6 +822,34 @@ def check_health_contract() -> list[CheckResult]:
         f"{len(HEALTH_CONTRACT_KEYS)} contract keys, none secret-shaped"
         if not leaky
         else f"secret-shaped keys on an unauthenticated endpoint: {leaky}",
+    )
+
+    drift = sorted(set(HEALTH_CONTRACT_KEYS) ^ set(served))
+    checks.add(
+        "health_contract_matches_the_served_payload",
+        served and not drift,
+        f"backend/main.py serves exactly the {len(served)} declared fields"
+        if served and not drift
+        else "/health payload could not be read from backend/main.py"
+        if not served
+        else f"declared and served fields disagree on: {drift}",
+    )
+
+    # A field name can be innocuous while the expression behind it is not:
+    # `"service": f"GSAT_Max Backend ({DATABASE_URL})"` keeps the contract's key
+    # set intact and publishes the database password to anyone who probes the
+    # endpoint. Names are not enough; check what produces each value.
+    unreduced = sorted(
+        f"{field}={expression}"
+        for field, expression in served.items()
+        if _secret_names_in(expression) and not _is_secret_reducing(expression)
+    )
+    checks.add(
+        "health_fields_reduce_secrets_to_presence",
+        not unreduced,
+        "every /health field that reads a secret reduces it to presence"
+        if not unreduced
+        else "unauthenticated /health fields carry secret values: " + "; ".join(unreduced),
     )
 
     stack = [middleware.cls for middleware in backend_main.app.user_middleware]
@@ -878,7 +1007,7 @@ def run_preflight(
         (
             *check_configuration_shape(environment, project_root=project_root),
             *check_migration_readiness(project_root=project_root),
-            *check_health_contract(),
+            *check_health_contract(project_root=project_root),
             *check_frontend_wiring(
                 environment,
                 project_root=project_root,
