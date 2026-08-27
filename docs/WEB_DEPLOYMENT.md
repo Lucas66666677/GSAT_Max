@@ -41,10 +41,18 @@ as the fallback for unknown paths and must not cache `index.html` or
 `backend/release_preflight.py` checks a release before it goes out: the shape of
 the production configuration, Alembic migration readiness, the backend health
 contracts, and the frontend-to-backend URL wiring. It reads no secret value,
-opens no database connection, makes no network request, and changes nothing --
-secrets are reduced to a presence flag and a length at the input boundary, and
-`DATABASE_URL` to a credential-free shape, so the report is safe to paste into a
-pull request or a CI log.
+never opens the configured database, makes no network request, and changes
+nothing outside a temporary directory -- secrets are reduced to a presence flag
+and a length at the input boundary, and `DATABASE_URL` to a credential-free
+shape, so the report is safe to paste into a pull request or a CI log.
+
+Migration readiness is the one group that does more than read the repository:
+after checking the revision files it runs `upgrade head` and then `downgrade
+base` against a throwaway SQLite database in a temporary directory, and compares
+the resulting schema to the ORM models column by column. A revision that parses
+cleanly can still raise, stop short of the head, or leave a column the service
+queries missing -- failures that otherwise surface at boot, once the old
+container is already gone.
 
 ```powershell
 .\.venv\Scripts\python.exe -m backend.release_preflight `

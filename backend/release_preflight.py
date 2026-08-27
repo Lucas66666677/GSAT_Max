@@ -10,8 +10,12 @@ the development defaults rather than the production ones:
    running service reads is documented in ``.env.example``.
 2. **Migration readiness** -- the Alembic history has a single head, an
    unbroken chain, reversible revisions, and a table set that matches the ORM
-   models. A drifting head only surfaces at boot, once the old container is
-   already gone.
+   models, *and* the migrations are then actually run: ``upgrade head``
+   followed by ``downgrade base`` against a throwaway SQLite database, whose
+   resulting schema is compared to the models column by column. Reading the
+   revision files proves the chain is well formed; only running them proves
+   the upgrade path works. A drifting head or a revision that raises only
+   surfaces at boot, once the old container is already gone.
 3. **Backend health contracts** -- ``/health``, the ``/livez`` route the
    deployment health gate probes, and the auth surface are registered, the
    gate probes liveness rather than the dependency-sensitive readiness
@@ -33,9 +37,11 @@ When the real settings validator is exercised, it is handed length-preserving
 placeholders rather than the values themselves, so the shape checks stay exact
 while the secrets stay behind.
 
-The preflight also performs no I/O against the deployment: it opens no database
-connection, makes no network request, and changes nothing. It reads repository
-files plus a description of the environment, and prints a report.
+The preflight also performs no I/O against the deployment: it never opens the
+configured ``DATABASE_URL``, makes no network request, and changes nothing
+outside a temporary directory it creates and deletes. It reads repository files
+plus a description of the environment, rehearses the migrations on a throwaway
+SQLite database, and prints a report.
 
 Usage::
 
@@ -53,8 +59,13 @@ import json
 import os
 from pathlib import Path
 import re
-from typing import Iterable, Mapping, Sequence
+import tempfile
+from typing import TYPE_CHECKING, Iterable, Mapping, Sequence
 from urllib.parse import urlsplit
+
+if TYPE_CHECKING:  # Imported lazily at runtime; this module stays import-light.
+    from sqlalchemy import MetaData
+    from sqlalchemy.engine import Inspector
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
@@ -140,6 +151,10 @@ REQUIRED_ROUTES: tuple[tuple[str, str], ...] = (
     ("POST", "/auth/refresh"),
     ("POST", "/auth/logout"),
 )
+
+#: Alembic's own bookkeeping table. It is not an application table, so it is
+#: excluded when the migrated schema is compared to the ORM models.
+ALEMBIC_VERSION_TABLE = "alembic_version"
 
 MINIMUM_JWT_SECRET_LENGTH = 32
 MINIMUM_UPLOAD_BYTES = 1_048_576
@@ -607,6 +622,101 @@ def tables_created_by_migrations(scripts: Iterable[Path]) -> set[str]:
     return tables
 
 
+@dataclass(frozen=True)
+class UpgradeRehearsal:
+    """What happened when the migrations were run, rather than only read.
+
+    Every field describes a throwaway SQLite database created inside a
+    temporary directory and deleted with it. The configured ``DATABASE_URL``
+    is never opened, so nothing here can carry a secret.
+    """
+
+    stamped_revision: str | None
+    tables: frozenset[str]
+    schema_drift: tuple[str, ...]
+    upgrade_error: str | None
+    tables_after_downgrade: frozenset[str]
+    downgrade_error: str | None
+
+
+def _schema_drift(inspector: Inspector, metadata: MetaData) -> tuple[str, ...]:
+    """Differences between the migrated schema and the ORM models."""
+    migrated = set(inspector.get_table_names()) - {ALEMBIC_VERSION_TABLE}
+    modelled = set(metadata.tables)
+    drift = [
+        f"{name}: no such table after upgrade" for name in sorted(modelled - migrated)
+    ]
+    drift += [
+        f"{name}: created by a revision but absent from the models"
+        for name in sorted(migrated - modelled)
+    ]
+    for name in sorted(modelled & migrated):
+        expected = {column.name for column in metadata.tables[name].columns}
+        actual = {column["name"] for column in inspector.get_columns(name)}
+        if missing := sorted(expected - actual):
+            drift.append(f"{name}: columns missing after upgrade {missing}")
+        if extra := sorted(actual - expected):
+            drift.append(f"{name}: columns absent from the models {extra}")
+    return tuple(drift)
+
+
+def rehearse_migrations(project_root: Path = PROJECT_ROOT) -> UpgradeRehearsal:
+    """Run ``upgrade head`` then ``downgrade base`` on a throwaway database.
+
+    Reading the revision files proves the chain is well formed; only running
+    them proves the upgrade path is one production can take. A revision that
+    raises, or one whose DDL has drifted from the models, is invisible to
+    static analysis and fatal at boot.
+
+    The rehearsal runs on SQLite, because the preflight must stay offline and
+    secret-free -- production's own database is never opened. That catches a
+    revision that raises, stops short of the head, or builds a schema the
+    models cannot query, which is every failure this history could have while
+    the revisions stay dialect-neutral. It would not catch DDL that only
+    PostgreSQL rejects; a revision reaching for a dialect-specific construct
+    still needs a staging run.
+    """
+    from alembic import command as alembic_command
+    from alembic.config import Config as AlembicConfig
+    from alembic.runtime.migration import MigrationContext
+    from sqlalchemy import create_engine, inspect
+
+    from backend.models import Base
+
+    def describe(error: Exception) -> str:
+        return f"{type(error).__name__}: {error}"
+
+    with tempfile.TemporaryDirectory(prefix="gsatmax-preflight-") as directory:
+        database = Path(directory) / "rehearsal.sqlite3"
+        config = AlembicConfig(str(project_root / "alembic.ini"))
+        config.attributes["database_url"] = f"sqlite:///{database.as_posix()}"
+        engine = create_engine(config.attributes["database_url"])
+        try:
+            try:
+                alembic_command.upgrade(config, "head")
+            except Exception as error:  # Reported as a failure, not raised.
+                return UpgradeRehearsal(
+                    None, frozenset(), (), describe(error), frozenset(), None
+                )
+            with engine.connect() as connection:
+                stamped = MigrationContext.configure(connection).get_current_revision()
+            inspector = inspect(engine)
+            tables = frozenset(inspector.get_table_names()) - {ALEMBIC_VERSION_TABLE}
+            drift = _schema_drift(inspector, Base.metadata)
+
+            downgrade_error = None
+            try:
+                alembic_command.downgrade(config, "base")
+            except Exception as error:  # Reported as a failure, not raised.
+                downgrade_error = describe(error)
+            remaining = frozenset(inspect(engine).get_table_names())
+            return UpgradeRehearsal(
+                stamped, tables, drift, None, remaining, downgrade_error
+            )
+        finally:
+            engine.dispose()
+
+
 def check_migration_readiness(
     *, project_root: Path = PROJECT_ROOT
 ) -> list[CheckResult]:
@@ -694,6 +804,43 @@ def check_migration_readiness(
         if overrides_url
         else "migrations/env.py leaves alembic.ini's development sqlalchemy.url "
         "in place, so production would migrate the wrong database",
+    )
+
+    # The checks above read the revision files. These run them, because a
+    # revision that parses cleanly can still raise, stop short of the head, or
+    # build a schema the models cannot query.
+    rehearsal = rehearse_migrations(project_root)
+    reached_head = rehearsal.upgrade_error is None and rehearsal.stamped_revision in heads
+    checks.add(
+        "upgrade_path_reaches_head",
+        reached_head,
+        f"upgrade head stamped {rehearsal.stamped_revision} on a throwaway database"
+        if reached_head
+        else rehearsal.upgrade_error
+        or f"upgrade head stopped at {rehearsal.stamped_revision}, not at {list(heads)}",
+    )
+    matches_models = rehearsal.upgrade_error is None and not rehearsal.schema_drift
+    checks.add(
+        "migrated_schema_matches_the_models",
+        matches_models,
+        f"{len(rehearsal.tables)} migrated tables match the models column for column"
+        if matches_models
+        else "; ".join(rehearsal.schema_drift) or "the upgrade never completed",
+    )
+    rolled_back = (
+        rehearsal.upgrade_error is None
+        and rehearsal.downgrade_error is None
+        and rehearsal.tables_after_downgrade <= {ALEMBIC_VERSION_TABLE}
+    )
+    checks.add(
+        "downgrade_path_unwinds_to_base",
+        rolled_back,
+        "downgrade base leaves an empty schema, so the release can roll back"
+        if rolled_back
+        else rehearsal.downgrade_error
+        or rehearsal.upgrade_error
+        or "tables left behind by downgrade base: "
+        + str(sorted(rehearsal.tables_after_downgrade - {ALEMBIC_VERSION_TABLE})),
     )
 
     return checks.results
@@ -1107,7 +1254,11 @@ def run_preflight(
     project_root: Path = PROJECT_ROOT,
     frontend_origin: str | None = None,
 ) -> PreflightReport:
-    """Run every check group. Opens no connection and changes nothing."""
+    """Run every check group.
+
+    Never opens the configured database and changes nothing outside the
+    temporary directory the migration rehearsal creates and deletes.
+    """
     return PreflightReport(
         (
             *check_configuration_shape(environment, project_root=project_root),
@@ -1127,7 +1278,9 @@ def main(argv: Sequence[str] | None = None) -> int:
         prog="python -m backend.release_preflight",
         description=(
             "Validate a GSAT_Max production release without reading secret "
-            "values, connecting to a database, or touching the deployment."
+            "values, connecting to the configured database, or touching the "
+            "deployment. The migrations are rehearsed on a throwaway SQLite "
+            "database in a temporary directory."
         ),
     )
     source = parser.add_mutually_exclusive_group(required=True)

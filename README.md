@@ -140,7 +140,7 @@ Android 實機需把 `API_BASE_URL` 換成開發電腦區網位址，例如 `htt
   --dart-define=API_BASE_URL=http://10.0.2.2:8000
 ```
 
-佈署前另外執行 Release Preflight，檢查生產設定形狀、資料庫遷移狀態、後端健康契約與前端對後端的 URL 接線。此工具不讀取任何密鑰內容、不連線資料庫、不變更佈署：
+佈署前另外執行 Release Preflight，檢查生產設定形狀、資料庫遷移狀態、後端健康契約與前端對後端的 URL 接線。此工具不讀取任何密鑰內容、不連線正式資料庫、不變更佈署；資料庫遷移會在暫存目錄的拋棄式 SQLite 上實際執行 `upgrade head` 與 `downgrade base`，並逐欄比對 ORM 模型：
 
 ```powershell
 .\.venv\Scripts\python.exe -m backend.release_preflight --env-file .env.example
