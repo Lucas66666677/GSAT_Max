@@ -32,12 +32,15 @@ services:
       - gsat_max_data:/data
     ports:
       - "127.0.0.1:8000:8000"
+    # Probes liveness, not readiness: `/health` runs a query, so gating `web`
+    # on it holds the whole stack back on a database blip rather than on the
+    # backend process itself.
     healthcheck:
       test:
         - CMD
         - python
         - -c
-        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=4)"
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/livez', timeout=4)"
       interval: 15s
       timeout: 5s
       retries: 8

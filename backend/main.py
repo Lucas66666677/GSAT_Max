@@ -935,6 +935,23 @@ def get_db() -> Generator[Session, None, None]:
         db.close()
 
 
+@app.get("/livez", tags=["system"])
+def liveness_probe() -> dict[str, str]:
+    """Answer whether this process is serving, and nothing else.
+
+    The deployment health gate probes this rather than ``/health``. ``/health``
+    executes a query, so a gate pointed at it reports the process as dead
+    whenever the database is briefly unreachable, and holds back everything
+    gated on it -- container startup ordering, a rollout, a restart -- for a
+    dependency that is not the process. Readiness stays at ``/health``; this
+    answers the narrower question a gate actually asks.
+
+    The payload is a literal for the same reason: the route is unauthenticated,
+    so anything it reads is published to anyone who probes it.
+    """
+    return {"status": "alive"}
+
+
 @app.get("/health", tags=["system"])
 def health_check(db: Session = Depends(get_db)) -> dict[str, Any]:
     db.execute(text("SELECT 1"))
