@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+import shutil
 import subprocess
 import sys
 from types import SimpleNamespace
@@ -266,7 +267,7 @@ def test_parse_env_file_ignores_comments_and_strips_quotes(tmp_path: Path) -> No
 
 
 def test_migrations_in_this_checkout_are_release_ready() -> None:
-    """Runs against the repository's own Alembic history. Opens no database."""
+    """Runs the repository's own Alembic history, on a throwaway database."""
     failures = [
         f"{result.name}: {result.detail}"
         for result in check_migration_readiness(project_root=PROJECT_ROOT)
@@ -318,6 +319,115 @@ def test_reversibility_check_rejects_an_empty_downgrade(
     assert "abcdef123456_no_rollback.py" in results["every_revision_is_reversible"].detail
     # The same stub is unreachable from the real head, so the chain check fires.
     assert results["revision_chain_is_unbroken"].passed is False
+
+
+def _sandbox_checkout(tmp_path: Path) -> Path:
+    """A checkout whose Alembic setup is the real one, so only revisions vary."""
+    root = tmp_path / "checkout"
+    (root / "backend").mkdir(parents=True)
+    shutil.copyfile(PROJECT_ROOT / "alembic.ini", root / "alembic.ini")
+    shutil.copytree(
+        PROJECT_ROOT / "backend" / "migrations",
+        root / "backend" / "migrations",
+        ignore=shutil.ignore_patterns("__pycache__"),
+    )
+    return root
+
+
+def _append_revision(root: Path, revision: str, upgrade: str, downgrade: str) -> None:
+    """Add `revision` on top of the sandbox's current head."""
+    from alembic.config import Config as AlembicConfig
+    from alembic.script import ScriptDirectory
+
+    head = ScriptDirectory.from_config(
+        AlembicConfig(str(root / "alembic.ini"))
+    ).get_current_head()
+    script = "\n".join(
+        [
+            "from alembic import op",
+            "import sqlalchemy as sa",
+            "",
+            f"revision = {revision!r}",
+            f"down_revision = {head!r}",
+            "branch_labels = None",
+            "depends_on = None",
+            "",
+            "",
+            "def upgrade() -> None:",
+            f"    {upgrade}",
+            "",
+            "",
+            "def downgrade() -> None:",
+            f"    {downgrade}",
+            "",
+        ]
+    )
+    versions = root / "backend" / "migrations" / "versions"
+    (versions / f"{revision}_sandbox.py").write_text(script, encoding="utf-8")
+
+
+def test_preflight_runs_the_migrations_it_declares_ready(tmp_path: Path) -> None:
+    """A revision that parses but raises must not pass as migration readiness.
+
+    Every static check still passes here -- the chain is intact, the revision
+    is reversible, the model tables are all created -- so without running the
+    upgrade the release would go out behind a broken migration.
+    """
+    root = _sandbox_checkout(tmp_path)
+    _append_revision(
+        root,
+        "aaaa11112222",
+        upgrade='op.drop_table("table_that_was_never_created")',
+        downgrade='op.execute("SELECT 1")',
+    )
+    results = {
+        result.name: result for result in check_migration_readiness(project_root=root)
+    }
+
+    assert results["upgrade_path_reaches_head"].passed is False
+    assert "table_that_was_never_created" in results["upgrade_path_reaches_head"].detail
+    assert results["revision_chain_is_unbroken"].passed is True
+    assert results["every_revision_is_reversible"].passed is True
+    assert results["models_are_covered_by_migrations"].passed is True
+
+
+def test_preflight_compares_the_migrated_schema_to_the_models(tmp_path: Path) -> None:
+    """A column the models query but no revision creates is caught before boot.
+
+    The table-level check is satisfied -- `users` is created by a revision --
+    so only comparing the applied schema to the models finds the drift.
+    """
+    root = _sandbox_checkout(tmp_path)
+    _append_revision(
+        root,
+        "bbbb33334444",
+        upgrade='op.drop_column("users", "display_name")',
+        downgrade='op.add_column("users", sa.Column("display_name", sa.String(120)))',
+    )
+    results = {
+        result.name: result for result in check_migration_readiness(project_root=root)
+    }
+
+    assert results["migrated_schema_matches_the_models"].passed is False
+    assert "display_name" in results["migrated_schema_matches_the_models"].detail
+    assert results["models_are_covered_by_migrations"].passed is True
+    assert results["upgrade_path_reaches_head"].passed is True
+
+
+def test_rehearsal_never_touches_the_configured_database() -> None:
+    """A rehearsal that migrated a real database would be a worse bug than the
+    one it looks for, so the throwaway URL has to win over alembic.ini's own.
+    """
+    configured = PROJECT_ROOT / "backend" / "gsat_english.db"
+    before = configured.stat().st_mtime_ns if configured.exists() else None
+
+    rehearsal = release_preflight.rehearse_migrations(PROJECT_ROOT)
+
+    assert rehearsal.upgrade_error is None
+    assert rehearsal.downgrade_error is None
+    assert rehearsal.tables_after_downgrade <= {release_preflight.ALEMBIC_VERSION_TABLE}
+    after = configured.stat().st_mtime_ns if configured.exists() else None
+    assert after == before
 
 
 # --------------------------------------------------------------------------- #
