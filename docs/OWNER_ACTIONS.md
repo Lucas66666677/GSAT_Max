@@ -56,6 +56,7 @@ Enter `y` for each agreement you accept. Then install Platform 36, Build Tools, 
 2. Set `APP_ENV=production`, a random `JWT_SECRET_KEY` of at least 32 characters, exact `API_CORS_ORIGINS`, and all provider secrets.
 3. Move rate-limit/job state to shared infrastructure before running more than one API process.
 4. Replace SQLite with managed PostgreSQL before broad public scale; Alembic is already active and every deployment must run `alembic upgrade head`.
+5. Run `python -m backend.release_preflight --from-environ --frontend-origin https://your-domain` on the host before each release and resolve every reported failure. It reads no secret values and touches nothing; see `docs/WEB_DEPLOYMENT.md`.
 
 ## 7. Device and Store Acceptance
 

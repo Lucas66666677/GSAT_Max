@@ -140,6 +140,14 @@ Android 實機需把 `API_BASE_URL` 換成開發電腦區網位址，例如 `htt
   --dart-define=API_BASE_URL=http://10.0.2.2:8000
 ```
 
+佈署前另外執行 Release Preflight，檢查生產設定形狀、資料庫遷移狀態、後端健康契約與前端對後端的 URL 接線。此工具不讀取任何密鑰內容、不連線資料庫、不變更佈署：
+
+```powershell
+.\.venv\Scripts\python.exe -m backend.release_preflight --env-file .env.example
+.\.venv\Scripts\python.exe -m backend.release_preflight --from-environ `
+  --frontend-origin https://gsat-max.example.com
+```
+
 App Icon 與 Splash 已生成。替換 `assets/icon.png`、`assets/splash.png` 後重跑：
 
 ```powershell
@@ -156,6 +164,7 @@ App Icon 與 Splash 已生成。替換 `assets/icon.png`、`assets/splash.png` �
 - `backend/main.py`：API、認證、AI、背景工作與資料流程
 - `backend/models.py`：SQLAlchemy 模型
 - `backend/seed_data.py`：可重複執行的 GSAT Seed CLI
+- `backend/release_preflight.py`：不接觸密鑰的佈署前檢查 CLI
 - `backend/tests/`、`test/`：後端與 Flutter 自動化測試
 - `docs/`：執行計畫、驗證紀錄與 Owner Actions
 - `deploy/`、`compose.yaml`：Web Nginx + FastAPI 的生產容器化佈署
