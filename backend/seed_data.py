@@ -1,4 +1,4 @@
-"""Seed core GSAT English content into the SQLite database.
+"""Seed core GSAT English content into the configured database.
 
 Usage examples:
     python seed_data.py --vocab 500
@@ -33,6 +33,7 @@ load_dotenv(PROJECT_ROOT / ".env", override=False)
 if str(CURRENT_DIR) not in sys.path:
     sys.path.insert(0, str(CURRENT_DIR))
 
+from config import normalize_database_url  # noqa: E402
 from models import GrammarConceptBank, Vocabulary  # noqa: E402
 
 
@@ -177,6 +178,7 @@ def parse_args() -> argparse.Namespace:
 
 
 def create_session(database_url: str) -> sessionmaker[Session]:
+    database_url = normalize_database_url(database_url)
     migration_config = AlembicConfig(str(PROJECT_ROOT / "alembic.ini"))
     migration_config.attributes["database_url"] = database_url
     alembic_command.upgrade(migration_config, "head")
