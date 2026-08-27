@@ -36,6 +36,29 @@ Upload the generated `build/web/` directory. The host must serve `index.html`
 as the fallback for unknown paths and must not cache `index.html` or
 `flutter_service_worker.js` permanently.
 
+## Release preflight
+
+`backend/release_preflight.py` checks a release before it goes out: the shape of
+the production configuration, Alembic migration readiness, the backend health
+contracts, and the frontend-to-backend URL wiring. It reads no secret value,
+opens no database connection, makes no network request, and changes nothing --
+secrets are reduced to a presence flag and a length at the input boundary, and
+`DATABASE_URL` to a credential-free shape, so the report is safe to paste into a
+pull request or a CI log.
+
+```powershell
+.\.venv\Scripts\python.exe -m backend.release_preflight `
+  --from-environ --frontend-origin https://your-domain
+```
+
+Pass `--env-file` instead of `--from-environ` to check a configuration file, and
+`--json` for a machine-readable report. The exit code is non-zero when any check
+fails. The cross-cutting check worth knowing about is
+`web_build_host_is_trusted_by_the_api`: the backend hostname the web build is
+compiled against has to be one the API's own `TrustedHostMiddleware` accepts,
+because a mismatch answers every request with `400` while both sides look
+individually healthy.
+
 ## Production checklist
 
 1. Terminate TLS at the hosting platform or an outer reverse proxy.
