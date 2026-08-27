@@ -564,3 +564,10 @@ def test_current_password_hash_is_not_flagged_outdated() -> None:
     assert backend_main.password_hash_is_outdated(None) is False
     assert backend_main.password_hash_is_outdated("garbage") is False
     assert backend_main.password_hash_is_outdated("bcrypt$12$x$y") is True
+
+
+def test_password_hash_iterations_uses_safe_default_for_invalid_environment_value(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("PASSWORD_HASH_ITERATIONS", "not-a-number")
+    assert backend_main.password_hash_iterations_from_env() == 120_000

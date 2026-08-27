@@ -157,9 +157,17 @@ JWT_EXPIRE_MINUTES = settings.jwt_expire_minutes
 # the service moves to paid compute. Existing users are upgraded automatically
 # on their next successful login (see maybe_upgrade_password_hash), because the
 # iteration count is stored per-hash rather than assumed.
-PASSWORD_HASH_ITERATIONS = max(
-    120_000, int(os.getenv("PASSWORD_HASH_ITERATIONS", "120000"))
-)
+def password_hash_iterations_from_env() -> int:
+    """Read a safe PBKDF2 cost without making a bad deploy variable fatal."""
+    raw_value = os.getenv("PASSWORD_HASH_ITERATIONS", "120000")
+    try:
+        configured_iterations = int(raw_value)
+    except ValueError:
+        return 120_000
+    return max(120_000, configured_iterations)
+
+
+PASSWORD_HASH_ITERATIONS = password_hash_iterations_from_env()
 _RATE_LIMIT_BUCKETS: dict[str, deque[float]] = defaultdict(deque)
 _RATE_LIMIT_LOCK = Lock()
 
