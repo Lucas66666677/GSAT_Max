@@ -181,9 +181,17 @@ app.add_middleware(
     allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allow_headers=["Authorization", "Content-Type", "X-Request-ID"],
 )
+# The production hostname is part of the *default* allowlist on purpose. This
+# service has no custom domain, so `gsat-max-api-lucas.onrender.com` is the only
+# host real traffic ever arrives on -- allowing it is exactly what a correctly
+# configured `TRUSTED_HOSTS` would do, not a loosening of it. Keeping it in the
+# default means shipping this middleware cannot lock the live API out with 400s
+# if the env var is missing or misspelled on the host, which is the one failure
+# mode that would take the whole backend down rather than harden it.
+DEFAULT_TRUSTED_HOSTS = "gsat-max-api-lucas.onrender.com,localhost,127.0.0.1,testserver"
 trusted_hosts = [
     item.strip()
-    for item in os.getenv("TRUSTED_HOSTS", "localhost,127.0.0.1,testserver").split(",")
+    for item in os.getenv("TRUSTED_HOSTS", DEFAULT_TRUSTED_HOSTS).split(",")
     if item.strip()
 ]
 app.add_middleware(TrustedHostMiddleware, allowed_hosts=trusted_hosts)

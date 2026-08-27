@@ -49,6 +49,18 @@ def test_trusted_host_middleware_rejects_unknown_host(client: TestClient) -> Non
     assert allowed.status_code == 200
 
 
+def test_default_trusted_hosts_include_the_production_hostname() -> None:
+    """The live API must stay reachable even if TRUSTED_HOSTS is never set.
+
+    Shipping a Host allowlist that excludes the only hostname production
+    traffic arrives on would answer every real request with 400. Pin the
+    default so a missing or misspelled env var on the host cannot introduce
+    that failure mode.
+    """
+    hosts = backend_main.DEFAULT_TRUSTED_HOSTS.split(",")
+    assert "gsat-max-api-lucas.onrender.com" in hosts
+
+
 def test_logout_revokes_refresh_token(client: TestClient) -> None:
     email = f"logout-{uuid.uuid4().hex}@example.com"
     registered = client.post(
