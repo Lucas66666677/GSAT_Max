@@ -9,14 +9,19 @@
 #
 # API_BASE_URL and APP_ENV are ordinary Vercel project environment variables,
 # not hardcoded here — set API_BASE_URL in the Vercel project settings. This
-# script only supplies a fallback so a build never silently succeeds with an
-# empty backend URL.
+# script supplies a fallback so a build never silently succeeds with an empty
+# backend URL, and check_api_base_url.sh then refuses any value the visitor's
+# browser could not reach, so a bad setting fails the build instead of shipping
+# a site that only works on the machine that built it.
 set -euo pipefail
 
 FLUTTER_VERSION="3.44.7"
 FLUTTER_DIR="${FLUTTER_ROOT:-$HOME/.cache/flutter-$FLUTTER_VERSION}"
 API_BASE_URL="${API_BASE_URL:-https://gsat-max-api-lucas.onrender.com}"
 APP_ENV="${APP_ENV:-production}"
+
+SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
+bash "$SCRIPT_DIR/check_api_base_url.sh" "$API_BASE_URL"
 
 if [ ! -x "$FLUTTER_DIR/bin/flutter" ]; then
   echo "Fetching Flutter $FLUTTER_VERSION..."
