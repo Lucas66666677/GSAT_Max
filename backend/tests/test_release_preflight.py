@@ -373,6 +373,96 @@ def test_secret_shaped_health_key_is_reported(monkeypatch: pytest.MonkeyPatch) -
     assert results["health_contract_exposes_no_secret_field"].passed is False
 
 
+def _stub_backend_checkout(tmp_path: Path, fields: str) -> Path:
+    """A checkout whose ``backend/main.py`` serves `fields` from ``/health``."""
+    backend = tmp_path / "backend"
+    backend.mkdir()
+    (backend / "main.py").write_text(
+        "@app.get('/health', tags=['system'])\n"
+        "def health_check(db=None):\n"
+        "    db.execute(text('SELECT 1'))\n"
+        "    return {\n" + fields + "    }\n",
+        encoding="utf-8",
+    )
+    return tmp_path
+
+
+def test_health_payload_sources_describe_the_route_the_service_serves(client) -> None:
+    """The statically parsed payload and the live response must not diverge.
+
+    Every value-level check reads the handler out of the source rather than
+    calling it, because the preflight opens no database connection and `/health`
+    runs a query. This is what keeps that parse honest.
+    """
+    served = release_preflight.health_payload_sources(PROJECT_ROOT)
+    assert set(served) == set(client.get("/health").json())
+    assert release_preflight.UNREADABLE_HEALTH_FIELD not in served
+
+
+def test_a_health_field_built_from_a_secret_is_reported(tmp_path: Path) -> None:
+    """The leak a field-name scan cannot see: innocuous key, secret-bearing value.
+
+    `/health` is unauthenticated, so `f"... ({DATABASE_URL})"` publishes the
+    database password to anyone who probes it -- while the contract's key set,
+    `status`, and `database` all stay exactly as the existing assertions expect.
+    """
+    root = _stub_backend_checkout(
+        tmp_path,
+        '        "status": "ok",\n'
+        '        "service": f"GSAT_Max Backend ({DATABASE_URL})",\n',
+    )
+    results = {
+        result.name: result for result in check_health_contract(project_root=root)
+    }
+    reduced = results["health_fields_reduce_secrets_to_presence"]
+    assert reduced.passed is False
+    assert "service" in reduced.detail
+    # Every key here is innocuous, so the name scan stays green. That is the
+    # whole reason the value check has to exist alongside it.
+    assert results["health_contract_exposes_no_secret_field"].passed is True
+
+
+def test_presence_reductions_of_a_secret_are_not_flagged(tmp_path: Path) -> None:
+    """`bool(secret)` publishes one bit, not the secret. Flagging it is noise."""
+    root = _stub_backend_checkout(
+        tmp_path,
+        '        "openai_configured": bool(OPENAI_API_KEY),\n'
+        '        "key_length": len(settings.jwt_secret_key),\n'
+        '        "webhook_configured": settings.revenuecat_webhook_auth is not None,\n',
+    )
+    results = {
+        result.name: result for result in check_health_contract(project_root=root)
+    }
+    assert results["health_fields_reduce_secrets_to_presence"].passed is True
+
+
+def test_an_undeclared_health_field_is_reported(tmp_path: Path) -> None:
+    """A field added to the handler but not to the contract is drift, not a feature."""
+    root = _stub_backend_checkout(
+        tmp_path,
+        '        "status": "ok",\n        "debug_dump": settings.app_env,\n',
+    )
+    results = {
+        result.name: result for result in check_health_contract(project_root=root)
+    }
+    drift = results["health_contract_matches_the_served_payload"]
+    assert drift.passed is False
+    assert "debug_dump" in drift.detail
+
+
+def test_a_payload_assembled_by_spread_is_not_read_as_clean(tmp_path: Path) -> None:
+    """When the contract stops being readable, the check fails rather than guesses."""
+    root = _stub_backend_checkout(tmp_path, "        **_diagnostics(),\n")
+    results = {
+        result.name: result for result in check_health_contract(project_root=root)
+    }
+    assert results["health_contract_matches_the_served_payload"].passed is False
+    assert (
+        release_preflight.UNREADABLE_HEALTH_FIELD
+        in results["health_contract_matches_the_served_payload"].detail
+    )
+
+
 # --------------------------------------------------------------------------- #
 # 4. Frontend-to-backend URL wiring
 # --------------------------------------------------------------------------- #

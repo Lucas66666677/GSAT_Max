@@ -59,6 +59,17 @@ compiled against has to be one the API's own `TrustedHostMiddleware` accepts,
 because a mismatch answers every request with `400` while both sides look
 individually healthy.
 
+`GET /health` is unauthenticated, so whatever it returns is public. Two checks
+hold that line, and both read the fields `backend/main.py` actually returns
+rather than a list kept alongside them:
+`health_contract_matches_the_served_payload` fails when the handler and the
+declared contract drift apart, and `health_fields_reduce_secrets_to_presence`
+fails when a field is built out of a secret. A field name can be innocuous while
+its value is not -- `"service": f"GSAT_Max Backend ({DATABASE_URL})"` leaves the
+key set untouched and publishes the database password -- so the field names are
+checked and so is what produces each value. Reducing a secret to presence or
+length, as `bool(OPENAI_API_KEY)` does, stays allowed.
+
 ## Production checklist
 
 1. Terminate TLS at the hosting platform or an outer reverse proxy.
