@@ -15,7 +15,10 @@ the development defaults rather than the production ones:
    resulting schema is compared to the models column by column. Reading the
    revision files proves the chain is well formed; only running them proves
    the upgrade path works. A drifting head or a revision that raises only
-   surfaces at boot, once the old container is already gone.
+   surfaces at boot, once the old container is already gone. Finally, the
+   deployment entrypoint is read to confirm it *applies* that history --
+   ``alembic upgrade head`` ahead of the server, under ``set -e`` -- because a
+   release that never migrates passes every check above.
 3. **Backend health contracts** -- ``/health``, the ``/livez`` route the
    deployment health gate probes, and the auth surface are registered, the
    gate probes liveness rather than the dependency-sensitive readiness
@@ -156,10 +159,20 @@ REQUIRED_ROUTES: tuple[tuple[str, str], ...] = (
 #: excluded when the migrated schema is compared to the ORM models.
 ALEMBIC_VERSION_TABLE = "alembic_version"
 
+#: The script the backend container runs at boot. Everything the rehearsal
+#: proves about the migrations is only worth something if this file applies
+#: them, so it is read rather than assumed.
+DEPLOYMENT_ENTRYPOINT: tuple[str, ...] = ("deploy", "backend", "entrypoint.sh")
+
 MINIMUM_JWT_SECRET_LENGTH = 32
 MINIMUM_UPLOAD_BYTES = 1_048_576
 
 _PROBE_URL = re.compile(r"https?://[^\s'\"]+")
+_ALEMBIC_UPGRADE_HEAD = re.compile(r"\balembic\b.*\bupgrade\b.*\bhead\b")
+_SERVER_START = re.compile(r"\buvicorn\b")
+_ABORT_ON_ERROR = re.compile(
+    r"^[ \t]*set\s+(?:-[a-zA-Z]*e|-o[ \t]+errexit)", re.MULTILINE
+)
 _ENV_LINE = re.compile(r"^\s*(?:export\s+)?([A-Z][A-Z0-9_]*)\s*=(.*)$")
 _DART_DEFINE = re.compile(r"--dart-define=\"?([A-Z][A-Z0-9_]*)=")
 _DART_FROM_ENVIRONMENT = re.compile(
@@ -719,6 +732,67 @@ def rehearse_migrations(project_root: Path = PROJECT_ROOT) -> UpgradeRehearsal:
             engine.dispose()
 
 
+@dataclass(frozen=True)
+class MigrationStartupStep:
+    """How the deployment entrypoint applies the migrations at boot."""
+
+    command: str
+    #: ``set -e`` (or ``-o errexit``) is in force by the time the step runs and
+    #: the step's own failure is not swallowed, so a bad upgrade stops the boot.
+    aborts_on_failure: bool
+    #: The step runs before the line that starts the server, so no request is
+    #: ever served against a schema the upgrade has not reached yet.
+    precedes_the_server: bool
+
+
+def deployment_migration_step(
+    project_root: Path = PROJECT_ROOT,
+) -> MigrationStartupStep | None:
+    """Read the ``alembic upgrade head`` step out of the container entrypoint.
+
+    ``None`` when the entrypoint is missing or never upgrades at all -- the
+    caller fails closed rather than reading an absent step as a correct one.
+
+    The parse is deliberately shallow -- ``#`` starts a comment, quoted or not,
+    and the rest is three regexes: the upgrade, the line that starts the
+    server, and the ``set -e`` that makes a failed upgrade fatal. That is
+    enough to tell a boot sequence that migrates from one that does not, and it
+    stops well short of pretending to be a shell.
+    """
+    entrypoint = project_root.joinpath(*DEPLOYMENT_ENTRYPOINT)
+    if not entrypoint.is_file():
+        return None
+
+    script = "\n".join(
+        raw.split("#", 1)[0].rstrip()
+        for raw in entrypoint.read_text(encoding="utf-8").splitlines()
+    )
+    upgrade = _ALEMBIC_UPGRADE_HEAD.search(script)
+    if upgrade is None:
+        return None
+
+    command = script[script.rfind("\n", 0, upgrade.start()) + 1 :]
+    command = command.split("\n", 1)[0].strip()
+    errexit = next(
+        (
+            match
+            for match in _ABORT_ON_ERROR.finditer(script)
+            if match.start() < upgrade.start()
+        ),
+        None,
+    )
+    server = _SERVER_START.search(script)
+    return MigrationStartupStep(
+        command=command,
+        # `|| true` and a trailing `&` each turn a failed upgrade into a booted
+        # service serving requests against a schema that was never migrated.
+        aborts_on_failure=errexit is not None
+        and "||" not in command
+        and not command.endswith("&"),
+        precedes_the_server=server is not None and upgrade.start() < server.start(),
+    )
+
+
 def check_migration_readiness(
     *, project_root: Path = PROJECT_ROOT
 ) -> list[CheckResult]:
@@ -843,6 +917,29 @@ def check_migration_readiness(
         or rehearsal.upgrade_error
         or "tables left behind by downgrade base: "
         + str(sorted(rehearsal.tables_after_downgrade - {ALEMBIC_VERSION_TABLE})),
+    )
+
+    # Everything above judges the migrations. This judges the deployment: a
+    # rehearsed, model-matching, reversible history is worth nothing if the
+    # container never runs it, and every check above stays green either way.
+    entrypoint = "/".join(DEPLOYMENT_ENTRYPOINT)
+    step = deployment_migration_step(project_root)
+    checks.add(
+        "deployment_applies_the_migrations",
+        step is not None and step.precedes_the_server,
+        f"{entrypoint} runs {step.command!r} before starting the server"
+        if step is not None and step.precedes_the_server
+        else f"{entrypoint} does not run `alembic upgrade head` ahead of the "
+        "server, so the release would serve requests against whatever schema "
+        "the database already had",
+    )
+    checks.add(
+        "a_failed_migration_stops_the_release",
+        step is not None and step.aborts_on_failure,
+        f"a failed upgrade aborts {entrypoint} before the server starts"
+        if step is not None and step.aborts_on_failure
+        else f"{entrypoint} would continue to boot after a failed upgrade, "
+        "leaving the service running on a half-migrated schema",
     )
 
     return checks.results
