@@ -520,12 +520,14 @@ def check_configuration_shape(
         f"configured providers: {', '.join(provider_keys) or 'none'}",
     )
 
+    from backend.config import is_public_origin
+
     rejected_origins = [
         origin
         for origin in environment.cors_origins
         if not origin.startswith("https://")
         or origin.endswith("/")
-        or urlsplit(origin).hostname in {"localhost", "127.0.0.1"}
+        or not is_public_origin(origin)
     ]
     checks.add(
         "cors_origins_are_explicit_https",
