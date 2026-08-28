@@ -54,6 +54,12 @@ cleanly can still raise, stop short of the head, or leave a column the service
 queries missing -- failures that otherwise surface at boot, once the old
 container is already gone.
 
+It then reads `deploy/backend/entrypoint.sh` to confirm the deployment actually
+applies that history: `alembic upgrade head` ahead of the line that starts the
+server, under a `set -e` that stops the boot when the upgrade fails. A release
+that migrates nothing, or that boots anyway after a failed upgrade, satisfies
+every other check in the group.
+
 ```powershell
 .\.venv\Scripts\python.exe -m backend.release_preflight `
   --from-environ --frontend-origin https://your-domain

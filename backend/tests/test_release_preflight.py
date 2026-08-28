@@ -21,6 +21,7 @@ import pytest
 from backend import main as backend_main
 from backend import release_preflight
 from backend.release_preflight import (
+    DEPLOYMENT_ENTRYPOINT,
     LIVENESS_ROUTE,
     READINESS_ROUTE,
     DatabaseUrlShape,
@@ -331,6 +332,15 @@ def _sandbox_checkout(tmp_path: Path) -> Path:
         root / "backend" / "migrations",
         ignore=shutil.ignore_patterns("__pycache__"),
     )
+    entrypoint = root.joinpath(*DEPLOYMENT_ENTRYPOINT)
+    entrypoint.parent.mkdir(parents=True)
+    shutil.copyfile(PROJECT_ROOT.joinpath(*DEPLOYMENT_ENTRYPOINT), entrypoint)
+    return root
+
+
+def _rewrite_entrypoint(root: Path, script: str) -> Path:
+    """Replace the sandbox's container entrypoint, leaving the history intact."""
+    root.joinpath(*DEPLOYMENT_ENTRYPOINT).write_text(script, encoding="utf-8")
     return root
 
 
@@ -428,6 +438,132 @@ def test_rehearsal_never_touches_the_configured_database() -> None:
     assert rehearsal.tables_after_downgrade <= {release_preflight.ALEMBIC_VERSION_TABLE}
     after = configured.stat().st_mtime_ns if configured.exists() else None
     assert after == before
+
+
+def _migration_results(root: Path) -> dict[str, release_preflight.CheckResult]:
+    return {
+        result.name: result for result in check_migration_readiness(project_root=root)
+    }
+
+
+def _assert_history_still_reads_ready(
+    results: dict[str, release_preflight.CheckResult]
+) -> None:
+    """The history itself is untouched in these sandboxes.
+
+    Asserting it here is the point: the entrypoint checks exist because every
+    other migration check passes while the release never migrates at all.
+    """
+    for name in (
+        "single_migration_head",
+        "revision_chain_is_unbroken",
+        "every_revision_is_reversible",
+        "models_are_covered_by_migrations",
+        "upgrade_path_reaches_head",
+        "migrated_schema_matches_the_models",
+        "downgrade_path_unwinds_to_base",
+    ):
+        assert results[name].passed is True, f"{name}: {results[name].detail}"
+
+
+def test_the_entrypoint_in_this_checkout_applies_the_migrations() -> None:
+    step = release_preflight.deployment_migration_step(PROJECT_ROOT)
+    assert step is not None
+    assert step.precedes_the_server is True
+    assert step.aborts_on_failure is True
+
+
+def test_a_release_that_never_migrates_is_reported(tmp_path: Path) -> None:
+    """A rehearsed, reversible, model-matching history the container never runs.
+
+    This is the gap: the migrations are perfect and the deployment applies
+    none of them, so the service boots against whatever schema was already
+    there. Every other check in the group stays green.
+    """
+    root = _rewrite_entrypoint(
+        _sandbox_checkout(tmp_path),
+        "#!/bin/sh\nset -eu\n\nexec uvicorn backend.main:app --host 0.0.0.0\n",
+    )
+    results = _migration_results(root)
+
+    assert results["deployment_applies_the_migrations"].passed is False
+    assert "alembic upgrade head" in results["deployment_applies_the_migrations"].detail
+    assert results["a_failed_migration_stops_the_release"].passed is False
+    _assert_history_still_reads_ready(results)
+
+
+def test_a_migration_that_runs_after_the_server_starts_is_reported(
+    tmp_path: Path,
+) -> None:
+    """`exec uvicorn` never returns, so an upgrade below it never runs."""
+    root = _rewrite_entrypoint(
+        _sandbox_checkout(tmp_path),
+        "#!/bin/sh\nset -eu\n\nexec uvicorn backend.main:app\n"
+        "python -m alembic upgrade head\n",
+    )
+    results = _migration_results(root)
+
+    assert results["deployment_applies_the_migrations"].passed is False
+    _assert_history_still_reads_ready(results)
+
+
+@pytest.mark.parametrize(
+    "command",
+    [
+        "python -m alembic upgrade head || true",
+        "python -m alembic upgrade head &",
+    ],
+)
+def test_a_swallowed_migration_failure_is_reported(
+    tmp_path: Path, command: str
+) -> None:
+    """Booting anyway after a failed upgrade is a half-migrated production.
+
+    The step is present and ahead of the server, so it reads as a deployment
+    that migrates -- it just does not stop when the migration does not work.
+    """
+    root = _rewrite_entrypoint(
+        _sandbox_checkout(tmp_path),
+        f"#!/bin/sh\nset -eu\n\n{command}\n\nexec uvicorn backend.main:app\n",
+    )
+    results = _migration_results(root)
+
+    assert results["deployment_applies_the_migrations"].passed is True
+    assert results["a_failed_migration_stops_the_release"].passed is False
+    _assert_history_still_reads_ready(results)
+
+
+def test_a_migration_step_without_errexit_is_reported(tmp_path: Path) -> None:
+    """Without `set -e` the upgrade's exit status is discarded just as surely."""
+    root = _rewrite_entrypoint(
+        _sandbox_checkout(tmp_path),
+        "#!/bin/sh\n\npython -m alembic upgrade head\n\nexec uvicorn backend.main:app\n",
+    )
+    results = _migration_results(root)
+
+    assert results["deployment_applies_the_migrations"].passed is True
+    assert results["a_failed_migration_stops_the_release"].passed is False
+
+
+def test_a_commented_out_migration_is_not_read_as_one(tmp_path: Path) -> None:
+    root = _rewrite_entrypoint(
+        _sandbox_checkout(tmp_path),
+        "#!/bin/sh\nset -eu\n\n# python -m alembic upgrade head\n"
+        "exec uvicorn backend.main:app\n",
+    )
+    assert release_preflight.deployment_migration_step(root) is None
+    assert _migration_results(root)["deployment_applies_the_migrations"].passed is False
+
+
+def test_a_missing_entrypoint_fails_closed(tmp_path: Path) -> None:
+    """No entrypoint to read is not the same as an entrypoint that migrates."""
+    root = _sandbox_checkout(tmp_path)
+    root.joinpath(*DEPLOYMENT_ENTRYPOINT).unlink()
+
+    assert release_preflight.deployment_migration_step(root) is None
+    results = _migration_results(root)
+    assert results["deployment_applies_the_migrations"].passed is False
+    assert results["a_failed_migration_stops_the_release"].passed is False
 
 
 # --------------------------------------------------------------------------- #
