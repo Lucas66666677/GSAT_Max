@@ -6,8 +6,11 @@ historically taken a release down without failing CI, because CI runs against
 the development defaults rather than the production ones:
 
 1. **Configuration shape** -- the production environment satisfies the real
-   :meth:`backend.config.Settings.validate` rules, and every variable the
-   running service reads is documented in ``.env.example``.
+   :meth:`backend.config.Settings.validate` rules, ``API_CORS_ORIGINS`` admits
+   the site's own origin as declared by ``PUBLIC_APP_URL`` -- an allowlist that
+   omits it blocks every request the site makes, and it does so in the
+   visitor's browser, where no backend check would see it -- and every variable
+   the running service reads is documented in ``.env.example``.
 2. **Migration readiness** -- the Alembic history has a single head, an
    unbroken chain, reversible revisions, and a table set that matches the ORM
    models, *and* the migrations are then actually run: ``upgrade head``
@@ -482,6 +485,29 @@ def validate_with_real_settings(environment: ProductionEnvironment) -> str | Non
     return None
 
 
+def browser_origin(url: str) -> str:
+    """The origin a browser would send in ``Origin`` for ``url``.
+
+    Scheme and authority only, lowercased, with the port dropped when it is the
+    scheme's default -- ``https://x:443/app`` and ``https://X`` are one origin
+    spelled three ways, and a CORS allowlist is matched by origin, not by
+    string.
+    """
+    parts = urlsplit(url.strip())
+    if not parts.scheme or not parts.hostname:
+        return ""
+    default_port = {"http": 80, "https": 443}.get(parts.scheme.lower())
+    try:
+        port = parts.port
+    except ValueError:
+        return ""
+    host = parts.hostname.lower()
+    if ":" in host:
+        host = f"[{host}]"
+    suffix = f":{port}" if port is not None and port != default_port else ""
+    return f"{parts.scheme.lower()}://{host}{suffix}"
+
+
 def check_configuration_shape(
     environment: ProductionEnvironment,
     *,
@@ -554,6 +580,18 @@ def check_configuration_shape(
         environment.public_app_url.startswith("https://")
         and not environment.public_app_url.endswith("/"),
         f"PUBLIC_APP_URL={environment.public_app_url!r}",
+    )
+
+    site_origin = browser_origin(environment.public_app_url)
+    allowed_origins = {browser_origin(item) for item in environment.cors_origins}
+    checks.add(
+        "public_app_url_is_allowed_by_cors",
+        site_origin and site_origin in allowed_origins,
+        f"{site_origin!r} appears in API_CORS_ORIGINS"
+        if site_origin and site_origin in allowed_origins
+        else f"PUBLIC_APP_URL is {environment.public_app_url!r}, an origin "
+        f"API_CORS_ORIGINS={list(environment.cors_origins)} does not admit, so "
+        "the browser would block every request the site makes",
     )
 
     checks.add(

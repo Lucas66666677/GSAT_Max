@@ -17,14 +17,22 @@
 # scripts/build_web.ps1 already refuses a plaintext production backend. This is
 # the same refusal for the public deployment path.
 #
-# Reads one argument and no environment variables, so it never sees a secret.
-# The one value it does handle is echoed only after userinfo and query strings
+# The backend is a separate deployment, so the API origin must also differ from
+# the site's own host. Naming the site itself is the '/api' mistake spelled
+# absolutely, and it fails the same way: the vercel.json rewrite answers every
+# path with the SPA shell, so requests come back 200 with HTML in them. The
+# optional site-host arguments are the names the caller knows the site by; each
+# one that is supplied is refused as an API origin.
+#
+# Reads its arguments and no environment variables, so it never sees a secret.
+# The one value it does echo is printed only after userinfo and query strings
 # are stripped, because build logs are not a place to put either.
 #
-# usage: check_api_base_url.sh <api-base-url>
+# usage: check_api_base_url.sh <api-base-url> [site-host...]
 set -euo pipefail
 
 url="${1-}"
+shift || true
 # A value pasted into a dashboard field often carries surrounding whitespace.
 url="${url#"${url%%[![:space:]]*}"}"
 url="${url%"${url##*[![:space:]]}"}"
@@ -103,5 +111,31 @@ case "$host" in
   *.* | *:*) ;;
   *) fail "'$host' has no domain suffix, so it is not publicly resolvable" ;;
 esac
+
+# The site's own host, under any name the caller passed. An API base URL naming
+# it is the same failure as the '/api' case rejected above: vercel.json rewrites
+# /(.*) to /index.html, so /health would answer 200 with the SPA shell and the
+# client would try to parse HTML as JSON. Comparison is by authority -- host
+# plus any non-default port -- because the site and the backend may legitimately
+# share a host on different ports, and 'x:443' and 'x' name one endpoint.
+authority() {
+  candidate="$1"
+  candidate="${candidate#*://}"
+  candidate="${candidate%%[/?#]*}"
+  case "$candidate" in *@*) candidate="${candidate#*@}" ;; esac
+  candidate="$(printf '%s' "$candidate" | tr '[:upper:]' '[:lower:]')"
+  case "$candidate" in *:443) candidate="${candidate%:443}" ;; esac
+  printf '%s' "$candidate"
+}
+
+api_authority="$(authority "$url")"
+for site in "$@"; do
+  # An unset VERCEL_URL or PUBLIC_APP_URL arrives as an empty argument: the
+  # caller does not know the site's host, so there is nothing to compare.
+  [ -n "$site" ] || continue
+  if [ "$api_authority" = "$(authority "$site")" ]; then
+    fail "'$api_authority' is the site's own origin; vercel.json rewrites /(.*) to /index.html, so it would return the SPA shell instead of the API"
+  fi
+done
 
 echo "check_api_base_url: '$host' is a usable public API origin"
