@@ -36,6 +36,23 @@ Upload the generated `build/web/` directory. The host must serve `index.html`
 as the fallback for unknown paths and must not cache `index.html` or
 `flutter_service_worker.js` permanently.
 
+## Response headers
+
+`web/_headers` declares the site's response headers: the security headers, the
+year-long immutable cache for `assets/` and `canvaskit/`, and the `no-cache`
+that keeps the two files above revalidated. That file is the Netlify and
+Cloudflare Pages format, and each host has to be told separately --
+`deploy/web/nginx.conf` carries the contract for the local full stack, and
+`vercel.json`'s `headers` array carries it for the public deployment, because
+Vercel does not read `_headers`. `flutter build web` copies `web/` into
+`build/web`, so a rule declared only in `_headers` ships as a text file at
+`/_headers` and is applied to nothing.
+
+`backend/tests/test_static_web_headers.py` holds the two in step: it parses both
+files and fails when the public host would send anything other than what the
+contract declares, when a file every release replaces is left cacheable, and
+when a `vercel.json` source is written in a form the check cannot read.
+
 ## Release preflight
 
 `backend/release_preflight.py` checks a release before it goes out: the shape of
