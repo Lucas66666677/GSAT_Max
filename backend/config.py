@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import ipaddress
 import os
 from pathlib import Path
+from urllib.parse import urlsplit
 
 from dotenv import load_dotenv
 
@@ -19,6 +21,43 @@ def normalize_database_url(url: str) -> str:
     if url.startswith("postgresql://"):
         return url.replace("postgresql://", "postgresql+psycopg://", 1)
     return url
+
+
+#: Reserved for the loopback interface by RFC 6761, so it never names a host a
+#: public browser could send a request from.
+_LOOPBACK_HOSTNAMES: frozenset[str] = frozenset({"localhost"})
+
+
+def is_public_origin(origin: str) -> bool:
+    """Whether ``origin`` names a host reachable from the public internet.
+
+    A browser on the public internet cannot send a request whose ``Origin`` is
+    a loopback, private, or link-local host, so such an entry in
+    ``API_CORS_ORIGINS`` is either a development leftover or a name that
+    resolves inside the deployment's own network. Either way production must
+    not hand it CORS credentials.
+
+    A name that is not an IP literal is treated as public: whether it resolves
+    somewhere private is a DNS question this validator cannot settle.
+    """
+    hostname = urlsplit(origin).hostname
+    if not hostname:
+        return False
+    if hostname in _LOOPBACK_HOSTNAMES or hostname.endswith(".localhost"):
+        return False
+    try:
+        address = ipaddress.ip_address(hostname)
+    except ValueError:
+        return True
+    if address.version == 6 and address.ipv4_mapped is not None:
+        # ``::ffff:10.0.0.1`` is the private IPv4 address it embeds.
+        address = address.ipv4_mapped
+    return not (
+        address.is_loopback
+        or address.is_private
+        or address.is_link_local
+        or address.is_unspecified
+    )
 
 
 def _csv_environment(name: str, default: str = "") -> tuple[str, ...]:
@@ -109,6 +148,15 @@ class Settings:
             or any(not origin.startswith("https://") for origin in self.cors_origins)
         ):
             raise RuntimeError("Production API_CORS_ORIGINS must contain explicit HTTPS origins.")
+        if self.is_production:
+            non_public = [
+                origin for origin in self.cors_origins if not is_public_origin(origin)
+            ]
+            if non_public:
+                raise RuntimeError(
+                    "Production API_CORS_ORIGINS must not contain loopback, private, "
+                    f"or link-local origins: {non_public}."
+                )
         if self.is_production and not self.public_app_url.startswith("https://"):
             raise RuntimeError("Production PUBLIC_APP_URL must use HTTPS.")
         if self.is_production and self.email_provider.lower() in {"development", "test"}:
