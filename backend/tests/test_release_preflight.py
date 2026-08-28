@@ -263,6 +263,87 @@ def test_parse_env_file_ignores_comments_and_strips_quotes(tmp_path: Path) -> No
 
 
 # --------------------------------------------------------------------------- #
+# The site's own origin must be admitted by CORS
+# --------------------------------------------------------------------------- #
+#
+# ``PUBLIC_APP_URL`` is the origin the release already treats as the browser's:
+# ``browser_origin_matches_public_app_url`` asserts the operator-supplied
+# ``--frontend-origin`` equals it. Nothing, however, required that origin to
+# appear in ``API_CORS_ORIGINS`` unless the operator remembered the optional
+# flag -- and a CORS allowlist that omits the site blocks every request in the
+# visitor's browser, where no backend check can see it happening.
+
+
+def test_a_cors_allowlist_that_omits_the_site_is_reported() -> None:
+    result = _configuration(
+        PUBLIC_APP_URL="https://gsat-max.example.com",
+        API_CORS_ORIGINS="https://gsat-max-staging.example.com",
+    )["public_app_url_is_allowed_by_cors"]
+    assert result.passed is False
+    assert "block every request" in result.detail
+
+
+def test_the_check_does_not_wait_for_the_optional_frontend_origin_flag() -> None:
+    """The regression this exists for: the release ran without --frontend-origin."""
+    report = run_preflight(
+        _environment(API_CORS_ORIGINS="https://other.example"), frontend_origin=None
+    )
+    assert report.result("public_app_url_is_allowed_by_cors").passed is False
+    assert "browser_origin_is_allowed_by_cors" not in {
+        result.name for result in report.results
+    }
+
+
+@pytest.mark.parametrize(
+    "public_app_url, cors_origins",
+    [
+        (FRONTEND_ORIGIN, FRONTEND_ORIGIN),
+        # One origin, spelled differently on either side.
+        (FRONTEND_ORIGIN, FRONTEND_ORIGIN + ":443"),
+        (FRONTEND_ORIGIN + ":443", FRONTEND_ORIGIN),
+        ("https://GSAT-Max.Example.com", FRONTEND_ORIGIN),
+        # The site is one entry among several.
+        (FRONTEND_ORIGIN, f"https://admin.example.com,{FRONTEND_ORIGIN}"),
+    ],
+)
+def test_an_admitted_site_origin_passes(public_app_url: str, cors_origins: str) -> None:
+    result = _configuration(
+        PUBLIC_APP_URL=public_app_url, API_CORS_ORIGINS=cors_origins
+    )["public_app_url_is_allowed_by_cors"]
+    assert result.passed is True
+
+
+def test_a_port_is_part_of_the_origin() -> None:
+    """A browser sends the port, so :8443 and :443 are different origins."""
+    result = _configuration(
+        PUBLIC_APP_URL="https://gsat-max.example.com:8443",
+        API_CORS_ORIGINS=FRONTEND_ORIGIN,
+    )["public_app_url_is_allowed_by_cors"]
+    assert result.passed is False
+
+
+@pytest.mark.parametrize(
+    "url, expected",
+    [
+        ("https://gsat-max.example.com", "https://gsat-max.example.com"),
+        ("https://gsat-max.example.com:443", "https://gsat-max.example.com"),
+        ("https://GSAT-Max.Example.COM/app", "https://gsat-max.example.com"),
+        ("http://localhost:8080", "http://localhost:8080"),
+        ("http://localhost:80", "http://localhost"),
+        ("https://[2606:4700::1111]:8443", "https://[2606:4700::1111]:8443"),
+        # Not an origin at all.
+        ("gsat-max.example.com", ""),
+        ("", ""),
+        ("https://", ""),
+    ],
+)
+def test_browser_origin_reduces_a_url_to_the_origin_a_browser_sends(
+    url: str, expected: str
+) -> None:
+    assert release_preflight.browser_origin(url) == expected
+
+
+# --------------------------------------------------------------------------- #
 # 2. Database migration readiness
 # --------------------------------------------------------------------------- #
 
