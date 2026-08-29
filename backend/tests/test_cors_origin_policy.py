@@ -23,6 +23,9 @@ def _production_settings(*origins: str) -> Settings:
         load_settings(),
         app_env="production",
         cors_origins=origins,
+        # Production also requires a durable database; the suite runs on
+        # SQLite. See test_production_database_contract.py.
+        database_url="postgresql+psycopg://gsatmax@db.internal.example:5432/gsatmax",
         jwt_secret_key="p" * 48,
         public_app_url=PUBLIC_ORIGIN,
         email_provider="resend",

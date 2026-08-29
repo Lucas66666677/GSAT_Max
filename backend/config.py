@@ -60,6 +60,27 @@ def is_public_origin(origin: str) -> bool:
     )
 
 
+def is_durable_database_url(url: str) -> bool:
+    """Whether ``url`` names a database that outlives the container serving it.
+
+    SQLite is a file inside the container's own filesystem. A production
+    service pointed at one loses every row on the next deploy, and disagrees
+    with itself the moment a second replica starts -- while answering
+    ``/health`` with ``"database": "reachable"`` throughout, because the file
+    genuinely is reachable. A URL with no host names a local file for the same
+    reason, whatever its scheme claims.
+
+    This is the predicate ``release_preflight``'s ``database_url_is_durable_
+    postgres`` check applies to a release. It is stated here so the running
+    process applies it too: the preflight is a script someone remembers to
+    run, and :meth:`Settings.validate` is what the deployment cannot skip.
+    """
+    split = urlsplit(url)
+    if split.scheme.startswith("sqlite"):
+        return False
+    return bool(split.hostname)
+
+
 def _csv_environment(name: str, default: str = "") -> tuple[str, ...]:
     return tuple(
         item.strip().rstrip("/")
@@ -135,6 +156,15 @@ class Settings:
         return self.app_env.lower() == "production"
 
     def validate(self) -> None:
+        if self.is_production and not is_durable_database_url(self.database_url):
+            # The message names no value: DATABASE_URL carries a password.
+            raise RuntimeError(
+                "Production DATABASE_URL must name a durable networked "
+                "database. SQLite and host-less URLs are files inside the "
+                "container and do not survive a replacement. Note that "
+                "leaving DATABASE_URL unset selects the SQLite development "
+                "default rather than failing."
+            )
         if self.is_production and (
             self.jwt_secret_key == "change-this-dev-secret"
             or len(self.jwt_secret_key) < 32
