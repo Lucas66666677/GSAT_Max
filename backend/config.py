@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 import ipaddress
 import os
+import re
 from pathlib import Path
 from urllib.parse import urlsplit
 
@@ -81,6 +82,42 @@ def is_durable_database_url(url: str) -> bool:
     return bool(split.hostname)
 
 
+#: Render sets this to the deployed commit on every service, at build time and
+#: at runtime. It is the only source the revision below is read from.
+REVISION_ENV_VAR = "RENDER_GIT_COMMIT"
+
+#: A commit SHA, and nothing that is not one. The lower bound is git's own
+#: abbreviation floor, so a short SHA set by hand on a host that is not Render
+#: stays usable; the upper bound is a full SHA-1. Anchored, because an
+#: unanchored pattern would find a SHA inside a longer string and publish a
+#: value the platform never set.
+_COMMIT_SHA = re.compile(r"\A[0-9a-fA-F]{7,40}\Z")
+
+
+def commit_sha_or_none(value: str | None) -> str | None:
+    """``value`` as a normalized commit SHA, or ``None`` when it is not one.
+
+    ``GET /version`` publishes the result, and that route is unauthenticated
+    like ``/livez`` -- so this is a whitelist rather than a check. A variable's
+    failure mode is holding the wrong thing: a database URL, an API key, a
+    pasted ``.env`` line. A presence or length test would republish every one
+    of those to any caller that probes the endpoint. Only hexadecimal can leave
+    this function, so none of them can.
+
+    The rejected value is deliberately not reported anywhere. The reason to
+    refuse it is that it might be a secret, so logging it would move the leak
+    into the log aggregator rather than close it.
+    """
+    if value is None:
+        return None
+
+    candidate = value.strip()
+    if not _COMMIT_SHA.match(candidate):
+        return None
+
+    return candidate.lower()
+
+
 def _csv_environment(name: str, default: str = "") -> tuple[str, ...]:
     return tuple(
         item.strip().rstrip("/")
@@ -150,6 +187,7 @@ class Settings:
     email_from: str
     public_app_url: str
     tesseract_cmd: str | None
+    revision: str | None
 
     @property
     def is_production(self) -> bool:
@@ -242,6 +280,7 @@ def load_settings() -> Settings:
         email_from=os.getenv("EMAIL_FROM", "no-reply@gsat-max.local"),
         public_app_url=os.getenv("PUBLIC_APP_URL", "http://localhost:8080").rstrip("/"),
         tesseract_cmd=_tesseract_command(),
+        revision=commit_sha_or_none(os.getenv(REVISION_ENV_VAR)),
     )
     settings.validate()
     return settings

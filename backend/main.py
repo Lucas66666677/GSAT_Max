@@ -952,6 +952,33 @@ def liveness_probe() -> dict[str, str]:
     return {"status": "alive"}
 
 
+@app.get("/version", tags=["system"])
+def deployed_revision_probe() -> dict[str, str | None]:
+    """Report which commit this process was built from, and nothing else.
+
+    A third route rather than a field on either health route, because both of
+    those payloads are contracts something already reads: the deployment health
+    gate probes ``/livez``, and ``release_preflight``'s ``health`` section pins
+    ``/health``'s field set exactly, so an addition there fails the release
+    rather than passing it. A different question gets its own payload.
+
+    The three answers, and what each settles:
+
+    * **404** -- the running build predates this route. That is a revision fact
+      on its own: whatever is deployed is older than this commit.
+    * ``{"revision": null}`` -- this build or later is deployed, and
+      ``RENDER_GIT_COMMIT`` is unset or is not a commit SHA.
+    * ``{"revision": "<sha>"}`` -- the exact commit.
+
+    Like ``/livez`` this route consults nothing, so it still answers while the
+    database is unreachable -- which is when "did my deploy land?" gets asked.
+    It is also unauthenticated, so it does not decide what is safe to publish:
+    ``config.commit_sha_or_none`` does, by returning nothing that is not
+    hexadecimal.
+    """
+    return {"revision": settings.revision}
+
+
 @app.get("/health", tags=["system"])
 def health_check(db: Session = Depends(get_db)) -> dict[str, Any]:
     db.execute(text("SELECT 1"))
