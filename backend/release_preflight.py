@@ -28,7 +28,9 @@ the development defaults rather than the production ones:
    route, ``/health`` stays unauthenticated, the Host allowlist runs
    ahead of CORS, and the health payload -- the fields the handler actually
    returns, not just the ones declared here -- exposes neither a secret-shaped
-   field name nor a field whose value is built out of a secret.
+   field name nor a field whose value is built out of a secret. ``/version``
+   is held to a stricter rule than a marker scan: it may serve the deployed
+   commit and nothing else, so no configuration reaches it by accretion.
 4. **Frontend-to-backend URL wiring** -- the backend host the web build is
    compiled against is one the backend's own ``TrustedHostMiddleware`` will
    accept, the ``--dart-define`` names the build scripts pass are the ones the
@@ -93,7 +95,14 @@ CREDENTIALED_URL_ENV_KEYS: frozenset[str] = frozenset({"DATABASE_URL"})
 
 #: Supplied by the operating system or the CI runner rather than by our
 #: deployment configuration, so ``.env.example`` is not expected to list them.
-PLATFORM_ENV_KEYS: frozenset[str] = frozenset({"CI", "LOCALAPPDATA", "PATH"})
+#: ``RENDER_GIT_COMMIT`` belongs here rather than in ``.env.example`` for a
+#: stronger reason than convenience: Render sets it per deploy, so a value
+#: written into our own configuration would pin ``/version`` to whatever commit
+#: was current when someone typed it, and the route would then confidently
+#: report the wrong revision forever.
+PLATFORM_ENV_KEYS: frozenset[str] = frozenset(
+    {"CI", "LOCALAPPDATA", "PATH", "RENDER_GIT_COMMIT"}
+)
 
 #: The modules that make up the running service. A variable read anywhere in
 #: them is deployment configuration and has to be documented.
@@ -145,6 +154,18 @@ LIVENESS_ROUTE = "/livez"
 #: Readiness. Executes a query, so it reports the database too. A gate
 #: pointed here fails on a dependency blip rather than on the process.
 READINESS_ROUTE = "/health"
+
+#: Deployed revision. Unauthenticated like the two above, and answering a
+#: question an operator asks precisely when a release is suspect, so it must
+#: publish the commit and nothing else about the configuration.
+VERSION_ROUTE = "/version"
+
+#: The one expression ``/version`` is allowed to serve. Stated as source text
+#: because that is what :func:`health_payload_sources` returns: the check reads
+#: what produces the value, not the value, so no configuration is read here
+#: either. Anything else -- ``settings.app_env``, an f-string, a bare env read
+#: -- fails the release rather than shipping a second field on a public route.
+VERSION_PAYLOAD_EXPRESSION = "settings.revision"
 
 #: Routes the mobile and web clients call by these exact paths, plus the
 #: liveness route the deployment health gate probes: dropping it would leave
@@ -422,17 +443,59 @@ def parse_env_file(path: Path) -> dict[str, str]:
 # --------------------------------------------------------------------------- #
 
 
+def _module_level_string_constants(trees: dict[str, ast.Module]) -> dict[str, str]:
+    """Upper-case module-level ``NAME = "value"`` bindings across the runtime.
+
+    Collected across every runtime module at once, because one of them names a
+    variable and another may be the one that reads it.
+    """
+    constants: dict[str, str] = {}
+    for tree in trees.values():
+        for statement in tree.body:
+            if not isinstance(statement, ast.Assign):
+                continue
+            if not (
+                isinstance(statement.value, ast.Constant)
+                and isinstance(statement.value.value, str)
+            ):
+                continue
+            for target in statement.targets:
+                if isinstance(target, ast.Name) and target.id.isupper():
+                    constants[target.id] = statement.value.value
+    return constants
+
+
 def environment_keys_read_by_runtime(project_root: Path = PROJECT_ROOT) -> set[str]:
     """Environment variables the running service reads, discovered via AST.
 
     Covers ``os.getenv``/``os.environ`` plus ``backend.config``'s own
     ``_csv_environment``/``_bool_environment`` helpers, each of which takes the
     variable name as its first argument.
+
+    The name is resolved through a module-level constant when the call passes
+    one -- ``os.getenv(REVISION_ENV_VAR)`` reads ``RENDER_GIT_COMMIT`` as
+    surely as spelling it out does. Matching only string literals left a read
+    behind one indirection invisible here, and an undocumented variable is
+    exactly what this function exists to surface.
     """
     readers = {"getenv", "get", "_csv_environment", "_bool_environment"}
+    trees = {
+        relative: ast.parse((project_root / relative).read_text(encoding="utf-8"))
+        for relative in RUNTIME_CONFIG_MODULES
+    }
+    constants = _module_level_string_constants(trees)
+
+    def _key(node: ast.expr) -> str | None:
+        """The variable name an argument names, literally or via a constant."""
+
+        if isinstance(node, ast.Constant) and isinstance(node.value, str):
+            return node.value
+        if isinstance(node, ast.Name):
+            return constants.get(node.id)
+        return None
+
     names: set[str] = set()
-    for relative in RUNTIME_CONFIG_MODULES:
-        tree = ast.parse((project_root / relative).read_text(encoding="utf-8"))
+    for tree in trees.values():
         for node in ast.walk(tree):
             if isinstance(node, ast.Call) and node.args:
                 function = node.func
@@ -441,23 +504,18 @@ def environment_keys_read_by_runtime(project_root: Path = PROJECT_ROOT) -> set[s
                     if isinstance(function, ast.Attribute)
                     else function.id if isinstance(function, ast.Name) else ""
                 )
-                first = node.args[0]
-                if (
-                    called in readers
-                    and isinstance(first, ast.Constant)
-                    and isinstance(first.value, str)
-                    and first.value.isupper()
-                ):
-                    names.add(first.value)
+                first = _key(node.args[0])
+                if called in readers and first is not None and first.isupper():
+                    names.add(first)
             elif isinstance(node, ast.Subscript):
-                target, key = node.value, node.slice
+                target = node.value
+                key = _key(node.slice)
                 if (
                     isinstance(target, ast.Attribute)
                     and target.attr == "environ"
-                    and isinstance(key, ast.Constant)
-                    and isinstance(key.value, str)
+                    and key is not None
                 ):
-                    names.add(key.value)
+                    names.add(key)
     return names - PLATFORM_ENV_KEYS
 
 
@@ -1226,6 +1284,60 @@ def check_health_contract(*, project_root: Path = PROJECT_ROOT) -> list[CheckRes
         if not live_served
         else f"unauthenticated {LIVENESS_ROUTE} fields are computed: "
         + "; ".join(computed),
+    )
+
+    # The deployed-revision route. Everything above answers "is the service
+    # healthy?"; this answers "is it the build I shipped?", which is the
+    # question every other check silently assumes. A preflight that passes
+    # against a revision nobody can name has proved something about the
+    # repository, not about the deployment.
+    version = next(
+        (
+            route
+            for route in backend_main.app.routes
+            if getattr(route, "path", "") == VERSION_ROUTE
+        ),
+        None,
+    )
+    version_injected = [
+        dependency.name
+        for dependency in getattr(
+            getattr(version, "dependant", None), "dependencies", ()
+        )
+    ]
+    checks.add(
+        "version_route_answers_without_a_dependency",
+        version is not None and not version_injected,
+        f"{VERSION_ROUTE} answers from the process alone"
+        if version is not None and not version_injected
+        else f"{VERSION_ROUTE} is not registered"
+        if version is None
+        else f"{VERSION_ROUTE} injects {version_injected}, so the one route "
+        "that says which build is running would stop answering during exactly "
+        "the incident that prompts the question",
+    )
+
+    # Whitelist the payload rather than scanning it for secret-shaped names.
+    # `/health` is scanned that way because it legitimately reports several
+    # facts and the check has to tell apart the safe ones; `/version` reports
+    # one thing, so the stricter rule is available and worth taking. It rejects
+    # `environment` and `service` -- neither secret-shaped, both configuration
+    # -- which a marker scan would wave through.
+    version_served = health_payload_sources(project_root, route=VERSION_ROUTE)
+    version_leaks = sorted(
+        f"{field}={expression}"
+        for field, expression in version_served.items()
+        if field != "revision" or expression != VERSION_PAYLOAD_EXPRESSION
+    )
+    checks.add(
+        "version_payload_is_the_revision_and_nothing_else",
+        bool(version_served) and not version_leaks,
+        f"{VERSION_ROUTE} serves only {VERSION_PAYLOAD_EXPRESSION}"
+        if version_served and not version_leaks
+        else f"{VERSION_ROUTE} payload could not be read from backend/main.py"
+        if not version_served
+        else f"unauthenticated {VERSION_ROUTE} fields beyond the revision: "
+        + "; ".join(version_leaks),
     )
 
     probed = deployment_health_gate_probe(project_root)

@@ -113,6 +113,57 @@ grows a field built from anything but a literal; and `/livez` is in
 `REQUIRED_ROUTES`, so deleting it fails the release rather than leaving the gate
 probing a 404.
 
+## Which revision is deployed
+
+`GET /version` reports the commit the running process was built from:
+
+```json
+{ "revision": "b9254220e7c1a83f45d6b0e29fc7a418d35e0c6b" }
+```
+
+```bash
+curl -fsS https://gsat-max-api-lucas.onrender.com/version
+```
+
+Three answers, each settling something different:
+
+| Response | What is deployed |
+| --- | --- |
+| `404` | A build older than the commit that added this route — a merge has not reached the service |
+| `{"revision": null}` | This build or later, with `RENDER_GIT_COMMIT` unset or not a commit SHA |
+| `{"revision": "<sha>"}` | Exactly that commit |
+
+Compare the value with `git rev-parse origin/main` to tell a service running
+current `main` from one still serving an earlier build. Check it *before* the
+checklist below: every other post-deploy check is misleading if the build being
+checked is not the one you shipped.
+
+Like `/livez`, the route injects no dependency, so it still answers while the
+database is unreachable — which is when the question usually gets asked.
+
+`RENDER_GIT_COMMIT` is set by Render itself, per deploy, at build time and at
+runtime. **Do not put it in `.env.example` or in the service's own environment
+variables.** A value written into our configuration by hand would pin `/version`
+to whatever commit was current when it was typed, and the route would then
+report the wrong revision with full confidence — worse than reporting none.
+`PLATFORM_ENV_KEYS` in the preflight records that classification, and a test
+fails if the variable ever appears in `.env.example`.
+
+The route is unauthenticated, so `config.commit_sha_or_none` decides what may
+leave it: 7–40 anchored hexadecimal characters, normalized to lowercase, and
+nothing else. A variable holding a database URL, a provider key or a pasted
+`.env` line reports `null` rather than being echoed to an anonymous caller, and
+the rejected value is not logged either — the reason to refuse it is that it
+might be a secret, so logging it would move the leak rather than close it.
+
+Two preflight checks hold the route to that. `version_route_answers_without_a_dependency`
+fails if it ever grows an injected dependency. `version_payload_is_the_revision_and_nothing_else`
+is stricter than the marker scan `/health` gets: `/health` legitimately reports
+several facts, so its check has to tell the safe ones apart, while `/version`
+reports one thing and is therefore whitelisted to exactly `settings.revision`.
+That rejects `environment` or `service` — neither secret-shaped, both
+configuration — which a marker scan would wave through.
+
 ## Production checklist
 
 1. Terminate TLS at the hosting platform or an outer reverse proxy.
